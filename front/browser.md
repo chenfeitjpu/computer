@@ -29,7 +29,7 @@
   - 端口相同
  
  限制范围
-  - Cookie、LocalStorage 和 IndexDB 无法读取
+  - Cookie、SessionStorage、LocalStorage 和 IndexDB 无法读取
   - DOM 无法获得
   - AJAX 请求不能发送
  
