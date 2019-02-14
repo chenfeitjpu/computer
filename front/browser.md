@@ -38,7 +38,17 @@
   - Cookie、SessionStorage、LocalStorage 和 IndexDB 无法读取
   - DOM 无法获得
   - AJAX 请求不能发送
- 
- 
+## AJAX ##
+同源政策规定，AJAX请求只能发给同源的网址，否则就报错。
+有三种方法规避这个限制
+  - JSONP
+  - CORS
+  - WebSocket
+### JSONP ###
+JSONP是服务器与客户端跨源通信的常用方法。最大特点就是简单适用，老式浏览器全部支持，服务器改造非常小。  
+它的基本思想是，网页通过添加一个<script>元素，向服务器请求JSON数据，这种做法不受同源政策限制；服务器收到请求后，将数据放在一个指定名字的回调函数里传回来。
+### CORS ###
+CORS全称是"跨域资源共享"（Cross-origin resource sharing）  
+
  
 
