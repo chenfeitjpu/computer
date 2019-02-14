@@ -12,10 +12,11 @@
 对于对象参数来说，可以使用以下几个属性
  - capture，布尔值，和 useCapture 作用一样
  - once，布尔值，值为 true 表示该回调只会调用一次，调用后会移除监听
- - passive，布尔值，表示永远不会调用 preventDefault
- 
-一般来说，我们只希望事件只触发在目标上，这时候可以使用 stopPropagation 来阻止事件的进一步传播。通常我们认为 stopPropagation 是用来阻止事件冒泡的，其实该函数也可以阻止捕获事件。<br>
-stopImmediatePropagation 同样也能实现阻止事件，还能阻止该事件目标执行别的注册事件。
+ - passive，布尔值，表示永远不会调用 preventDefault 
+## 事件阻止 ##
+  - 一般来说，我们只希望事件只触发在目标上，这时候可以使用 stopPropagation 来阻止事件的进一步传播。通常我们认为 stopPropagation 是用来阻止事件冒泡的，其实该函数也可以阻止捕获事件。<br>
+  - stopImmediatePropagation 同样也能实现阻止事件，还能阻止该事件目标执行别的注册事件。
+  - preventDefault 阻止事件关联的默认动作，如果 Event 对象的 cancelable 属性是 fasle，那么就没有默认动作，或者不能阻止默认动作。
 ## 事件代理 ##
 如果一个节点中的子节点是动态生成的，那么子节点需要注册事件的话应该注册在父节点上
 事件代理的方式相对于直接给目标注册事件来说，有以下优点
