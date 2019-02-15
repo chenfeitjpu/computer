@@ -4,11 +4,17 @@
   * [事件阻止](#%E4%BA%8B%E4%BB%B6%E9%98%BB%E6%AD%A2)
   * [事件代理](#%E4%BA%8B%E4%BB%B6%E4%BB%A3%E7%90%86)
 * [同源策略](#%E5%90%8C%E6%BA%90%E7%AD%96%E7%95%A5)
+  * [Cookie](#cookie)
+  * [DOM](#dom)
   * [AJAX](#ajax)
     * [JSONP](#jsonp)
     * [CORS](#cors)
       * [简单请求](#%E7%AE%80%E5%8D%95%E8%AF%B7%E6%B1%82)
       * [非简单请求](#%E9%9D%9E%E7%AE%80%E5%8D%95%E8%AF%B7%E6%B1%82)
+  * [跨域窗口的通信](#%E8%B7%A8%E5%9F%9F%E7%AA%97%E5%8F%A3%E7%9A%84%E9%80%9A%E4%BF%A1)
+    * [片段识别符](#%E7%89%87%E6%AE%B5%E8%AF%86%E5%88%AB%E7%AC%A6)
+    * [window\.name](#windowname)
+    * [跨文档通信API](#%E8%B7%A8%E6%96%87%E6%A1%A3%E9%80%9A%E4%BF%A1api)
 
 # 事件 #
 ## 事件触发 ##
@@ -44,6 +50,12 @@
   - Cookie、SessionStorage、LocalStorage 和 IndexDB 无法读取
   - DOM 无法获得
   - AJAX 请求不能发送
+## Cookie ##
+Cookie 是服务器写入浏览器的一小段信息，只有同源的网页才能共享。  
+浏览器允许通过设置document.domain共享 Cookie，此方法只适用于不同子域(一级域名相同)的框架间( iframe )交互
+## DOM ##
+如果两个网页不同源，就无法拿到对方的DOM。典型的例子是iframe窗口和window.open方法打开的窗口，它们与父窗口无法通信。
+设置document.domain属性，就可以规避同源政策，拿到DOM。此方法只适用于不同子域(一级域名相同)的框架间( iframe )交互
 ## AJAX ##
 同源政策规定，AJAX请求只能发给同源的网址，否则就报错。
 有三种方法规避这个限制
@@ -76,20 +88,37 @@ CORS全称是"跨域资源共享"（Cross-origin resource sharing）。它允许
 如果要把Cookie发到服务器，一方面要服务器同意，指定Access-Control-Allow-Credentials字段。另一方面，开发者必须在AJAX请求中打开withCredentials属性  
 需要注意的是，如果要发送Cookie，Access-Control-Allow-Origin就不能设为星号，必须指定明确的、与请求网页一致的域名。同时，Cookie依然遵循同源政策，只有用服务器域名设置的Cookie才会上传，其他域名的Cookie并不会上传，且（跨源）原网页代码中的document.cookie也无法读取服务器域名下的Cookie。
 #### 非简单请求 ####
-非简单请求的CORS请求，会在正式通信之前，增加一次HTTP查询请求，称为"预检"请求（preflight）。  
-##### 预检请求 #####
-"预检"请求用的请求方法是OPTIONS，表示这个请求是用来询问的。头信息里面，关键字段是Origin，表示请求来自哪个源。除了Origin字段，"预检"请求的头信息包括两个特殊字段。	
-  - Access-Control-Request-Method 用来列出浏览器的CORS请求会用到哪些HTTP方法
-  - Access-Control-Request-Headers 该字段可选，是一个逗号分隔的字符串，指定浏览器CORS请求会额外发送的头信息字段
-
-服务器回应的CORS相关字段
-  - Access-Control-Allow-Origin 服务器许可域名
-  - Access-Control-Allow-Methods 它的值是逗号分隔的一个字符串
-  - Access-Control-Allow-Headers 该字段可选，是一个逗号分隔的字符串，表明服务器支持的所有头信息字段
-  - Access-Control-Allow-Credentials 该字段可选，它是一个布尔值，表示是否允许发送Cookie
-  - Access-Control-Max-Age 该字段可选，用来指定本次预检请求的有效期，单位为秒。在此期间，不用发出另一条预检请求。
+非简单请求的CORS请求，会在正式通信之前，增加一次HTTP查询请求，称为"预检"请求（preflight）。
+	##### 预检请求 #####
+	"预检"请求用的请求方法是OPTIONS，表示这个请求是用来询问的。头信息里面，关键字段是Origin，表示请求来自哪个源。除了Origin字段，"预检"请求的头信息包括两个特殊字段。
+	- Access-Control-Request-Method 用来列出浏览器的CORS请求会用到哪些HTTP方法
+	- Access-Control-Request-Headers 该字段可选，是一个逗号分隔的字符串，指定浏览器CORS请求会额外发送的头信息字段
+	服务器回应的CORS相关字段
+	- Access-Control-Allow-Origin 服务器许可域名
+	- Access-Control-Allow-Methods 它的值是逗号分隔的一个字符串
+	- Access-Control-Allow-Headers 该字段可选，是一个逗号分隔的字符串，表明服务器支持的所有头信息字段
+	- Access-Control-Allow-Credentials 该字段可选，它是一个布尔值，表示是否允许发送Cookie
+	- Access-Control-Max-Age 该字段可选，用来指定本次预检请求的有效期，单位为秒。在此期间，不用发出另一条预检请求。
 	
 一旦服务器通过了"预检"请求，以后每次浏览器正常的CORS请求，就都跟简单请求一样，会有一个Origin头信息字段。服务器的回应，也都会有一个Access-Control-Allow-Origin头信息字段。
+## 跨域窗口的通信 ##
+  - 片段识别符
+  - window.name
+  - 跨文档通信API
+### 片段识别符 ###
+片段标识符（fragment identifier）指的是，URL的#号后面的部分，通过监听hashchange事件得到通知。
+### window.name ###
+浏览器窗口有window.name属性。这个属性的最大特点是，无论是否同源，只要在同一个窗口里，前一个网页设置了这个属性，后一个网页可以读取它。
+### 跨文档通信API ###
+跨文档通信 API（Cross-document messaging）。这个API为window对象新增了一个window.postMessage方法，允许跨窗口通信，不论这两个窗口是否同源。
+
+postMessage方法的第一个参数是具体的信息内容，第二个参数是接收消息的窗口的源（origin）
+
+父窗口和子窗口都可以通过message事件，监听对方的消息。
+message事件的事件对象event，提供以下三个属性。
+  - event.source 发送消息的窗口
+  - event.origin 发送消息的窗口的源
+  - event.data 消息内容
 
 
 	
