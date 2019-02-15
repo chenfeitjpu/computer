@@ -18,6 +18,8 @@
 * [存储](#%E5%AD%98%E5%82%A8)
   * [Cookie](#cookie-1)
 * [渲染机制](#%E6%B8%B2%E6%9F%93%E6%9C%BA%E5%88%B6)
+  * [Load 和 DOMContentLoaded](#load-%E5%92%8C-domcontentloaded)
+  * [重绘（Repaint）和回流（Reflow）](#%E9%87%8D%E7%BB%98repaint%E5%92%8C%E5%9B%9E%E6%B5%81reflow)
 
 # 事件 #
 ## 事件触发 ##
@@ -149,3 +151,12 @@ message事件的事件对象event，提供以下三个属性。
 ![渲染机制](../images/paint.png)
 CSS 的解析会阻塞脚本的执行，而脚本会阻塞 HTML 的解析。
 
+## Load 和 DOMContentLoaded ##
+Load 事件触发代表页面中的 DOM，CSS，JS，图片已经全部加载完毕。<br>
+DOMContentLoaded 事件触发代表初始的 HTML 被完全加载和解析，不需要等待 CSS，JS，图片加载。
+## 重绘（Repaint）和回流（Reflow） ##
+重绘和回流是渲染步骤中的一小节，但是这两个步骤对于性能影响很大。
+  - 重绘是当节点需要更改外观而不会影响布局的
+  - 回流是布局或者几何属性需要改变就称为回流
+  
+  回流必定会发生重绘，重绘不一定会引发回流。回流所需的成本比重绘高的多，改变深层次的节点很可能导致父节点的一系列回流。
