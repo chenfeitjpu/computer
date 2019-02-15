@@ -53,6 +53,27 @@ JSONP是服务器与客户端跨源通信的常用方法。最大特点就是简
 它的基本思想是，网页通过添加一个<script>元素，向服务器请求JSON数据，这种做法不受同源政策限制；服务器收到请求后，将数据放在一个指定名字的回调函数里传回来。
 ### CORS ###
 CORS全称是"跨域资源共享"（Cross-origin resource sharing）  
+它允许浏览器向跨源服务器，发出XMLHttpRequest请求，从而克服了AJAX只能同源使用的限制。  
+浏览器将CORS请求分成两类：简单请求（simple request）和非简单请求（not-so-simple request）。
+满足以下条件就属于简单请求
+  - 请求方法是以下三种方法之一
+    - HEAD
+	- GET
+	- POST
+  - 人为设置HTTP的头信息不超出以下几种字段
+	- Accept
+	- Accept-Language
+	- Content-Language
+	- Last-Event-ID
+	- Content-Type：只限于三个值 application/x-www-form-urlencoded、multipart/form-data、text/plain
+#### 简单请求 ####
+对于简单请求，浏览器直接发出CORS请求。具体来说，就是在头信息之中，增加一个Origin字段。  
+如果Origin指定的域名在许可范围内，服务器返回的响应，会多出几个头信息字段。
+  - Access-Control-Allow-Origin 服务器许可域名
+  - Access-Control-Allow-Credentials 该字段可选，它是一个布尔值，表示是否允许发送Cookie。
+  - Access-Control-Expose-Headers 该字段可选，获取其他头字段
 
+
+	
  
 
