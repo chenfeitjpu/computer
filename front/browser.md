@@ -100,6 +100,7 @@ CORS全称是"跨域资源共享"（Cross-origin resource sharing）。它允许
 "预检"请求用的请求方法是OPTIONS，表示这个请求是用来询问的。头信息里面，关键字段是Origin，表示请求来自哪个源。除了Origin字段，"预检"请求的头信息包括两个特殊字段。
   - Access-Control-Request-Method 用来列出浏览器的CORS请求会用到哪些HTTP方法
 	- Access-Control-Request-Headers 该字段可选，是一个逗号分隔的字符串，指定浏览器CORS请求会额外发送的头信息字段
+
 服务器回应的CORS相关字段
 	- Access-Control-Allow-Origin 服务器许可域名
 	- Access-Control-Allow-Methods 它的值是逗号分隔的一个字符串
