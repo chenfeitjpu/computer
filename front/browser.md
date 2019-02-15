@@ -123,7 +123,7 @@ message事件的事件对象event，提供以下三个属性。
   - event.data 消息内容
 
 # 存储 #
-| 特性 | Cookie | SessionStorage | LocalStorage | IndexedDB |
+| 特性  | Cookie | SessionStorage | LocalStorage | IndexedDB |
 | ----------- | ---------- | ---------- |
 | 生命周期 | 一般由服务器生成，可以设置过期时间 | 页面关闭就清理 | 页面关闭就清理 | 除非被清理，否则一直存在 |
 | ---------- | ---------- | ---------- |
