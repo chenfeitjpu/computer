@@ -146,6 +146,6 @@ message事件的事件对象event，提供以下三个属性。
   - 将 DOM 与 CSSOM 合并成一个渲染树。
   - 根据渲染树来布局，计算每个节点的位置。
   - 调用 GPU 绘制，合成图层，显示在屏幕上。
-![alt](../images/paint.png)
+![渲染机制](../images/paint.png)
 CSS 的解析会阻塞脚本的执行，而脚本会阻塞 HTML 的解析。
 
