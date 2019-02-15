@@ -123,7 +123,7 @@ message事件的事件对象event，提供以下三个属性。
   - event.data 消息内容
 
 # 存储 #
-| First Header  | Second Header |
+| 特性  | Second Header |
 | ------------- | ------------- |
 | Content Cell  | Content Cell  |
 | Content Cell  | Content Cell  |
