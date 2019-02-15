@@ -123,15 +123,15 @@ message事件的事件对象event，提供以下三个属性。
   - event.data 消息内容
 
 # 存储 #
-| 特性  | Cookie | SessionStorage | LocalStorage | IndexedDB |
-| ------- | ---------- | ---------- |
+| 特性 | Cookie | SessionStorage | LocalStorage | IndexedDB |
+| --- | --- | --- | --- | --- |
 | 生命周期 | 一般由服务器生成，可以设置过期时间 | 页面关闭就清理 | 页面关闭就清理 | 除非被清理，否则一直存在 |
 | 存储大小 | 4K | 5M | 5M | 无限 |
-| 通信     | 每次都会携带在 header 中 | 不参与 | 不参与 | 不参与 |
+| 通信 | 每次都会携带在 header 中 | 不参与 | 不参与 | 不参与 |
 ## Cookie ##
 对于 cookie，我们需要注意安全性。
 | 属性 | 作用 |
-| ---------- | ----------- |
+| --- | --- |
 | value | 如果用于保存用户登录态，应该将该值加密，不能使用明文的用户标识 |
 | http-only | 不能通过 JS 访问 Cookie，减少 XSS 攻击 |
 | secure | 只能在协议为 HTTPS 的请求中携带 |
