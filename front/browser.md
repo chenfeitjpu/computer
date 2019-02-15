@@ -19,6 +19,7 @@
   * [Cookie](#cookie-1)
 * [渲染机制](#%E6%B8%B2%E6%9F%93%E6%9C%BA%E5%88%B6)
   * [Load 和 DOMContentLoaded](#load-%E5%92%8C-domcontentloaded)
+  * [图层](#%E5%9B%BE%E5%B1%82)
   * [重绘（Repaint）和回流（Reflow）](#%E9%87%8D%E7%BB%98repaint%E5%92%8C%E5%9B%9E%E6%B5%81reflow)
 
 # 事件 #
