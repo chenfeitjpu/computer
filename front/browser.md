@@ -76,11 +76,13 @@ CORS全称是"跨域资源共享"（Cross-origin resource sharing）。它允许
 如果要把Cookie发到服务器，一方面要服务器同意，指定Access-Control-Allow-Credentials字段。另一方面，开发者必须在AJAX请求中打开withCredentials属性  
 需要注意的是，如果要发送Cookie，Access-Control-Allow-Origin就不能设为星号，必须指定明确的、与请求网页一致的域名。同时，Cookie依然遵循同源政策，只有用服务器域名设置的Cookie才会上传，其他域名的Cookie并不会上传，且（跨源）原网页代码中的document.cookie也无法读取服务器域名下的Cookie。
 #### 非简单请求 ####
-非简单请求的CORS请求，会在正式通信之前，增加一次HTTP查询请求，称为"预检"请求（preflight）。
+非简单请求的CORS请求，会在正式通信之前，增加一次HTTP查询请求，称为"预检"请求（preflight）。  
 	##### 预检请求 #####
 	"预检"请求用的请求方法是OPTIONS，表示这个请求是用来询问的。头信息里面，关键字段是Origin，表示请求来自哪个源。除了Origin字段，"预检"请求的头信息包括两个特殊字段。
+	
 	- Access-Control-Request-Method 用来列出浏览器的CORS请求会用到哪些HTTP方法
 	- Access-Control-Request-Headers 该字段可选，是一个逗号分隔的字符串，指定浏览器CORS请求会额外发送的头信息字段
+	
 	服务器回应的CORS相关字段
 	- Access-Control-Allow-Origin 服务器许可域名
 	- Access-Control-Allow-Methods 它的值是逗号分隔的一个字符串
