@@ -77,18 +77,16 @@ CORS全称是"跨域资源共享"（Cross-origin resource sharing）。它允许
 需要注意的是，如果要发送Cookie，Access-Control-Allow-Origin就不能设为星号，必须指定明确的、与请求网页一致的域名。同时，Cookie依然遵循同源政策，只有用服务器域名设置的Cookie才会上传，其他域名的Cookie并不会上传，且（跨源）原网页代码中的document.cookie也无法读取服务器域名下的Cookie。
 #### 非简单请求 ####
 非简单请求的CORS请求，会在正式通信之前，增加一次HTTP查询请求，称为"预检"请求（preflight）。  
-	##### 预检请求 #####
-	"预检"请求用的请求方法是OPTIONS，表示这个请求是用来询问的。头信息里面，关键字段是Origin，表示请求来自哪个源。除了Origin字段，"预检"请求的头信息包括两个特殊字段。
-	
-	- Access-Control-Request-Method 用来列出浏览器的CORS请求会用到哪些HTTP方法
-	- Access-Control-Request-Headers 该字段可选，是一个逗号分隔的字符串，指定浏览器CORS请求会额外发送的头信息字段
-	
-	服务器回应的CORS相关字段
-	- Access-Control-Allow-Origin 服务器许可域名
-	- Access-Control-Allow-Methods 它的值是逗号分隔的一个字符串
-	- Access-Control-Allow-Headers 该字段可选，是一个逗号分隔的字符串，表明服务器支持的所有头信息字段
-	- Access-Control-Allow-Credentials 该字段可选，它是一个布尔值，表示是否允许发送Cookie
-	- Access-Control-Max-Age 该字段可选，用来指定本次预检请求的有效期，单位为秒。在此期间，不用发出另一条预检请求。
+##### 预检请求 #####
+"预检"请求用的请求方法是OPTIONS，表示这个请求是用来询问的。头信息里面，关键字段是Origin，表示请求来自哪个源。除了Origin字段，"预检"请求的头信息包括两个特殊字段。	
+  - Access-Control-Request-Method 用来列出浏览器的CORS请求会用到哪些HTTP方法
+  - Access-Control-Request-Headers 该字段可选，是一个逗号分隔的字符串，指定浏览器CORS请求会额外发送的头信息字段  
+服务器回应的CORS相关字段
+  - Access-Control-Allow-Origin 服务器许可域名
+  - Access-Control-Allow-Methods 它的值是逗号分隔的一个字符串
+  - Access-Control-Allow-Headers 该字段可选，是一个逗号分隔的字符串，表明服务器支持的所有头信息字段
+  - Access-Control-Allow-Credentials 该字段可选，它是一个布尔值，表示是否允许发送Cookie
+  - Access-Control-Max-Age 该字段可选，用来指定本次预检请求的有效期，单位为秒。在此期间，不用发出另一条预检请求。
 	
 一旦服务器通过了"预检"请求，以后每次浏览器正常的CORS请求，就都跟简单请求一样，会有一个Origin头信息字段。服务器的回应，也都会有一个Access-Control-Allow-Origin头信息字段。
 
