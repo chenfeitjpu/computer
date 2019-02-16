@@ -188,5 +188,5 @@ JavaScript语言的一大特点就是单线程，所有任务需要排队，前�
   - macro-task(宏任务) 包括整体代码script，setTimeout，setInterval
   - micro-task(微任务) Promise，process.nextTick
 
-不同类型的任务会进入对应的Event Queue
+不同类型的任务会进入对应的 Event Queue <br>
 事件循环的顺序，决定js代码的执行顺序。进入整体代码(宏任务)后，开始第一次循环。接着执行所有的微任务。然后再次从宏任务开始，找到其中一个任务队列执行完毕，再执行所有的微任务。
