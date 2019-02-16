@@ -109,7 +109,7 @@ CORS全称是"跨域资源共享"（Cross-origin resource sharing）。它允许
   - Access-Control-Max-Age 该字段可选，用来指定本次预检请求的有效期，单位为秒。在此期间，不用发出另一条预检请求。
 	
 一旦服务器通过了"预检"请求，以后每次浏览器正常的CORS请求，就都跟简单请求一样，会有一个Origin头信息字段。服务器的回应，也都会有一个Access-Control-Allow-Origin头信息字段。
-## 跨域窗口的通信 ##
+## 跨文档通信 ##
   - 片段识别符
   - window.name
   - 跨文档通信API
