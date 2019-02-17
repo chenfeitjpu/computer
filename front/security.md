@@ -4,7 +4,10 @@
 * [CSRF](#csrf)
   * [攻击](#攻击-1)
   * [防御](#防御-1)
-
+* [劫持](#劫持)
+  * [HTTP劫持](#http劫持)
+  * [DNS劫持](#dns劫持)
+  
 # XSS #
 XSS（Cross-Site Scripting）跨站脚本攻击，是一种代码注入攻击。攻击者通过在目标网站上注入恶意脚本，使之在用户的浏览器上运行。利用这些恶意脚本，攻击者可获取用户的敏感信息如 Cookie、SessionID 等，进而危害数据安全。<br>
 XSS 利用的是用户对指定网站的信任。
@@ -33,3 +36,7 @@ CSRF 利用的是网站对用户网页浏览器的信任。
   - Samesite Cookie
     - Strict 这个 Cookie 在任何情况下都不可能作为第三方 Cookie
     - Lax 这个请求改变了当前页面或者打开了新页面且同时是个GET请求，则这个Cookie可以作为第三方Cookie
+
+# 劫持 #
+## HTTP劫持 ##
+## DNS劫持 ##
