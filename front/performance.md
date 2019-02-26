@@ -1,8 +1,30 @@
-* [网络](#%E7%BD%91%E7%BB%9C)
+* [网络请求](#%E7%BD%91%E7%BB%9C%E8%AF%B7%E6%B1%82)
   * [DNS预解析](#dns%E9%A2%84%E8%A7%A3%E6%9E%90)
+  * [缓存](#%E7%BC%93%E5%AD%98)
+    * [强缓存](#%E5%BC%BA%E7%BC%93%E5%AD%98)
+    * [协商缓存](#%E5%8D%8F%E5%95%86%E7%BC%93%E5%AD%98)
+    * [缓存策略](#%E7%BC%93%E5%AD%98%E7%AD%96%E7%95%A5)
 
 # 网络请求 #
 ## DNS预解析 ##
 DNS 解析也是需要时间的，可以通过预解析的方式来预先获得域名所对应的 IP。
 
 `<link rel="dns-prefetch" href="//www.google.cn">`
+
+## 缓存 ##
+良好的缓存策略可以降低资源的重复加载提高网页的整体加载速度
+### 强缓存 ###
+强缓存表示在缓存期间不需要请求
+  - Expires HTTP/1.0的产物，受限于本地时间
+  
+`Expires: Wed, 22 Oct 2018 08:41:00 GMT`
+  - Cache-Control 出现于HTTP/1.1，优先级高于Expires
+  
+`Cache-control: max-age=30`
+### 协商缓存 ###
+协商缓存需要请求，如果缓存有效会返回304。
+  - Last-Modified 和 If-Modified-Since Last-Modified 表示本地文件最后修改日期，If-Modified-Since 会将 Last-Modified 的值发送给服务器，询问服务器在该日期后资源是否有更新，有更新的话就会将新的资源发送回来。
+  但是如果在本地打开缓存文件，就会造成 Last-Modified 被修改。
+  - ETag 和 If-None-Match ETag 优先级比 Last-Modified 高。 ETag 类似于文件指纹，If-None-Match 会将当前 ETag 发送给服务器，询问该资源 ETag 是否变动，有变动的话就将新的资源发送回来。
+### 缓存策略 ###
+	
