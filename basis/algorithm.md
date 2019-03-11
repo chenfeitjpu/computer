@@ -17,21 +17,21 @@
 # 查询算法 #
 ## 二分查找 ##
 `
-public function binarySearch($list, $item) {
-	$min = 0;
-	$max = count($list) - 1;
-	while ($min <= $max) {
-		$mid = intval(($min + $max) / 2);
-		$value = $list[$mid];
-		if($value == $item) {
-			return $mid;
-		} else if($value < $item) {
-			$min = $mid + 1;
-		} else {
-			$max = $mid - 1;
-		}
-	}
-	return - 1;
-}
+public function binarySearch($list, $item) {    
+	$min = 0;    
+	$max = count($list) - 1;    
+	while ($min <= $max) {    
+		$mid = intval(($min + $max) / 2);    
+		$value = $list[$mid];    
+		if($value == $item) {    
+			return $mid;    
+		} else if($value < $item) {    
+			$min = $mid + 1;    
+		} else {    
+			$max = $mid - 1;    
+		}    
+	}    
+	return - 1;    
+}    
 `	
 # 排序算法 #
