@@ -18,7 +18,7 @@
 ## 二分查找 ##
 ```
 public function binarySearch($list, $item) {
-	$min = 0;    
+    $min = 0;    
 	$max = count($list) - 1;  
 	while ($min <= $max) {    
 		$mid = intval(($min + $max) / 2);
@@ -35,3 +35,26 @@ public function binarySearch($list, $item) {
 }    
 ```
 # 排序算法 #
+## 选择排序 ##
+```
+public function findSmallest($list) {
+	$index = 0;
+	$smallest = current($list);
+	for($i = 1, $length = count($list); $i < $length; $i++) {
+		if($list[$i] < $smallest) {
+			$index = $i;
+			$smallest = $list[$i];
+		}
+	}
+	return $index;
+}
+
+public function selectionSort($list) {
+	$res = [];
+	for($i = 0, $length = count($list); $i < $length; $i++) {
+		$index = $this->findSmallest($list);
+		array_push($res, current(array_splice($list, $index, 1)));
+	}
+	return $res;
+}
+```
