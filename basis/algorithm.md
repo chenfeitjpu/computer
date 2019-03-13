@@ -1,5 +1,6 @@
 * [编程思想](#编程思想)
   * [递归](#递归)
+  * [分而治之](#分而治之)
 * [性能分析](#性能分析)
   * [时间复杂度](#时间复杂度)
   * [空间复杂度](#空间复杂度)
@@ -7,10 +8,13 @@
   * [二分查找](#二分查找)
 * [排序算法](#排序算法)
   * [选择排序](#选择排序)
+  * [快速排序](#快速排序)
 
 # 编程思想 #
 ## 递归 ##
 自身调用自身
+ - 确定基线条件
+ - 确定递归条件
 ```
 public function factorial($num) {
 	if($num == 1) {
@@ -20,6 +24,10 @@ public function factorial($num) {
 	}
 }
 ```
+## 分而治之 ##
+不断分解问题
+  - 确定基线条件
+  - 缩小问题规模  
 
 # 性能分析 #
 ## 时间复杂度 ##
@@ -74,5 +82,21 @@ public function selectionSort($list) {
 		array_push($res, current(array_splice($list, $index, 1)));
 	}
 	return $res;
+}
+```
+## 快速排序 ##
+```
+public function quickSort($list) {
+	$length = count($list);
+	if($length <= 1) {
+		return $list;
+	} else {
+		$pivot = array_shift($list);
+		$less = $great = [];
+		foreach($list as $v) {
+			$v <= $pivot ? $less[] = $v : $great[] = $v;
+		}
+		return array_merge($this->quickSort($less), [$pivot], $this->quickSort($great));
+	}
 }
 ```
