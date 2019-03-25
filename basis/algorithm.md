@@ -159,6 +159,7 @@ public function quickSort($list) {
 
 # 查找算法 #
 ## 二分查找 ##
+每次通过跟区间的中间元素对比,将待查找的区间缩小为之前的一半,直到找到要查找的元素,
 ```
 public function binarySearch($list, $item) {
     $min = 0;    
