@@ -8,8 +8,6 @@
   * [分而治之](#分而治之)
 * [编程技巧](#编程技巧)
   * [递归](#递归)
-* [查找算法](#查找算法)
-  * [二分查找](#二分查找)
 * [排序算法](#排序算法)
   * [冒泡排序](#冒泡排序)
   * [插入排序](#插入排序)
@@ -19,6 +17,8 @@
   * [桶排序](#桶排序)
   * [计数排序](#计数排序)
   * [基数排序](#基数排序)
+* [查找算法](#查找算法)
+  * [二分查找](#二分查找)
 * [搜索算法](#搜索算法)
   * [广度优先搜索](#广度优先搜索)
 
@@ -65,27 +65,6 @@ public function factorial($num) {
 	}
 }
 ```  
-
-# 查找算法 #
-## 二分查找 ##
-```
-public function binarySearch($list, $item) {
-    $min = 0;    
-	$max = count($list) - 1;  
-	while ($min <= $max) {    
-		$mid = intval(($min + $max) / 2);
-		$value = $list[$mid];
-		if($value == $item) {
-			return $mid;
-		} else if($value < $item) {
-			$min = $mid + 1;
-		} else {    
-			$max = $mid - 1;    
-		}    
-	}    
-	return - 1;    
-}    
-```
 
 # 排序算法 #
 ## 冒泡排序 ##
@@ -177,6 +156,27 @@ public function quickSort($list) {
 当要排序的n个数据,所处的范围并不大的时候,比如最大值是k,我们就可以把数据划分成k个桶。每个桶内的数据值都是相同的,省掉了桶内排序的时间。
 ## 基数排序 ##
 要排序的数据可以分割出独立的“位”来比较,而且位之间有递进的关系。
+
+# 查找算法 #
+## 二分查找 ##
+```
+public function binarySearch($list, $item) {
+    $min = 0;    
+	$max = count($list) - 1;  
+	while ($min <= $max) {    
+		$mid = intval(($min + $max) / 2);
+		$value = $list[$mid];
+		if($value == $item) {
+			return $mid;
+		} else if($value < $item) {
+			$min = $mid + 1;
+		} else {    
+			$max = $mid - 1;    
+		}    
+	}    
+	return - 1;    
+}    
+```
 
 # 搜索算法 #
 ## 广度优先搜索 ##
