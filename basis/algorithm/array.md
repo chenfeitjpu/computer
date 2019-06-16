@@ -1,4 +1,9 @@
 * [k数之和](#k数之和)
+* [删除重复元素](#删除重复元素)
+* [删除目标元素](#删除目标元素)
+* [搜索插入位置](#搜索插入位置)
+* [最大子序和](#最大子序和)
+* [加1](#加1)
 
 # k数之和 #
 两数之和
@@ -151,5 +156,105 @@ function fourSum(array $nums, int $target) {
 		}
 	}
 	return $res;
+}
+```
+# 删除重复元素 #
+```
+/**
+ * 双指针－慢指针存放最终值，快指针用来比较重复元素
+ */
+function removeDuplicates(array &nums) {
+	$len = count($nums);
+	if($len == 0) return 0;
+	$i = 0;
+	for($j = 1; $j < $len; $j++) {
+		if($nums[$j] != $nums[$i]) {
+			$i++;
+			if($i != $j) {
+				$nums[$i] = $nums[$j];
+			}
+		}
+	}
+	return $i+1;
+}
+```
+# 删除目标元素 #
+```
+/**
+ * 双指针－慢指针存放最终值，快指针用来比较目标值
+ */
+function removeElement(array $nums, int $val) {
+	$len = count($nums);
+	if($len == 0) return 0;
+	$i = 0;
+	for($j = 0; $j < $len; $j++) {
+		if($nums[$j] != $val) {
+			$nums[$i] = $nums[$j];
+			$i++;
+		}
+	}
+	return $i;
+}
+```
+# 搜索插入位置 #
+```
+/**
+ * 二分查找
+ */
+function searchIndex(array $nums, int $target) {
+	$len = count($nums);
+	if($len == 0) return 0;
+	if($num[0] > $target) return 0;
+	$left = 0;
+	$right = $len - 1;
+	while ($left <= $right) {
+		$mid = floor(($left  + $right) / 2);
+		if($nums[$mid] == $target) {
+			return $mid;
+		} else if($nums[$mid] < $target) {
+			$left = $mid + 1;
+		} else {
+			$right = $mid - 1;
+		}
+	} 
+	return $left;
+}
+```
+# 最大子序和 #
+```
+/**
+ * 动态规划
+ */
+function maxSubArray(array $nums, int $target) {
+	$len = count($nums);
+	if($len == 0) return null;
+	$max = $nums[0];
+	$sum = 0;
+	for($i = 0; $i < $len; $i++) {
+		if($sum) {
+			$sum += $nums[$i];
+		} else {
+			$sum = $nums[$i];
+		}
+		$max= max($max, $sum);
+	}
+	return $max;
+}
+```
+# 加1 #
+```
+/**
+ * 循环进位
+ */
+function plusOne(array $nums) {
+	$len = count($nums);
+	if($len == 0) return null;
+	for($i = $len - 1; $i >= 0; $i--) {
+		$nums[$i]++;
+		$nums[$i] = $nums[$i] % 10;
+		if($nums[$i] > 0) return $nums; 
+	}
+	array_unshift($nums, 1);
+	return $nums;
 }
 ```
