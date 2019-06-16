@@ -2,7 +2,7 @@
 
 # k数之和 #
 两数之和
-｀｀｀
+```
 /**
 * 双指针找两个数
 */
@@ -45,9 +45,9 @@ function twoSum(array $nums, int $target) {
 	}
 	return $res;
 }
-｀｀｀ 
+```
 三数之和
-｀｀｀
+```
 /**
  *循环固定一个数，双指针找两个数
  */
@@ -93,9 +93,9 @@ function threeSum(array $nums, int $target) {
 	}
 	return $res;
 }
-｀｀｀
+```
 四数之和
-｀｀｀｀
+```
 /**
  * 循环固定两个数，双指针找两个数
  */
@@ -152,4 +152,4 @@ function fourSum(array $nums, int $target) {
 	}
 	return $res;
 }
-｀｀｀｀
+```
