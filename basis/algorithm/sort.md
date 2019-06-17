@@ -27,7 +27,7 @@ function bubbleSort($nums) {
 # 插入排序 #
 ```
 /**
- * 把未排序的数据向有序集合中添加元素
+ * 把未排序的数据依次添加到有序集合中
  */
 function insertSort($nums) {
     $len = count($nums);
@@ -74,7 +74,7 @@ function selectionSort($nums) {
  * 合并两个有序序列
  */
 function mergeSort(&$nums, $start, $end) {
-    if($start >= $end) return $nums;
+    if($start == $end) return $nums;
     $mid = floor(($start + $end) /2);
     mergeSort($nums, $start, $mid);
     mergeSort($nums, $mid+1, $end);
