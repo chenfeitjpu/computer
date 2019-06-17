@@ -258,3 +258,26 @@ function plusOne(array $nums) {
 	return $nums;
 }
 ```
+# 合并有序数组 #
+```
+/**
+ * 双指针逆序进行比较
+ */
+public function merge(array $nums1, int $m, array $nums2, int $n) {
+	for ($k = $m + $n - 1, $i = $m -1, $j = $n - 1; $k >= 0; $k--) {
+		if($i < 0) {
+			$nums1[$k] = $nums2[$j--];
+			continue;
+		}
+		if($j < 0) {
+			$nums1[$k] = $nums1[$i--];
+			continue;
+		}
+		if($nums1[$i] > $nums2[$j]) {
+			$nums1[$k] = $nums1[$i--];
+		} else {
+			$nums1[$k] = $nums2[$j--];
+		}
+	}
+}
+```
