@@ -281,3 +281,20 @@ public function merge(array $nums1, int $m, array $nums2, int $n) {
 	}
 }
 ```
+# 求众数 #
+```
+/**
+ * 众数加1，其它数-1
+ */
+function majorityElement($nums) {
+	$count = 0;
+	$res = null;
+	foreach($nums as $num) {
+		if($count == 0) {
+			$res = $num;
+		}
+		$count += ($num == $res ? 1 : -1);
+	}
+	return $res;
+}
+```
