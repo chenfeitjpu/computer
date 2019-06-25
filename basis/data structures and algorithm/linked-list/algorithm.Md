@@ -1,3 +1,10 @@
+* [反转链表](#反转链表)
+* [对区间内的链表进行反转](#对区间内的链表进行反转)
+* [两两交换链表中的节点](#两两交换链表中的节点)
+* [环形链表(判断有环)](#环形链表判断有环)
+* [环形链表(返回入口)](#环形链表返回入口)
+* [K个一组翻转链表](#k个一组翻转链表)
+
 # 反转链表 #
 ```
 /**
@@ -53,7 +60,6 @@ function reverseBetween($head, $m, $n) {
 }
 ```
 ```
-
 /**
  * 对反转区间内的元素逐个进行反转
  */
@@ -73,5 +79,163 @@ function reverBetween($head, $m, $n) {
         $tail = $start->next;
     }
     return $dummy->next;
+}
+```
+# 两两交换链表中的节点 #
+```
+/**
+ * 递归
+ */
+function swapPairs($head) {
+    if(!$head || !$head->next) return $head;
+    $next = $head->next;
+    $head->next = swapPairs($next->next);
+    $next->next = $head;
+    return $next;
+}
+```
+```
+/**
+ * 循环
+ */
+function swapPairs($head) {
+    $dummy = new ListNode(-1);
+    $dummy->next = $head;
+    $pre = $dummy;
+    while ($pre->next && $pre->next->next) {
+        $start = $pre->next;
+        $end = $pre->next->next;
+        $pre->next = $end;
+        $start->next = $end->next;
+        $end->next = $start;
+        $pre = $start;
+    }
+    return $dummy->next;
+}
+```
+# 环形链表(判断有环) #
+```
+/**
+ * 散列表
+ */
+function hasCycle($head) {
+    $map = [];
+    while ($head) {
+        if(isset($map[$head->val])) {
+            return true;
+        }
+        $map[$head->val] = $head->val;
+    }
+    return false;
+}
+```
+```
+/**
+ * 双指针
+ */
+function hadCycle2($head) {
+    $fast = $head;
+    while ($head && $fast && $fast->next) {
+        $head = $head->next;
+        $fast = $fast->next->next;
+        if($head->val == $fast->val) return true;
+    }
+    return false;
+}
+```
+# 环形链表(返回入口) #
+```
+/**
+ * 散列表
+ */
+function detectCycle($head) {
+    $map = [];
+    while ($head) {
+        if(isset($map[$head->val])) {
+            return $map[$head->val];
+        }
+        $map[$head->val] = $head;
+    }
+    return null;
+}
+```
+```
+/**
+ * 双指针
+ */
+function detectCycle2($head) {
+    $fast = $slow = $head;
+    $hasCycle = false;
+    while ($head && $fast && $fast->next) {
+        $slow = $slow->next;
+        $fast = $fast->next->next;
+        if($slow->val == $fast->val) {
+            $hasCycle = true;
+            break;
+        }
+    }
+    if($hasCycle) {
+        $fast = $head;
+        while ($fast->val != $slow->val) {
+            $slow = $slow->next;
+            $fast = $fast->next;
+        }
+        return $slow;
+    }
+    return null;
+}
+```
+# K个一组翻转链表 #
+```
+/**
+ * 尾插入
+ */
+function reverseKGroup($head, $k) {
+    $dummy = new ListNode(-1);
+    $dummy->next = $head;
+    $pre = $tail = $dummy;
+    while (true) {
+        $count = $k;
+        while ($count && $tail) {
+            $tail = $tail->next;
+            $count--;
+        }
+        if(!$tail) break;
+        $head = $pre->next;
+        while ($pre->next != $tail) {
+            $cur = $pre->next;
+            $pre->next = $cur->next;
+            $cur->next = $tail->next;
+            $tail->next = $cur;
+        }
+        $pre = $head;
+        $tail = $head;
+    }
+    return $dummy->next;
+}
+```
+```
+/**
+ * 递归
+ */
+function reverseKGroup2($head, $k) {
+    $cur = $head;
+    $count = 0;
+    while ($cur && $count != $k) {
+        $cur = $cur->next;
+        $count++;
+    }
+    if($count == $k) {
+        $cur = reverseKGroup2($cur, $k);
+        while ($count) {
+            $tmp = $head->next;
+            $head->next = $cur;
+            $cur = $head;
+            $head = $tmp;
+            $count--;
+        }
+        $head = $cur;
+    }
+    return $head;
 }
 ```
