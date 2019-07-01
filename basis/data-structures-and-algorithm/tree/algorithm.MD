@@ -4,7 +4,6 @@
 * [二叉树的层次遍历(102)](#二叉树的层次遍历102)
 * [二叉树的最大深度(104)](#二叉树的最大深度104)
 * [二叉树的最小深度(111)](#二叉树的最小深度111)
-* [括号生成(22)](#括号生成22)
 
 # 验证二叉搜索树(98) #
 ```
@@ -192,20 +191,5 @@ function minDepth1($root) {
         }
     }
     return $level;
-}
-```
-# 括号生成(22) #
-```
-function generateParenthesis($n) {
-    $res = [];
-    if(!$n) return [''];
-    for($i = 0; $i < $n; $i++) {
-        foreach (generateParenthesis($i) as $left) {
-            foreach (generateParenthesis($n- 1 - $i) as $right) {
-                $res[] = '(' . $left . ')' . $right;
-            }
-        }
-    }
-    return $res;
 }
 ```
