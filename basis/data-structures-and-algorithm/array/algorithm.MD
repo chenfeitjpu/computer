@@ -1,9 +1,123 @@
+* [剑指offer](#剑指offer)
+  * [二维数组中的查找(1)](#二维数组中的查找1)
 * [k数之和](#k数之和)
 * [删除重复元素](#删除重复元素)
 * [删除目标元素](#删除目标元素)
 * [搜索插入位置](#搜索插入位置)
 * [最大子序和](#最大子序和)
 * [加1](#加1)
+* [合并有序数组](#合并有序数组)
+* [求众数](#求众数)
+
+# 剑指offer #
+## 二维数组中的查找(1) ##
+```
+/**
+ * 暴力破解-枚举
+ * 时间复杂度O(m*n)
+ * 空间负责度O(1)
+ */
+function find($array, $target) {
+    $rowLen = count($array);
+    if(!$rowLen) return false;
+    $colLen = count($array[0]);
+    for($i = 0; $i < $rowLen; $i++) {
+        for($j = 0; $j < $colLen; $j++) {
+            if($array[$i][$j] == $target) {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+```
+```
+/**
+ * 分治法-利用数据的深度有序性
+ * 时间复杂度O(max(m,n))
+ * 空间负责度O(1)
+ */
+function find1($array, $target) {
+    $rowLen = count($array);
+    if(!$rowLen) return false;
+    $colLen = count($array[0]);
+    $i = 0;
+    $j = $colLen - 1;
+    while (0 <= $i && $i <= $rowLen -1 && 0 <= $j && $j <= $colLen-1) {
+        $cur = $array[$i][$j];
+        if($cur < $target) {
+            $i++;
+        } else if($cur > $target) {
+            $j--;
+        } else {
+            return true;
+        }
+    }
+    return false;
+}
+```
+```
+/**
+ * 二分法-利用数据的广度有序性
+ * 时间复杂度O(log(max(m,n)))
+ * 空间负责度O(1)
+ */
+function find2($array, $target) {
+    $rowLen = count($array);
+    if(!$rowLen) return false;
+    $colLen = count($array[0]);
+    //二分查找定位行列范围
+    $row = $col = 0;
+    $left = 0;
+    $right = $rowLen - 1;
+    while ($left <= $right) {
+        $mid = floor(($left + $right) / 2);
+        $row = $left;
+        $col = $colLen - $rowLen + $row;
+        $col = $col >= 0 ? $col : 0;
+        $cur = $array[$row][$col];
+        if($cur < $target) {
+            $left = $mid + 1;
+        } else if($cur > $target) {
+            $right = $mid -1;
+        } else {
+            return true;
+        }
+    }
+
+    //从行里面二分查找目标元素
+    $left = 0;
+    $right = $col - 1;
+    while ($left <= $right) {
+        $mid = floor(($left + $right) / 2);
+        $cur = $array[$row][$mid];
+        if($cur < $target) {
+            $left = $mid + 1;
+        } else if($cur > $target) {
+            $right = $mid -1;
+        } else {
+            return true;
+        }
+    }
+
+    //从列里面二分查找目标元素
+    $left = 0;
+    $right = $row - 1;
+    while ($left <= $right) {
+        $mid = floor(($left + $right) / 2);
+        $cur = $array[$mid][$col];
+        if($cur < $target) {
+            $left = $mid + 1;
+        } else if($cur > $target) {
+            $right = $mid -1;
+        } else {
+            return true;
+        }
+    }
+
+    return false;
+}
+```
 
 # k数之和 #
 两数之和
