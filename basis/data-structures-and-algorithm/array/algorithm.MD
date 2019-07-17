@@ -2,6 +2,8 @@
   * [二维数组中的查找(1)](#二维数组中的查找1)
   * [旋转数组的最小数字(6)](#旋转数组的最小数字6)
   * [调整数组顺序使奇数位于偶数前面(13)](#调整数组顺序使奇数位于偶数前面13)
+  * [数组中出现次数超过一半的数字(28)](#数组中出现次数超过一半的数字28)
+  * [连续子数组的最大和(30)](#连续子数组的最大和30)
 * [k数之和](#k数之和)
 * [删除重复元素](#删除重复元素)
 * [删除目标元素](#删除目标元素)
@@ -289,7 +291,81 @@ function moreThanHalfNumSolution2($array) {
     return $count > floor($len / 2) ? $num : 0;
 }
 ```
-
+## 连续子数组的最大和(30) ##
+```
+/**
+ * 暴力法
+ * 时间复杂度O(n²)
+ * 空间复杂度O(1)
+ */
+function findGreatestSumOfSubArray($array) {
+    $len = count($array);
+    if(!$len) return 0;
+    $max = 0;
+    for($i = 0; $i < $len; $i++) {
+        $sum = 0;
+        for($j = $i; $j < $len; $j++) {
+            $sum += $array[$j];
+            if($max < $sum) {
+                $max = $sum;
+            }
+        }
+    }
+    return $max;
+}
+```
+```
+/**
+ * 贪心算法
+ * 时间复杂度O(n)
+ * 空间复杂度O(1)
+ */
+function findGreatestSumOfSubArray($array) {
+    $len = count($array);
+    if(!$len) return 0;
+    $max = 0;
+    $sum = 0;
+    for($i = 0; $i < $len; $i++) {
+        if($sum < 0) {
+            $sum = $array[$i];
+        } else {
+            $sum += $array[$i];
+        }
+        if($max < $sum) {
+            $max = $sum;
+        }
+    }
+    return $max;
+}
+```
+```
+/**
+ * 动态规划
+ * 时间复杂度O(n)
+ * 空间复杂度O(1)
+ */
+function findGreatestSumOfSubArray($array) {
+    $max = 0;
+    findGreatestSum($array, count($array)-1, $max);
+    return $max;
+}
+function findGreatestSum($array, $n, &$max) {
+    if($n == 0) {
+        $max = $array[$n];
+        return $array[$n];
+    }
+    $sum = findGreatestSum($array, $n - 1, $max);
+    if($sum > 0) {
+        $sum += $array[$n];
+    } else {
+        $sum = $array[$n];
+    }
+    if($max < $sum) {
+        $max = $sum;
+    }
+    return $sum;
+}
+```
 
 
 # k数之和 #
