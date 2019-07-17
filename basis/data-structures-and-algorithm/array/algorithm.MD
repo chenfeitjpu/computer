@@ -118,6 +118,56 @@ function find2($array, $target) {
     return false;
 }
 ```
+## 旋转数组的最小数字(6) ##
+```
+/**
+ * 遍历
+ * 时间复杂度O(n)
+ * 空间复杂度O(1)
+ */
+function minNumberInRotateArray($array) {
+    $len = count($array);
+    if(!$len) {
+        return 0;
+    }
+    for($i = 0; $i < $len - 1; $i++) {
+        if($array[$i] > $array[$i+1]) {
+            return $array[$i+1];
+        }
+    }
+    return $array[0];
+}
+```
+```
+/**
+ * 二分法-利用数据的有序性
+ * 时间复杂度O(log n)
+ * 空间复杂度O(1)
+ */
+function minNumberInRotateArray1($array) {
+    $len = count($array);
+    if(!$len) {
+        return 0;
+    }
+    $left = 0;
+    $right = $len - 2;
+    while ($left <= $right) {
+        $mid = floor(($left + $right) / 2);
+        if($array[$mid] <= $array[$mid+1]) {
+            if($array[0] <= $array[$mid]) {
+                $left = $mid + 1;
+            } else {
+                $right = $mid - 1;
+            }
+        } else {
+            return $array[$mid+1];
+        }
+    }
+    return $array[0];
+}
+```
+
+
 
 # k数之和 #
 两数之和
