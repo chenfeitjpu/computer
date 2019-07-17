@@ -316,7 +316,7 @@ function findGreatestSumOfSubArray($array) {
 ```
 ```
 /**
- * 贪心算法
+ * 迭代
  * 时间复杂度O(n)
  * 空间复杂度O(1)
  */
