@@ -1,6 +1,7 @@
 * [剑指offer](#剑指offer)
   * [二维数组中的查找(1)](#二维数组中的查找1)
   * [旋转数组的最小数字(6)](#旋转数组的最小数字6)
+  * [调整数组顺序使奇数位于偶数前面(13)](#调整数组顺序使奇数位于偶数前面13)
 * [k数之和](#k数之和)
 * [删除重复元素](#删除重复元素)
 * [删除目标元素](#删除目标元素)
@@ -167,6 +168,58 @@ function minNumberInRotateArray1($array) {
     return $array[0];
 }
 ```
+## 调整数组顺序使奇数位于偶数前面(13) ##
+```
+/**
+ * 冒泡法
+ * 时间复杂度O(n²)
+ * 空间复杂度O(1)
+ */
+function reOrderArray($array) {
+    $len = count($array);
+    if($len <= 1) return $array;
+    for($i = 0; $i < $len - 1; $i++) {
+        for($j = 0; $j < $len - $i -1; $j++) {
+            if(($array[$j] & 1) == 0 && ($array[$j+1] & 1) == 1) {
+                $tmp = $array[$j];
+                $array[$j] = $array[$j+1];
+                $array[$j+1] = $tmp;
+            }
+        }
+    }
+    return $array;
+}
+```
+```
+
+/**
+ * 拆成奇偶两个数组再合并
+ * 时间复杂度O(n)
+ * 空间复杂度O(n)
+ */
+function reOrderArray1($array) {
+    $len = count($array);
+    if($len <= 1) return $array;
+    $odd = $even = [];
+    for($i = 0; $i < $len; $i++) {
+        if($array[$i] & 1) {
+            $odd[] = $array[$i];
+        } else {
+            $even[] = $array[$i];
+        }
+    }
+    $oddLen = count($odd);
+    for($i = 0; $i < $oddLen; $i++) {
+        $array[$i] = $odd[$i];
+    }
+    $evenLen = count($even);
+    for($i = 0; $i < $evenLen; $i++) {
+        $array[$oddLen + $i] = $even[$i];
+    }
+    return $array;
+}
+```
+
 
 
 
