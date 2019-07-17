@@ -219,7 +219,76 @@ function reOrderArray1($array) {
     return $array;
 }
 ```
-
+## 数组中出现次数超过一半的数字(28) ##
+```
+/**
+ * 遍历
+ * 时间复杂度O(n)
+ * 空间复杂度O(n)
+ */
+function moreThanHalfNumSolution($array) {
+    $len = count($array);
+    if(!$len) return 0;
+    if($len ==1 ) return current($array);
+    $map = [];
+    for($i = 0; $i < $len; $i++) {
+        $value = $array[$i];
+        if(isset($map[$value])) {
+            $map[$value]++;
+        } else {
+            $map[$value] = 1;
+        }
+    }
+    foreach($map as $key => $value) {
+        if($value > floor($len / 2)) {
+            return $key;
+        }
+    }
+    return 0;
+}
+```
+```
+/**
+ * 排序
+ * 时间复杂度O(nlog n)
+ * 空间复杂度O(1)
+ */
+function moreThanHalfNumSolution1($array) {
+    $len = count($array);
+    if(!$len) return 0;
+    if($len ==1 ) return current($array);
+    sort($array);
+    return $array[floor($len / 2 - 1)];
+}
+```
+```
+/**
+ * 计数
+ * 时间复杂度O(n)
+ * 空间复杂度O(1)
+ */
+function moreThanHalfNumSolution2($array) {
+    $len = count($array);
+    if(!$len) return 0;
+    if($len ==1 ) return current($array);
+    $count = 0;
+    $num = 0;
+    for($i = 0; $i < $len; $i++) {
+        $value = $array[$i];
+        if($count == 0) {
+            $num = $value;
+        }
+        $count += ($num == $value) ? 1 : -1;
+    }
+    $count = 0;
+    for($i = 0; $i < $len; $i++) {
+        if($num == $array[$i]) {
+            $count++;
+        }
+    }
+    return $count > floor($len / 2) ? $num : 0;
+}
+```
 
 
 
