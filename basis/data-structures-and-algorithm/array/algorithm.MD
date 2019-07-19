@@ -366,7 +366,184 @@ function findGreatestSum($array, $n, &$max) {
     return $sum;
 }
 ```
-
+## 把数组排成最小的数(32) ##
+```
+/**
+ * 全排列
+ * 时间复杂度O(n!)
+ * 空间复杂度O(n!)
+ */
+function printMinNumber($array) {
+    $min = PHP_INT_MAX;
+    $list = permute($array);
+    foreach ($list as $value) {
+        if($min > $value) {
+            $min = $value;
+        }
+    }
+    return $min;
+}
+function permute($array) {
+    $len = count($array);
+    $res = [];
+    if($len == 1) {
+        $res[] = current($array);
+    } else {
+        for($i = 0; $i < $len; $i++) {
+            $cur = $array[$i];
+            $list = permute(array_merge(array_slice($array, 0, $i), array_slice($array, $i + 1, $len)));
+            for($j = 0; $j < $len - 1; $j++) {
+                $res[] = $cur . $list[$j];
+            }
+        }
+    }
+    return $res;
+}
+```
+```
+/**
+ * 排序
+ * 时间复杂度O(nlog n)
+ * 空间复杂度O(1)
+ */
+function printMinNumber2($array) {
+    usort($array, function ($a, $b) {
+        return $a . $b > $b . $a;
+    });
+    return implode('', $array);
+}
+```
+## 数组中的逆序对(35) ##
+```
+/**
+ * 暴力法
+ * 时间复杂度O(n²)
+ * 空间复杂度O(1)
+ */
+function inversePairs($array) {
+    $len = count($array);
+    if($len <= 1) return 0;
+    $count = 0;
+    for($i = 0; $i < $len; $i++) {
+        for($j = $i + 1; $j < $len; $j++) {
+            if($array[$i] > $array[$j]) {
+                $count++;
+            }
+        }
+    }
+    return $count;
+}
+```
+```
+/**
+ * 排序
+ * 时间复杂度O(nlog n)
+ * 空间复杂度O(n)
+ */
+function inversePairs2($array) {
+    $len = count($array);
+    if($len <= 1) return 0;
+    return mergeSort($array, 0, $len - 1);
+}
+function mergeSort(&$array, $start, $end) {
+    if($start >= $end) return 0;
+    $mid = intval(($start + $end) / 2);
+    $count = mergeSort($array, $start, $mid);
+    $count += mergeSort($array, $mid + 1, $end);
+    $count += merge($array, $start, $mid, $end);
+    return $count;
+}
+function merge(&$array, $start, $mid, $end) {
+    $count = 0;
+    $i = $start;
+    $j = $mid + 1;
+    $tmp = [];
+    while($i <= $mid && $j <= $end) {
+        if($array[$i] < $array[$j]) {
+            $tmp[] = $array[$i++];
+        } else {
+            $count += $mid - $i + 1;
+            $tmp[] = $array[$j++];
+        }
+    }
+    while ($i <= $mid) {
+        $tmp[] = $array[$i++];
+    }
+    while ($j <= $end) {
+        $tmp[] = $array[$j++];
+    }
+    $k = 0;
+    $len = count($tmp);
+    while ($k < $len) {
+        $array[$start + $k] = $tmp[$k];
+        $k++;
+    }
+    return $count;
+}
+```
+## 数字在排序数组中出现的次数(37) ##
+```
+/**
+ * 暴力法
+ * 时间复杂度O(n)
+ * 空间复杂度O(1)
+ */
+function getNumberOfK($array, $value) {
+    $len = count($array);
+    $count = 0;
+    if($len < 1) return $count;
+    for($i = 0; $i < $len; $i++) {
+        if($array[$i] == $value) {
+            $count++;
+        }
+    }
+    return $count;
+}
+```
+```
+/**
+ * 二分法
+ * 时间复杂度O(log n)
+ * 空间复杂度O(1)
+ */
+function getNumberOfK2($array, $value) {
+    $len = count($array);
+    if(!$len) return 0;
+    $first = getIndexIndex($array, $value, 'first');
+    $last = getIndexIndex($array, $value, 'last');
+    return $first > -1 ? ($last - $first + 1) : 0;
+}
+function getIndexIndex($array, $value, $type) {
+    $len = count($array);
+    $left = 0;
+    $right = $len - 1;
+    $index = -1;
+    while ($left <= $right) {
+        $mid = intval(($left + $right) / 2);
+        $cur = $array[$mid];
+        if($cur < $value) {
+            $left = $mid + 1;
+        } else if($cur > $value){
+            $right = $mid - 1;
+        } else {
+            if($type == 'first') {
+                if($mid > 0 && $array[$mid - 1] == $value) {
+                    $right = $mid - 1;
+                } else {
+                    return $mid;
+                }
+            } else {
+                if($mid < $len - 1 && $array[$mid + 1] == $value) {
+                    $left = $mid + 1;
+                } else {
+                    return $mid;
+                }
+            }
+        }
+    }
+    return $index;
+}
+```
 
 # k数之和 #
 两数之和
