@@ -54,16 +54,19 @@ function slidingWindow($nums, $k) {
     if(!$len) return [];
     $window = $res = [];
     for($i = 0; $i < $len; $i++) {
-        while($i >= $k && $window[0] <= $i - $k) {
+        while($i >= $k && $window && $window[0] <= $i - $k) {
             array_shift($window);
         }
-        while($window && $window[count($window)-1] <= $nums[$i]) {
+        while($window && $nums[$window[count($window)-1]] <= $nums[$i]) {
             array_pop($window);
         }
         array_push($window, $i);
         if($i >= $k-1) {
             $res[] = $nums[$window[0]];
         }
+    }
+    if($len < $k) {
+        $res[] = $nums[$window[0]];
     }
     return $res;
 }

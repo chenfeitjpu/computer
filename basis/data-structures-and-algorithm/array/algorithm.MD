@@ -4,14 +4,23 @@
   * [调整数组顺序使奇数位于偶数前面(13)](#调整数组顺序使奇数位于偶数前面13)
   * [数组中出现次数超过一半的数字(28)](#数组中出现次数超过一半的数字28)
   * [连续子数组的最大和(30)](#连续子数组的最大和30)
-* [k数之和](#k数之和)
-* [删除重复元素](#删除重复元素)
-* [删除目标元素](#删除目标元素)
-* [搜索插入位置](#搜索插入位置)
-* [最大子序和](#最大子序和)
-* [加1](#加1)
-* [合并有序数组](#合并有序数组)
-* [求众数](#求众数)
+  * [把数组排成最小的数(32)](#把数组排成最小的数32)
+  * [数组中的逆序对(35)](#数组中的逆序对35)
+  * [数字在排序数组中出现的次数(37)](#数字在排序数组中出现的次数37)
+  * [数组中只出现一次的数字(40)](#数组中只出现一次的数字40)
+  * [数组中重复的数字(50)](#数组中重复的数字50)
+  * [构建乘积数组(51)](#构建乘积数组51)
+* [LeeCode题解](#leecode题解)
+  * [k数之和](#k数之和)
+  * [三数之和](#三数之和)
+  * [四数之和](#四数之和)
+  * [删除重复元素](#删除重复元素)
+  * [删除目标元素](#删除目标元素)
+  * [搜索插入位置](#搜索插入位置)
+  * [最大子序和](#最大子序和)
+  * [加1](#加1)
+  * [合并有序数组](#合并有序数组)
+  * [求众数](#求众数)
 
 # 剑指offer #
 ## 二维数组中的查找(1) ##
@@ -544,8 +553,129 @@ function getIndexIndex($array, $value, $type) {
     return $index;
 }
 ```
-
-# k数之和 #
+## 数组中只出现一次的数字(40) ##
+```
+/**
+ * 暴力法
+ * 时间复杂度O(n * n)
+ * 空间复杂度O(1)
+ */
+function findNumsAppearOnce($array) {
+    $len = count($array);
+    $res = [];
+    for($i = 0; $i < $len; $i++) {
+        $flag = true;
+        for($j = 0; $j < $len; $j++) {
+            if($i != $j && $array[$i] == $array[$j]) {
+                $flag = false;
+                break;
+            }
+        }
+        if($flag) {
+            $res[] = $array[$i];
+        }
+    }
+    return $res;
+}
+```
+```
+/**
+ * 暴力法
+ * 时间复杂度O(n)
+ * 空间复杂度O(n)
+ */
+function findNumsAppearOnce1($array) {
+    $len = count($array);
+    $map = [];
+    for($i = 0; $i < $len; $i++) {
+        $cur = $array[$i];
+        if(isset($map[$cur])) {
+            $map[$cur]++;
+        } else {
+            $map[$cur] = 1;
+        }
+    }
+    $res = [];
+    foreach($map as $key => $value) {
+        if($value == 1) {
+            $res[] = $key;
+        }
+    }
+    return $res;
+}
+```
+```
+/**
+ * 异或
+ * 时间复杂度O(n)
+ * 空间复杂度O(1)
+ */
+function findNumsAppearOnce2($array) {
+    $len = count($array);
+    $num = 0;
+    for($i = 0; $i < $len; $i++) {
+        $num ^=  $array[$i];    
+    }
+    $tmp = $num & -$num;
+    $num1 = $num2 = 0;
+    for($i = 0; $i < $len; $i++) {
+        $cur = $array[$i];
+        if(($cur & $tmp) == $tmp) {
+            $num1 ^= $cur;
+        } else {
+            $num2 ^= $cur;
+        }
+    }
+    return [$num1, $num2];
+}
+```
+## 数组中重复的数字(50) ##
+```
+/**
+ * 计数
+ * 时间复杂度O(n)
+ * 空间复杂度O(1)
+ */
+function duplicate($array) {
+    $len = count($array);
+    if($len <= 1) return -1;
+    for($i = 0; $i < $len; $i++) {
+        while($i != $array[$i]) {
+            $cur = $array[$i];
+            if($array[$cur] == $cur) {
+                return $cur;
+            } else {
+                $tmp = $array[$cur];
+                $array[$cur] = $cur;
+                $array[$i] = $tmp;
+            }
+        }
+    }
+}
+```
+## 构建乘积数组(51) ##
+```
+/**
+ * 计数
+ * 时间复杂度O(n)
+ * 空间复杂度O(1)
+ */
+function multiply($array) {
+    $len = count($array);
+    $res = [];
+    for($i = 0, $tmp = 1; $i < $len; $i++) {
+        $res[$i] = $tmp;
+        $tmp *= $array[$i];
+    }
+    for($i = $len - 1, $tmp = 1; $i >= 0; $i--) {
+        $res[$i] *= $tmp;
+        $tmp *= $array[$i];
+    }
+    return $res;
+}
+```
+# LeeCode题解 #
+## k数之和 ##
 两数之和
 ```
 /**
@@ -591,7 +721,7 @@ function twoSum(array $nums, int $target) {
 	return $res;
 }
 ```
-三数之和
+## 三数之和 ##
 ```
 /**
  *循环固定一个数，双指针找两个数
@@ -639,7 +769,7 @@ function threeSum(array $nums, int $target) {
 	return $res;
 }
 ```
-四数之和
+## 四数之和 ##
 ```
 /**
  * 循环固定两个数，双指针找两个数
@@ -698,7 +828,7 @@ function fourSum(array $nums, int $target) {
 	return $res;
 }
 ```
-# 删除重复元素 #
+## 删除重复元素 ##
 ```
 /**
  * 双指针－慢指针存放最终值，快指针用来比较重复元素
@@ -718,7 +848,7 @@ function removeDuplicates(array &nums) {
 	return $i+1;
 }
 ```
-# 删除目标元素 #
+## 删除目标元素 ##
 ```
 /**
  * 双指针－慢指针存放最终值，快指针用来比较目标值
@@ -736,7 +866,7 @@ function removeElement(array $nums, int $val) {
 	return $i;
 }
 ```
-# 搜索插入位置 #
+## 搜索插入位置 ##
 ```
 /**
  * 二分查找
@@ -760,7 +890,7 @@ function searchIndex(array $nums, int $target) {
 	return $left;
 }
 ```
-# 最大子序和 #
+## 最大子序和 ##
 ```
 /**
  * 动态规划
@@ -781,7 +911,7 @@ function maxSubArray(array $nums, int $target) {
 	return $max;
 }
 ```
-# 加1 #
+## 加1 ##
 ```
 /**
  * 循环进位
@@ -798,7 +928,7 @@ function plusOne(array $nums) {
 	return $nums;
 }
 ```
-# 合并有序数组 #
+## 合并有序数组 ##
 ```
 /**
  * 双指针逆序进行比较
@@ -821,7 +951,7 @@ public function merge(array $nums1, int $m, array $nums2, int $n) {
 	}
 }
 ```
-# 求众数 #
+## 求众数 ##
 ```
 /**
  * 众数加1，其它数-1
