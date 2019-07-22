@@ -1,11 +1,67 @@
-* [反转链表](#反转链表)
-* [反转链表(区间)](#反转链表区间)
-* [两两交换链表中的节点](#两两交换链表中的节点)
-* [K个一组翻转链表](#k个一组翻转链表)
-* [环形链表(判断有环)](#环形链表判断有环)
-* [环形链表(返回入口)](#环形链表返回入口)
+* [剑指offer题解](#剑指offer题解)
+  * [从尾到头打印链表(3)](#从尾到头打印链表3)
+* [LeeCode题解](#leecode题解)
+  * [反转链表](#反转链表)
+  * [反转链表(区间)](#反转链表区间)
+  * [两两交换链表中的节点](#两两交换链表中的节点)
+  * [K个一组翻转链表](#k个一组翻转链表)
+  * [环形链表(判断有环)](#环形链表判断有环)
+  * [环形链表(返回入口)](#环形链表返回入口)
 
-# 反转链表 #
+# 剑指offer题解 #
+## 从尾到头打印链表(3) ##
+```
+/**
+ * 反转链表
+ * 时间复杂度O(n)
+ * 空间复杂度O(1)
+ */
+function printListFromTailToHead($head) {
+    $pre = null;
+    $cur = $head;
+    while($cur) {
+        $next = $cur->next;
+        $cur->next = $pre;
+        $pre = $cur;
+        $cur = $next;
+    }
+    while($pre) {
+        echo $pre->value . PHP_EOL;
+        $pre = $pre->next;
+    }
+}
+```
+```
+/**
+ * 利用栈
+ * 时间复杂度O(n)
+ * 空间复杂度O(n)
+ */
+function printListFromTailToHead($head) {
+    $stack = [];
+    while($head) {
+        array_push($stack, $head->value);
+        $head = $head->next;
+    }
+    while($stack) {
+        echo array_pop($stack) . PHP_EOL;
+    }
+}
+```
+```
+/**
+ * 递归
+ * 时间复杂度O(n)
+ * 空间复杂度O(1)
+ */
+function printListFromTailToHead($head) {
+    if(!$head) return;
+    printListFromTailToHead($head->next);
+    echo $head->value . PHP_EOL;
+}
+```
+# LeeCode题解 #
+## 反转链表 ##
 ```
 /**
  * 把当前元素的指针指向前一个元素(从前向后遍历)
@@ -34,7 +90,7 @@ function reverseList2($head) {
     return $p;
 }
 ```
-# 反转链表(区间) #
+## 反转链表(区间) ##
 ```
 /**
  * 拼接法
@@ -81,7 +137,7 @@ function reverseBetween2($head, $m, $n) {
     return $dummy->next;
 }
 ```
-# 两两交换链表中的节点 #
+## 两两交换链表中的节点 ##
 ```
 /**
  * 循环
@@ -113,7 +169,7 @@ function swapPairs($head) {
     return $next;
 }
 ```
-# K个一组翻转链表 #
+## K个一组翻转链表 ##
 ```
 /**
  * 循环+尾插入
@@ -165,7 +221,7 @@ function reverseKGroup2($head, $k) {
     }
     return $head;
 ```
-# 环形链表(判断有环) #
+## 环形链表(判断有环) ##
 ```
 /**
  * 散列表
@@ -195,7 +251,7 @@ function hadCycle2($head) {
     return false;
 }
 ```
-# 环形链表(返回入口) #
+## 环形链表(返回入口) ##
 ```
 /**
  * 散列表
