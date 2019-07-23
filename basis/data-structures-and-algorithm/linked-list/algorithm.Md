@@ -1,5 +1,8 @@
 * [剑指offer题解](#剑指offer题解)
   * [从尾到头打印链表(3)](#从尾到头打印链表3)
+  * [链表中倒数第k个结点(14)](#链表中倒数第k个结点14)
+  * [反转链表(15)](#反转链表15)
+  * [合并两个排序的链表(16)](#合并两个排序的链表16)
 * [LeeCode题解](#leecode题解)
   * [反转链表](#反转链表)
   * [反转链表(区间)](#反转链表区间)
@@ -60,6 +63,105 @@ function printListFromTailToHead($head) {
     echo $head->value . PHP_EOL;
 }
 ```
+## 链表中倒数第k个结点(14) ##
+```
+/**
+ * 顺序遍历
+ * 时间复杂度O(n)
+ * 空间复杂度O(1)
+ */
+function findKthToTail($head, $k) {
+    if(!$head) return null;
+    $length = 0;
+    $cur = $head;
+    while($cur) {
+        $length++;
+        $cur = $cur->next;
+    }
+    if($k > $length) return null;
+    $i = 0;
+    while ($i < $length - $k) {
+        $head = $head->next;
+        $i++;
+    }
+    return $head;
+}
+```
+```
+/**
+ * 双指针
+ * 时间复杂度O(n)
+ * 空间复杂度O(1)
+ */
+function findKthToTail($head, $k) {
+    if(!$head) return null;
+    $left = $right = $head;
+    $i = 0;
+    while($i < $k && $right) {
+        $right = $right->next;
+        $i++;
+    }
+    while ($right) {
+        $right = $right->next;
+        $left = $left->next;
+    }
+    return $left;
+}
+```
+## 反转链表(15) ##
+```
+/**
+ * 三指针
+ * 时间复杂度O(n)
+ * 空间复杂度O(1)
+ */
+function reverseList($head) {
+    if(!$head) return null;
+    $pre = null;
+    $cur = $head;
+    $next = null;
+    while($cur) {
+        $next = $cur->next;
+        $cur->next = $pre;
+        $pre = $cur;
+        $cur = $next;
+    }
+    while($pre) {
+        echo $pre->value . PHP_EOL;
+        $pre = $pre->next;
+    }
+}
+```
+## 合并两个排序的链表(16) ##
+```
+/**
+ * 遍历
+ * 时间复杂度O(n)
+ * 空间复杂度O(1)
+ */
+function merge($head1, $head2) {
+   if(!$head1) return $head2;
+   if(!$head2) return $head1;
+    $dummy = new Node(-1);
+    $dummy->next = $head1;
+    $pre = $dummy;
+    while ($head1 && $head2) {
+        if($head1->value > $head2->value) {
+            $next = $head2->next;
+            $pre->next = $head2;
+            $head2->next = $head1;
+            $head2 = $next;
+        }
+        $pre = $head1;
+        $head1 = $head1->next;
+    }
+    if(!$head1 && $head2) {
+        $pre->next = $head2;
+    }
+    return $dummy->next;
+}
+```
+
 # LeeCode题解 #
 ## 反转链表 ##
 ```
