@@ -5,6 +5,8 @@
   * [合并两个排序的链表(16)](#合并两个排序的链表16)
   * [复杂链表的复制(25)](#复杂链表的复制25)
   * [两个链表的第一个公共结点(36)](#两个链表的第一个公共结点36)
+  * [链表中环的入口结点(55)](#链表中环的入口结点55)
+  * [删除链表中重复的结点(56)](#删除链表中重复的结点56)
 * [LeeCode题解](#leecode题解)
   * [反转链表](#反转链表)
   * [反转链表(区间)](#反转链表区间)
@@ -310,7 +312,7 @@ function findFirstCommonNode($head1, $head2) {
 ```
 ```
 /**
- * 左对齐
+ * 对齐(裁剪)
  * 时间复杂度O(n²)
  * 空间复杂度O(1)
  */
@@ -352,7 +354,7 @@ function getLength($head) {
 ```
 ```
 /**
- * 右对齐
+ * 对齐(拼接)
  * 时间复杂度O(n²)
  * 空间复杂度O(1)
  */
@@ -368,6 +370,92 @@ function findFirstCommonNode2($head1, $head2) {
         $right = $right->next ? $right->next : $head1;
     }
     return false;
+}
+```
+## 链表中环的入口结点(55) ##
+```
+/**
+ * hash表
+ * 时间复杂度O(n)
+ * 空间复杂度O(n)
+ */
+function entryNodeOfLoop($head) {
+    if(!$head) return null;
+    $map = [];
+    $cur = $head;
+    while ($cur) {
+        if(isset($map[$cur->value])) {
+            return $cur;
+        } else {
+            $map[$cur->value] = $cur;
+        }
+        $cur = $cur->next;
+    }
+    return null;
+}
+```
+```
+/**
+ * 快慢指针
+ * 时间复杂度O(n)
+ * 空间复杂度O(1)
+ */
+function entryNodeOfLoop1($head) {
+    if(!$head) return null;
+    $hasCycle = false;
+    $slow = $fast = $head;
+    while ($fast && $fast->next) {
+        $slow = $slow->next;
+        $fast = $fast->next->next;
+        if($slow->value == $fast->value) {
+            $hasCycle = true;
+            break;
+        }
+    }
+    if(!$hasCycle) return null;
+    $k = 0;
+    $tmp = $slow;
+    do {
+        $slow = $slow->next;
+        $k++;
+    } while ($slow != $tmp);
+    $slow = $fast = $head;
+    while($k) {
+        $fast = $fast->next;
+        $k--;
+    }
+    while($slow != $fast) {
+        $slow = $slow->next;
+        $fast = $fast->next;
+    }
+    return $slow;
+}
+```
+## 删除链表中重复的结点(56) ##
+```
+/**
+ * 遍历
+ * 时间复杂度O(n)
+ * 空间复杂度O(1)
+ */
+function deleteDuplication($head) {
+    if(!$head) return null;
+    $dummy = new Node(-1);
+    $dummy->next = $head;
+    $pre = $dummy;
+    while ($head && $head->next) {
+        $value = $head->value;
+        if($value == $head->next->value) {
+            while ($head && $value == $head->value) {
+                $head = $head->next;
+            }
+            $pre->next = $head;
+        } else {
+            $pre = $head;
+            $head = $head->next;
+        }
+    }
+    return $dummy->next;
 }
 ```
 
