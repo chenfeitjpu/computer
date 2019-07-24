@@ -8,6 +8,59 @@
   * [二叉树的最小深度(111)](#二叉树的最小深度111)
 
 # 剑指offer题解 #
+```
+class TreeNode {
+
+    public $val;
+    
+    public $left;
+    
+    public $right;
+
+    public function __construct($val) {
+        $this->val = $val;
+    }
+
+}
+```
+## 重建二叉树(4) ##
+```
+/**
+ * 递归
+ * 时间复杂度O(n)
+ * 空间复杂度O(n)
+ */
+function reConstructBinaryTree($pre, $vin) {
+    $len = count($pre);
+    if(!$len || $len != count($vin)) return null;
+    $rootValue = $pre[0];
+    $root = new TreeNode($rootValue);
+    $rootIndex  = null;
+    for($i = 0; $i < $len; $i++) {
+        if($vin[$i] == $rootValue) {
+            $rootIndex = $i;
+        }
+    }
+    $leftPre = $leftVin = [];
+    for($i = 0; $i < $rootIndex; $i++) {
+        $leftPre[] = $pre[$i + 1];
+        $leftVin[] = $vin[$i];
+    }
+    $rightPre = $rightVin = [];
+    for($i = $rootIndex + 1; $i < $len; $i++) {
+        $rightPre[] = $pre[$i];
+        $rightVin[] = $vin[$i];
+    }
+    if($leftPre) {
+        $root->left = reConstructBinaryTree($leftPre, $leftVin);
+    }
+    if($rightPre) {
+        $root->right = reConstructBinaryTree($rightPre, $rightVin);
+    }
+    return $root;
+}
+
+```
 
 # LeeCode题解 #
 ## 验证二叉搜索树(98) ##
