@@ -1,4 +1,6 @@
 * [剑指offer题解](#剑指offer题解)
+  * [重建二叉树(4)](#重建二叉树4)
+  * [树的子结构(17)](#树的子结构17)
 * [LeeCode题解](#leecode题解)
   * [验证二叉搜索树(98)](#验证二叉搜索树98)
   * [二叉搜索树的最近公共祖先(235)](#二叉搜索树的最近公共祖先235)
@@ -59,7 +61,39 @@ function reConstructBinaryTree($pre, $vin) {
     }
     return $root;
 }
-
+```
+## 树的子结构(17) ##
+```
+/**
+ * 递归
+ * 时间复杂度O(n²)
+ * 空间复杂度O(1)
+ */
+function hasSubtree($t1, $t2) {
+    if(!$t1 || !$t2 ) {
+        return false;
+    }
+    $result = false;
+    if($t1->val == $t2->val) {
+        $result = parentHasChild($t1, $t2);
+    }
+    if(!$result) {
+        return hasSubtree($t1->left, $t2) || hasSubtree($t1->right, $t2);
+    }
+    return $result;
+}
+function parentHasChild($p, $c) {
+    if(!$c) {
+        return true;
+    } else if(!$p) {
+        return false;
+    }
+    if($p->val == $c->val) {
+        return parentHasChild($p->left, $c->left) && parentHasChild($p->right, $c->right);
+    } else {
+        return false;
+    }
+}
 ```
 
 # LeeCode题解 #
