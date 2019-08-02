@@ -95,7 +95,50 @@ function parentHasChild($p, $c) {
     }
 }
 ```
-
+## 二叉树的镜像(18) ##
+```
+/**
+ * 遍历
+ * 时间复杂度O(n)
+ * 空间复杂度O(1)
+ */
+function mirror(&$root) {
+    if(!$root) {
+        return $root;
+    }
+    $tmp = $root->left;
+    $root->left = $root->right;
+    $root->right = $tmp;
+    mirror($root->left);
+    mirror($root->right);
+}
+```
+## 从上往下打印二叉树(22) ##
+```
+/**
+ * 队列
+ * 时间复杂度O(n)
+ * 空间复杂度O(n)
+ */
+function printFromTopToBottom($root) {
+    if(!$root) {
+        return $root;
+    }
+    $stack = $res = [];
+    array_push($stack, $root);
+    while ($stack) {
+        $node = array_shift($stack);
+        $res[] = $node->val;
+        if($node->left) {
+            array_push($stack, $node->left);
+        }
+        if($node->right) {
+            array_push($stack, $node->right);
+        }
+    }
+    return $res;
+}
+```
 # LeeCode题解 #
 ## 验证二叉搜索树(98) ##
 ```
