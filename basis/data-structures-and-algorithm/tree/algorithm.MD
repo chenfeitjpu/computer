@@ -3,13 +3,18 @@
   * [树的子结构(17)](#树的子结构17)
   * [二叉树的镜像(18)](#二叉树的镜像18)
   * [从上往下打印二叉树(22)](#从上往下打印二叉树22)
+  * [二叉树中和为某一值的路径(24)](#二叉树中和为某一值的路径24)
+  * [二叉树的深度(38)](#二叉树的深度38)
+  * [平衡二叉树(39)](#平衡二叉树39)
+  * [二叉树的下一个结点(57)](#二叉树的下一个结点57)
+  * [对称的二叉树(58)](#对称的二叉树58)
 * [LeeCode题解](#leecode题解)
   * [验证二叉搜索树(98)](#验证二叉搜索树98)
   * [二叉搜索树的最近公共祖先(235)](#二叉搜索树的最近公共祖先235)
   * [二叉树的最近公共祖先(236)](#二叉树的最近公共祖先236)
   * [二叉树的层次遍历(102)](#二叉树的层次遍历102)
   * [二叉树的最大深度(104)](#二叉树的最大深度104)
-  * [二叉树的最小深度(111)](#二叉树的最小深度111)
+      * [二叉树的最小深度(111)](#二叉树的最小深度111)
 
 # 剑指offer题解 #
 ```
@@ -141,6 +146,135 @@ function printFromTopToBottom($root) {
     return $res;
 }
 ```
+## 二叉树中和为某一值的路径(24) ##
+````
+/**
+ * 遍历
+ * 时间复杂度O(n)
+ * 空间复杂度O(1)
+ */
+function findPath($root, $num) {
+    $res = [];
+    if(!$root) {
+        return $res;
+    }
+    $tmp = [];
+    findPathRecursion($root, $num, $res, $tmp);
+}
+
+function findPathRecursion($root, $num, &$res, $tmp) {
+    if(!$root) {
+        return;
+    }
+    $tmp[] = $root->val;
+    if($root->val == $num && !$root->left && !$root->right) {
+        $res[] = $tmp;
+        return;
+    }
+    findPathRecursion($root->left, $num - $root->val, $res, $tmp);
+    findPathRecursion($root->right, $num - $root->val, $res, $tmp);
+}
+````
+## 二叉树的深度(38) ##
+```
+/**
+ * 遍历
+ * 时间复杂度O(n)
+ * 空间复杂度O(1)
+ */
+function treeDepth($root) {
+    if(!$root) {
+        return 0;
+    }
+    return max(treeDepth($root->left), treeDepth($root->right)) + 1;
+}
+```
+## 平衡二叉树(39) ##
+```
+/**
+ * 遍历
+ * 时间复杂度O(n)
+ * 空间复杂度O(1)
+ */
+function isBalanced($root) {
+    if(!$root) {
+        return true;
+    }
+    $depth = 0 ;
+    return isBalancedTree($root, $depth);
+}
+
+function isBalancedTree($root, &$depth) {
+    if(!$root) {
+        $depth = 0;
+        return true;
+    }
+    $left = $right = 0;
+    if(isBalancedTree($root->left, $left) && isBalancedTree($root->right, $right)) {
+        if(abs($left - $right) <= 1) {
+            $depth = max($left, $right) + 1;
+            return true;
+        }
+    } else {
+        return false;
+    }
+}
+```
+## 二叉树的下一个结点(57) ##
+```
+/**
+ * 遍历
+ * 时间复杂度o(n)
+ * 空间复杂度O(1)
+ */
+function getNext($node) {
+    $next = null;
+    if($node->right) {
+        $next = $node->right;
+        while($next->left) {
+            $next = $next->left;
+        }
+    } elseif ($node->next) {
+        $parent = $node->next;
+        while($parent && $parent->right == $node) {
+            $node = $parent;
+            $parent = $parent->next;
+        }
+        $next = $parent;
+    }
+    return $next;
+}
+```
+## 对称的二叉树(58) ##
+```
+/**
+ * 遍历
+ * 时间复杂度O(n)
+ * 空间复杂度O(1)
+ */
+function isSymmetrical($root) {
+    if(!$root) {
+        return true;
+    }
+    return isSymmetricalNode($root->left, $root->right);    
+}
+function isSymmetricalNode($p1, $p2) {
+    if(!$p1 && !$p2) {
+        return true;
+    }
+    if(!$p1 || !$p2) {
+        return false;
+    }
+    if($p1->val != $p2->val) {
+        return false;
+    }
+    return isSymmetricalNode($p1->left, $p2->right)
+        && isSymmetricalNode($p1->right, $p2->left)
+    ;
+}
+```
+
+
 # LeeCode题解 #
 ## 验证二叉搜索树(98) ##
 ```
