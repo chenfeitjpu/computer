@@ -12,6 +12,7 @@
   * [把二叉树打印成多行(60)](#把二叉树打印成多行60)
   * [序列化二叉树(61)](#序列化二叉树61)
   * [二叉搜索树的后序遍历序列(23)](#二叉搜索树的后序遍历序列23)
+  * [二叉搜索树与双向链表(26)](#二叉搜索树与双向链表26)
   * [二叉搜索树的第k个结点(62)](#二叉搜索树的第k个结点62)
 * [LeeCode题解](#leecode题解)
   * [验证二叉搜索树(98)](#验证二叉搜索树98)
@@ -438,6 +439,42 @@ function verifyBST($queue, $start, $end)  {
         $right = verifyBST($queue, $i, $end - 1);
     }
     return $left && $right;
+}
+```
+## 二叉搜索树与双向链表(26) ##
+```
+/**
+ * 遍历
+ * 时间复杂度O(n)
+ * 空间复杂度O(1)
+ */
+function convert($root) {
+    if(!$root) {
+        return null;
+    }
+    $lastNode = null;
+    convertNode($root, $lastNode);
+    $head = $lastNode;
+    while ($head->left) {
+        $head = $head->left;
+    }
+    return $head;
+}
+function convertNode($root, &$lastNode) {
+    if(!$root) {
+        return null;
+    }
+    if($root->left) {
+        convertNode($root->left, $lastNode);
+    }
+    $root->left = $lastNode;
+    if($lastNode) {
+        $lastNode->right = $root;
+    }
+    $lastNode = $root;
+    if($root->right) {
+        convertNode($root->right, $lastNode);
+    }
 }
 ```
 ## 二叉搜索树的第k个结点(62) ##
