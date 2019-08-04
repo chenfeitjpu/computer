@@ -8,13 +8,16 @@
   * [平衡二叉树(39)](#平衡二叉树39)
   * [二叉树的下一个结点(57)](#二叉树的下一个结点57)
   * [对称的二叉树(58)](#对称的二叉树58)
+  * [按之字顺序打印二叉树(59)](#按之字顺序打印二叉树59)
+  * [把二叉树打印成多行(60)](#把二叉树打印成多行60)
+  * [序列化二叉树(61)](#序列化二叉树61)
 * [LeeCode题解](#leecode题解)
   * [验证二叉搜索树(98)](#验证二叉搜索树98)
   * [二叉搜索树的最近公共祖先(235)](#二叉搜索树的最近公共祖先235)
   * [二叉树的最近公共祖先(236)](#二叉树的最近公共祖先236)
   * [二叉树的层次遍历(102)](#二叉树的层次遍历102)
   * [二叉树的最大深度(104)](#二叉树的最大深度104)
-      * [二叉树的最小深度(111)](#二叉树的最小深度111)
+  * [二叉树的最小深度(111)](#二叉树的最小深度111)
 
 # 剑指offer题解 #
 ```
@@ -273,7 +276,126 @@ function isSymmetricalNode($p1, $p2) {
     ;
 }
 ```
+## 按之字顺序打印二叉树(59) ##
+```
+/**
+ * 遍历
+ * 时间复杂度O(n)
+ * 空间复杂度O(n)
+ */
+function myPrint($root) {
+    $res = [];
+    if(!$root) {
+        return $res;
+    }
+    $odd = $even = [];
+    array_push($odd, $root);
+    while ($odd || $even) {
+        $tmpOdd = $tmpEven = [];
+        while ($odd) {
+            $node = array_pop($odd);
+            $tmpOdd[] = $node->val;
+            if($node->left) {
+                array_push($even, $node->left);
+            }
+            if($node->right) {
+                array_push($even, $node->right);
+            }
+        }
+        if($tmpOdd) {
+            $res[] = $tmpOdd;
+        }
+        while ($even) {
+            $node = array_pop($even);
+            $tmpEven[] = $node->val;
+            if($node->right) {
+                array_push($odd, $node->right);
+            }
+            if($node->left) {
+                array_push($odd, $node->left);
+            }
+        }
+        if($tmpEven) {
+            $res[] = $tmpEven;  
+        }
+    }
+    return $res;
+}
+```
+## 把二叉树打印成多行(60) ##
+```
+/**
+ * 遍历
+ * 时间复杂度O(n)
+ * 空间复杂度O(n)
+ */
+function rowPrint($root) {
+    $res = [];
+    if(!$root) {
+        return $res;
+    }
+    $queue = [];
+    array_push($queue, $root);
+    while ($queue) {
+        $tmp = [];
+        $len = count($queue);
+        for($i = 0; $i < $len; $i++) {
+            $node = array_shift($queue);
+            $tmp[] = $node->val;
+            if($node->left) {
+                array_push($queue, $node->left);
+            }
+            if($node->right) {
+                array_push($queue, $node->right);
+            }
+        }
+        $res[] = $tmp;
+    }
+    return $res;
+}
+```
+## 序列化二叉树(61) ##
+```
+function MySerialize($root) {
+    $res = '';
+    if(!$root) {
+        return $res;
+    }
+    serializeNode($root, $res);
+    return $res;
+}
+function serializeNode($root, &$str) {
+    if(!$root) {
+        $str .= '#';
+        return;
+    }
+    $str .= $root->val . ',';
+    serializeNode($root->left, $str);
+    serializeNode($root->right, $str);
+}
 
+function MyDeserialize($str) {
+    if(!$str) {
+        return null;
+    }
+    return unserializeNode($str);
+}
+function unserializeNode(&$str) {
+    if(stripos($str, '#') === 0) {
+        $str = substr($str, 1);
+        return null;
+    }
+    $pos = stripos($str, ',');
+    $node = new TreeNode(intval(substr($str, 0, $pos)));
+    $str = substr($str, $pos+1);
+    if(!$str) {
+        return $node;
+    }
+    $node->left = unserializeNode($str);
+    $node->right = unserializeNode($str);
+    return $node;
+}
+```
 
 # LeeCode题解 #
 ## 验证二叉搜索树(98) ##
