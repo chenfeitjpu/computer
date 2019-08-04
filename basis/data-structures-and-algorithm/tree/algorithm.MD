@@ -11,6 +11,8 @@
   * [按之字顺序打印二叉树(59)](#按之字顺序打印二叉树59)
   * [把二叉树打印成多行(60)](#把二叉树打印成多行60)
   * [序列化二叉树(61)](#序列化二叉树61)
+  * [二叉搜索树的后序遍历序列(23)](#二叉搜索树的后序遍历序列23)
+  * [二叉搜索树的第k个结点(62)](#二叉搜索树的第k个结点62)
 * [LeeCode题解](#leecode题解)
   * [验证二叉搜索树(98)](#验证二叉搜索树98)
   * [二叉搜索树的最近公共祖先(235)](#二叉搜索树的最近公共祖先235)
@@ -394,6 +396,75 @@ function unserializeNode(&$str) {
     $node->left = unserializeNode($str);
     $node->right = unserializeNode($str);
     return $node;
+}
+```
+## 二叉搜索树的后序遍历序列(23) ##
+```
+/**
+ * 遍历
+ * 时间复杂度O(n)
+ * 空间复杂度O(1)
+ */
+function verifySquenceOfBST($queue) {
+    if(!$queue) {
+        return false;
+    }
+    return verifyBST($queue, 0, count($queue) - 1);
+}
+function verifyBST($queue, $start, $end)  {
+    if($start > $end) {
+        return false;
+    }
+    //根节点
+    $root = $queue[$end];
+    for($i = $start; $i < $end; $i++) {
+        if($queue[$i] > $root) {
+            break;
+        }
+    }
+    for($j = $i; $j < $end; $j++) {
+        if($queue[$j] < $root) {
+            return false;
+        }
+    }
+    //左子树
+    $left = true;
+    if($start < $i) {
+        $left = verifyBST($queue, $start, $i - 1);
+    }
+    //右子树
+    $right = true;
+    if($i < $end) {
+        $right = verifyBST($queue, $i, $end - 1);
+    }
+    return $left && $right;
+}
+```
+## 二叉搜索树的第k个结点(62) ##
+```
+/**
+ * 遍历
+ * 时间复杂度O(n)
+ * 空间复杂度O(1)
+ */
+function kthNode($root, &$k) {
+    $target = null;
+    if(!$root) {
+        return $target;
+    }
+    if($root->left) {
+        $target = kthNode($root->left, $k);
+    }
+    if(!$target) {
+        if($k == 1) {
+            $target = $root;
+        } 
+        $k--;
+    }
+    if(!$target && $root->right) {
+        $target = kthNode($root->right, $k);
+    }
+    return $target;
 }
 ```
 
