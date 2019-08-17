@@ -152,7 +152,6 @@ function findContinuousSequence($sum) {
     }
     return $res;
 }
-
 ```
 ## 和为S的两个数字(42) ##
 ```
