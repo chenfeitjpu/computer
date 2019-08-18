@@ -161,6 +161,90 @@ function fourSum(array $nums, int $target) {
 	return $res;
 }
 ```
+## 两两交换链表中的节点(24) ##
+```
+/**
+ * 循环
+ */
+function swapPairs($head) {
+    $dummy = new ListNode(-1);
+    $dummy->next = $head;
+    $pre = $dummy;
+    while ($pre->next && $pre->next->next) {
+        $start = $pre->next;
+        $end = $pre->next->next;
+        $pre->next = $end;
+        $start->next = $end->next;
+        $end->next = $start;
+        $pre = $start;
+    }
+    return $dummy->next;
+}
+```
+```
+/**
+ * 递归
+ */
+function swapPairs($head) {
+    if(!$head || !$head->next) return $head;
+    $next = $head->next;
+    $head->next = swapPairs($next->next);
+    $next->next = $head;
+    return $next;
+}
+```
+## K个一组翻转链表(25) ##
+```
+/**
+ * 循环+尾插入
+ */
+function reverseKGroup($head, $k) {
+    $dummy = new ListNode(-1);
+    $dummy->next = $head;
+    $pre = $tail = $dummy;
+    while (true) {
+        $count = $k;
+        while ($count && $tail) {
+            $tail = $tail->next;
+            $count--;
+        }
+        if(!$tail) break;
+        $head = $pre->next;
+        while ($pre->next != $tail) {
+            $cur = $pre->next;
+            $pre->next = $cur->next;
+            $cur->next = $tail->next;
+            $tail->next = $cur;
+        }
+        $pre = $tail = $head;
+    }
+    return $dummy->next;
+}
+```
+```
+/**
+ * 递归
+ */
+function reverseKGroup2($head, $k) {
+    $cur = $head;
+    $count = 0;
+    while ($cur && $count != $k) {
+        $cur = $cur->next;
+        $count++;
+    }
+    if($count == $k) {
+        $cur = reverseKGroup2($cur, $k);
+        while ($count) {
+            $tmp = $head->next;
+            $head->next = $cur;
+            $cur = $head;
+            $head = $tmp;
+            $count--;
+        }
+        $head = $cur;
+    }
+    return $head;
+```
 # 删除排序数组中的重复项(26) #
 ```
 /**
@@ -221,6 +305,28 @@ function searchIndex(array $nums, int $target) {
 		}
 	} 
 	return $left;
+}
+```
+# 幂函数(50) #
+```
+function fastPow($x, $n) {
+    if($n == 1) {
+        return $x;
+    }
+    $value = fastPow($x, floor($n / 2));
+    if($n % 2 == 0) {
+        return $value * $value;
+    } else {
+        return $value * $value * $x;
+    }
+}
+function myPow($x, $n) {
+    if($n == 0) return 1;
+    if($n < 0) {
+        $x = 1 / $x;
+        $n = -$n;
+    }
+    return fastPow($x, $n);
 }
 ```
 # 最大子序和(53) #
@@ -284,6 +390,67 @@ public function merge(array $nums1, int $m, array $nums2, int $n) {
 	}
 }
 ```
+## 反转链表II(92) ##
+```
+/**
+ * 拼接法
+ */
+function reverseBetween($head, $m, $n) {
+    $dummy = new ListNode(-1);
+    $dummy->next = $head;
+    $pre = $dummy;
+    for($i = 0; $i < $m - 1; $i++) {
+        $pre = $pre->next;
+    }
+    $node = null;
+    $cur = $pre->next;
+    for($i = 0; $i < $n - $m + 1; $i++) {
+        $tmp = $cur->next;
+        $cur->next = $node;
+        $node = $cur;
+        $cur = $tmp;
+    }
+    $pre->next->next = $cur;
+    $pre->next = $node;
+    return $dummy->next;
+}
+```
+```
+/**
+ * 插入法
+ */
+function reverseBetween2($head, $m, $n) {
+    $dummy = new ListNode(-1);
+    $dummy->next = $head;
+    $pre = $dummy;
+    for($i = 0; $i < $m - 1; $i++) {
+        $pre = $pre->next;
+    }
+    $start = $pre->next;
+    $tail = $start->next;
+    for($i = 0; $i < $n - $m; $i++) {
+        $start->next = $tail->next;
+        $tail->next = $pre->next;
+        $pre->next = $tail;
+        $tail = $start->next;
+    }
+    return $dummy->next;
+}
+```
+# 买卖股票的最佳时机(122) #
+```
+function maxProfit($prices) {
+    $len = count($prices);
+    if($len <= 2) return 0;
+    $profit = 0;
+    for($i = 1; $i < $len; $i++) {
+        if($prices[$i] > $prices[$i -1]) {
+            $profit += $prices[$i] - $prices[$i - 1];
+        }
+    }
+    return $profit;
+}
+```
 # 求众数(169) #
 ```
 /**
@@ -299,5 +466,108 @@ function majorityElement($nums) {
 		$count += ($num == $res ? 1 : -1);
 	}
 	return $res;
+}
+```
+```
+function majorityCount($nums, $num, $lower, $hight) {
+    $count = 0;
+    for($i = $lower; $i <= $hight; $i++) {
+        if($nums[$i] == $num) {
+            $count++;
+        }
+    }
+    return $count;
+}
+function majority($nums, $lower, $hight) {
+    if($lower == $hight) {
+        return $nums[$lower];
+    }
+    $mid = floor(($hight - $lower) / 2) + $lower;
+    $left = majority($nums, $lower, $mid);
+    $right = majority($nums, $mid + 1, $hight);
+    if($left == $right) {
+        return $left;
+    }
+    $leftCount = majorityCount($nums, $left, $lower, $hight);
+    $rightCount = majorityCount($nums, $right, $lower, $hight);
+    return $leftCount > $rightCount ? $left : $right;
+}
+function majorityElement($nums) {
+    $len = count($nums);
+    if($len == 0) return null;
+    if($len == 1) return current($nums);
+    return majority($nums, 0, $len-1);
+}
+```
+## 反转链表(206) ##
+```
+/**
+ * 把当前元素的指针指向前一个元素(从前向后遍历)
+ */
+function reverseList($head) {
+    $pre = null;
+    $cur = $head;
+    while ($cur) {
+        $tmp = $cur->next;
+        $cur->next = $pre;
+        $pre = $cur;
+        $cur = $tmp;
+    }
+    return $pre;
+}
+```
+```
+/**
+ * 把后一个元素的指针指向当前元素(从后向前遍历)
+ */
+function reverseList2($head) {
+    if(!$head->next) return $head;
+    $p = reverseList2($head->next);
+    $head->next->next = $head;
+    $head->next = null;
+    return $p;
+}
+```
+# 滑动窗口最大值(239) #
+```
+function slidingWindow($nums, $k) {
+    $len = count($nums);
+    if(!$len) return [];
+    $window = $res = [];
+    for($i = 0; $i < $len; $i++) {
+        while($i >= $k && $window && $window[0] <= $i - $k) {
+            array_shift($window);
+        }
+        while($window && $nums[$window[count($window)-1]] <= $nums[$i]) {
+            array_pop($window);
+        }
+        array_push($window, $i);
+        if($i >= $k-1) {
+            $res[] = $nums[$window[0]];
+        }
+    }
+    if($len < $k) {
+        $res[] = $nums[$window[0]];
+    }
+    return $res;
+}
+```
+# 有效的字母异位词(242) #
+```
+function isAnagram($s, $t) {
+    $slen = strlen($s);
+    $tlen = strlen($t);
+    if($slen != $tlen) return false;
+    $map = [];
+    for($i = 0; $i < $slen; $i++) {
+        isset($map[$s[$i]]) ? $map[$s[$i]]++ : $map[$s[$i]] = 1;
+        isset($map[$t[$i]]) ? $map[$t[$i]]-- : $map[$t[$i]] = -1;
+    }
+    foreach ($map as $k => $v) {
+        if($v) {
+            return false;
+        }
+    }
+    return true;
 }
 ```
