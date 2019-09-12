@@ -16,8 +16,24 @@
   - binlog 逻辑日志
 
 两者区别
-|日志类型|存贮位置|记录内容|写入方式|
-|---|----|----|---|
-|redolog|引擎层|数据变化|循环写|
-|binlog|server层|逻辑变化|追加写|
+<table>
+	<tr>
+	   <td>日志类型</td>
+	   <td>存贮位置</td>
+	   <td>记录内容</td>
+	   <td>写入方式</td>
+	</tr>
+	<tr>
+		<td>redolog</td>
+		<td>引擎层</td>
+		<td>数据变化</td>
+		<td>循环写</td>
+	</tr>
+	<tr>
+		<td>binlog</td>
+		<td>server层</td>
+		<td>逻辑变化</td>
+		<td>追加写</td>
+	</tr>
+</table>
 # 事务 #
