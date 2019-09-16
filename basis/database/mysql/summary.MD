@@ -38,3 +38,12 @@
 </table>
 
 # 事务 #
+特性
+  - 原子性(atomicity)
+  - 持久性(consistency)
+  - 隔离性(isolation)
+    - 读未提交(read uncommitted)
+    - 读提交(read committed)
+    - 可重复度(repeatable read)
+    - 串行化(serializable)	
+  - 一致性(durability)
