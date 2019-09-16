@@ -12,8 +12,8 @@
   - 存储引擎 操作数据
   
 # 日志 #
-  - redolog 物理日志
-  - binlog 逻辑日志
+  - redolog 引擎层(innodb特有)记录内存中数据变化，同步到磁盘
+  - binlog server层记录所有SQL语句
 
 两者区别
 <table>
