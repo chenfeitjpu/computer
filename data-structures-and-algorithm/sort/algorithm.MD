@@ -1,6 +1,6 @@
 * [冒泡排序](#冒泡排序)
-* [插入排序](#插入排序)
 * [选择排序](#选择排序)
+* [插入排序](#插入排序)
 * [快速排序](#快速排序)
 * [归并排序](#归并排序)
 * [桶排序](#桶排序)
@@ -27,26 +27,6 @@ function bubble($nums) {
     return $nums;
 }
 ```
-# 插入排序 #
-```
-/**
- * 向有序集合中添加一个元素
- */
-function insertSort($nums) {
-    $len = count($nums);
-    if($len <= 1) {
-        return $nums;
-    }
-    for($i = 0; $i < $len; $i++) {
-        $tmp = $nums[$i];
-        for($j = $i - 1; $j >= 0 && $nums[$j] > $tmp; $j--) {
-            $nums[$j + 1] = $nums[$j];
-        }
-        $nums[$j + 1] = $tmp;
-    }
-    return $nums;
-}
-```
 # 选择排序 #
 ```
 /**
@@ -67,6 +47,26 @@ function select($nums) {
         if($index != $i) {
             list($nums[$i], $nums[$index]) = [$nums[$index], $nums[$i]];
         }
+    }
+    return $nums;
+}
+```
+# 插入排序 #
+```
+/**
+ * 向有序集合中添加一个元素
+ */
+function insert($nums) {
+    $len = count($nums);
+    if($len <= 1) {
+        return $nums;
+    }
+    for($i = 1; $i < $len; $i++) {
+        $radix = $nums[$i];
+        for($j = $i - 1; $j >= 0 && $nums[$j] > $radix; $j--) {
+            $nums[$j + 1] = $nums[$j];
+        }
+        $nums[$j + 1] = $radix;
     }
     return $nums;
 }
