@@ -10,15 +10,15 @@
 # 冒泡排序 #
 ```
 /**
- * 比较相邻元素
+ * 比较相邻元素进行交换
  */
-function bubbleSort($nums) {
+function bubble($nums) {
     $len = count($nums);
-    if($len <= 1) {
+    if ($len <= 1) {
         return $nums;
     }
-    for($i = 0; $i < $len - 1; $i++) {
-        for($j = 0; $j < $len - 1 - $i; $j++) {
+    for ($i = 0; $i < $len - 1; $i++) {
+        for ($j = 0; $j < $len - 1 - $i; $j++) {
             if($nums[$j] > $nums[$j + 1]) {
                 list($nums[$j], $nums[$j + 1]) = [$nums[$j + 1], $nums[$j]];
             }
