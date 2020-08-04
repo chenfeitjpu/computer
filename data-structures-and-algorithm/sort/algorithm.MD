@@ -74,9 +74,9 @@ function insert($nums) {
 # 快速排序 #
 ```
 /**
- * 选择一个基准值，比它小的放左边，比它大的放右边
+ * 选择一个基准值，从右边开始找比它小的放左边，从左边开始找比它大的放右边，最后交换基准值
  */
-function sortArray($nums) {
+function quickSort($nums) {
     $len = count($nums);
     if($len <= 1) {
         return $nums;
@@ -88,24 +88,22 @@ function quickSort(&$nums, $start, $end) {
     if($start >= $end) {
         return;
     }
-    $base = $nums[$start];
-    $left = $start;
-    $right = $end;
-    while($left < $right) {
-        while($left < $right && $nums[$right] >= $base) {
+    $radix = $nums[$start];
+    list($left, $right) = [$start, $end];
+    while ($left < $right) {
+        while ($left < $right && $nums[$right] >= $radix) {
             $right--;
         }
-        while($left < $right && $nums[$left] <= $base) {
+        while ($left < $right && $nums[$left] <= $radix) {
             $left++;
         }
         if($left < $right) {
             list($nums[$left], $nums[$right]) = [$nums[$right], $nums[$left]];
         }
     }
-    $nums[$start] = $nums[$left];
-    $nums[$left] = $base;
-    quickSort($nums, $start, $left -1);
-    quickSort($nums, $left + 1, $end);
+    list($nums[$start], $nums[$left]) = [$nums[$left], $radix];
+    quick($nums, $start, $left - 1);
+    quick($nums, $left + 1, $end);
 }
 ```
 # 归并排序 #
