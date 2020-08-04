@@ -130,14 +130,9 @@ function mergeSort(&$nums, $start, $end) {
 }
 function merge(&$nums, $start, $mid, $end) {
     $tmp = [];
-    $i = $start;
-    $j = $mid + 1;
+    list($i, $j) = [$start, $mid + 1];
     while($i <= $mid && $j <= $end) {
-        if($nums[$i] < $nums[$j]) {
-            $tmp[] = $nums[$i++];
-        } else {
-            $tmp[] = $nums[$j++];
-        }
+        $tmp[] = $nums[$i] <= $nums[$j] ? $nums[$i++] : $nums[$j++];
     }
     while($i <= $mid) {
         $tmp[] = $nums[$i++];
@@ -146,8 +141,8 @@ function merge(&$nums, $start, $mid, $end) {
         $tmp[] = $nums[$j++];
     }
     $k = 0;
-    while($start <= $end) {
-        $nums[$start++] = $tmp[$k++];
+    for ($i = $start; $i <= $end; $i++) {
+        $nums[$i] = $tmp[$i - $start];
     }
 }
 ```
