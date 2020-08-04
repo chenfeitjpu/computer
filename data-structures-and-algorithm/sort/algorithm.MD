@@ -11,6 +11,8 @@
 ```
 /**
  * 比较相邻元素进行交换
+ * time O(n²)
+ * space O(1)
  */
 function bubble($nums) {
     $len = count($nums);
@@ -31,6 +33,8 @@ function bubble($nums) {
 ```
 /**
  * 从未排序集合中选择一个元素
+ * time O(n²)
+ * space O(1)
  */
 function select($nums) {
     $len = count($nums);
@@ -55,6 +59,8 @@ function select($nums) {
 ```
 /**
  * 向有序集合中添加一个元素
+ * time O(n²)
+ * space O(1)
  */
 function insert($nums) {
     $len = count($nums);
@@ -75,6 +81,8 @@ function insert($nums) {
 ```
 /**
  * 选择一个基准值，从右边开始找比它小的放左边，从左边开始找比它大的放右边，最后交换基准值
+ * time O(n㏒n)
+ * space O(1)
  */
 function quickSort($nums) {
     $len = count($nums);
@@ -110,6 +118,8 @@ function quickSort(&$nums, $start, $end) {
 ```
 /**
  * 合并两个有序集合
+ * time O(n㏒n)
+ * space O(n)
  */
 function sortArray($nums) {
     $len = count($nums);
