@@ -22,7 +22,7 @@ function bubble($nums) {
     for ($i = 0; $i < $len - 1; $i++) {
         for ($j = 0; $j < $len - 1 - $i; $j++) {
             if($nums[$j] > $nums[$j + 1]) {
-                list($nums[$j], $nums[$j + 1]) = [$nums[$j + 1], $nums[$j]];
+                [$nums[$j], $nums[$j + 1]] = [$nums[$j + 1], $nums[$j]];
             }
         }
     }
@@ -49,7 +49,7 @@ function select($nums) {
             }
         }
         if($index != $i) {
-            list($nums[$i], $nums[$index]) = [$nums[$index], $nums[$i]];
+            [$nums[$i], $nums[$index]] = [$nums[$index], $nums[$i]];
         }
     }
     return $nums;
@@ -106,10 +106,10 @@ function quickSort(&$nums, $start, $end) {
             $left++;
         }
         if($left < $right) {
-            list($nums[$left], $nums[$right]) = [$nums[$right], $nums[$left]];
+            [$nums[$left], $nums[$right]] = [$nums[$right], $nums[$left]];
         }
     }
-    list($nums[$start], $nums[$left]) = [$nums[$left], $radix];
+    [$nums[$start], $nums[$left]] = [$nums[$left], $radix];
     quick($nums, $start, $left - 1);
     quick($nums, $left + 1, $end);
 }
