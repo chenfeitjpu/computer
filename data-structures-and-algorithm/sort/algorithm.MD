@@ -52,7 +52,7 @@ function insertSort($nums) {
 /**
  * 从未排序集合中选择一个元素
  */
-function selectSort($nums) {
+function select($nums) {
     $len = count($nums);
     if($len <= 1) {
         return $nums;
