@@ -84,7 +84,7 @@ function insert($nums) {
  * time O(n㏒n)
  * space O(1)
  */
-function quickSort($nums) {
+function sortArray($nums) {
     $len = count($nums);
     if($len <= 1) {
         return $nums;
@@ -110,8 +110,8 @@ function quickSort(&$nums, $start, $end) {
         }
     }
     list($nums[$start], $nums[$left]) = [$nums[$left], $nums[$start]];
-    quick($nums, $start, $left - 1);
-    quick($nums, $left + 1, $end);
+    quickSort($nums, $start, $left - 1);
+    quickSort($nums, $left + 1, $end);
 }
 ```
 # 归并排序 #
@@ -150,7 +150,6 @@ function merge(&$nums, $start, $mid, $end) {
     while($j <= $end) {
         $tmp[] = $nums[$j++];
     }
-    $k = 0;
     for ($i = $start; $i <= $end; $i++) {
         $nums[$i] = $tmp[$i - $start];
     }
