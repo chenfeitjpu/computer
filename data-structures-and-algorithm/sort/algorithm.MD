@@ -49,7 +49,7 @@ function select($nums) {
             }
         }
         if($index != $i) {
-            [$nums[$i], $nums[$index]] = [$nums[$index], $nums[$i]];
+            list($nums[$i], $nums[$index]) = [$nums[$index], $nums[$i]];
         }
     }
     return $nums;
