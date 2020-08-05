@@ -109,7 +109,7 @@ function quickSort(&$nums, $start, $end) {
             [$nums[$left], $nums[$right]] = [$nums[$right], $nums[$left]];
         }
     }
-    [$nums[$start], $nums[$left]] = [$nums[$left], $radix];
+    list($nums[$start], $nums[$left]) = [$nums[$left], $nums[$start]];
     quick($nums, $start, $left - 1);
     quick($nums, $left + 1, $end);
 }
