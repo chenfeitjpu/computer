@@ -22,7 +22,7 @@ function bubble($nums) {
     for ($i = 0; $i < $len - 1; $i++) {
         for ($j = 0; $j < $len - 1 - $i; $j++) {
             if($nums[$j] > $nums[$j + 1]) {
-                [$nums[$j], $nums[$j + 1]] = [$nums[$j + 1], $nums[$j]];
+                list($nums[$j], $nums[$j + 1]) = [$nums[$j + 1], $nums[$j]];
             }
         }
     }
