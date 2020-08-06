@@ -4,8 +4,8 @@
 * [快速排序](#快速排序)
 * [归并排序](#归并排序)
 * [桶排序](#桶排序)
-* [基数排序](#基数排序)
 * [计数排序](#计数排序)
+* [基数排序](#基数排序)
    
 # 冒泡排序 #
 ```
@@ -184,6 +184,31 @@ function bucketSort($nums) {
     return $res;
 }
 ```
+# 计数排序 #
+```
+function countSort($nums) {
+    $len = count($nums);
+    if($len <= 1) {
+        return $nums;
+    }
+    list($max, $min) = [max($nums), min($nums)];
+    $range = $max - $min;
+    $list = [];
+    for ($i = 0; $i <= $range; $i++) {
+        $list[$i] = 0;
+    }
+    for ($i = 0; $i < $len; $i++) {
+        $list[$nums[$i] - $min]++;
+    }
+    $res = [];
+    for ($i = 0; $i <= $range; $i++) {
+        while ($list[$i]--) {
+            $res[] = $min + $i;
+        }
+    }
+    return $res;
+}
+```
 # 基数排序 #
 ```
 function radixSort($nums) {
@@ -210,30 +235,5 @@ function radixSort($nums) {
         $unit *= 10;
     }
     return $nums;
-}
-```
-# 计数排序 #
-```
-function countSort($nums) {
-    $len = count($nums);
-    if($len <= 1) {
-        return $nums;
-    }
-    list($max, $min) = [max($nums), min($nums)];
-    $range = $max - $min;
-    $list = [];
-    for ($i = 0; $i <= $range; $i++) {
-        $list[$i] = 0;
-    }
-    for ($i = 0; $i < $len; $i++) {
-        $list[$nums[$i] - $min]++;
-    }
-    $res = [];
-    for ($i = 0; $i <= $range; $i++) {
-        while ($list[$i]--) {
-            $res[] = $min + $i;
-        }
-    }
-    return $res;
 }
 ```
