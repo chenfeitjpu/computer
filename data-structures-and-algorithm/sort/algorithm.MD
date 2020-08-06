@@ -216,26 +216,23 @@ function radixSort($nums) {
     if($len <= 1) {
         return $nums;
     }
-    $res = [];
-    for($i = 0; $i < 10; $i++) {
-        $res[] = [];
-    }
-    $digit = strlen(max($nums));
-    $d = 0;
-    $n = 1;
-    while($d < $digit) {
-        for($i = 0; $i < $len; $i++) {
-            $index = floor($nums[$i] / $n) % 10;
-            $res[$index][] = $nums[$i];
+    list($digits, $digit, $start, $end, $unit) = [strlen(max($nums)), 0, 0, 9, 1];
+    while ($digit < $digits) {
+        $list = [];
+        for ($i = 0; $i < $len; $i++) {
+            $index = floor($nums[$i] / $unit) % 10;
+            $list[$index][] = $nums[$i];
         }
-        $k = 0;
-        for($i = 0; $i < 10; $i++) {
-            while($res[$i]) {
-               $nums[$k++] = array_shift($res[$i]);
+        for ($i = $start, $j = 0; $i <= $end; $i++) {
+            if(!isset($list[$i])) {
+                continue;
+            }
+            while($list[$i]) {
+                $nums[$j++] = array_shift($list[$i]);
             }
         }
-        $d++;
-        $n *= 10;
+        $digit++;
+        $unit *= 10;
     }
     return $nums;
 }
