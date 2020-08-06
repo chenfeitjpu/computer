@@ -162,32 +162,26 @@ function bucketSort($nums) {
     if($len <=1 ) {
         return $nums;
     }
-
-    $bucket = 3;
+    $size = 3;
+    $buckets[] = [];
+    for ($i = 0; $i < $size; $i++) {
+        $buckets[] = [];
+    }
+    list($max, $min) = [max($nums), min($nums)];
+    $range = ceil(($max - $min + 1) / $size);
+    for ($i = 0; $i < $len; $i++) {
+        $index = floor(($nums[$i] - $min) / $range);
+        $radix = $nums[$i];
+        for($j = count($buckets[$index]) - 1; $j >= 0 && $buckets[$index][$j] > $radix; $j--) {
+            $buckets[$index][$j + 1] = $buckets[$index][$j];
+        }
+        $buckets[$index][$j + 1] = $radix;
+    }
     $res = [];
-    for($i = 0; $i < $bucket; $i++) {
-        $res[] = [];
+    for ($i = 0; $i < $size; $i++) {
+        $res = array_merge($res, $buckets[$i]);
     }
-
-    $min = min($nums);
-    $max = max($nums);
-    $range = ceil(($max - $min + 1) / $bucket);
-    for($i = 0; $i < $len; $i++) {
-        $index = intval(($nums[$i] - $min) / $range);
-        $j = count($res[$index]) - 1;
-        while($j >= 0 && $res[$index][$j] > $nums[$i]) {
-            $res[$index][$j + 1] = $res[$index][$j];
-            $j--;
-        }
-        $res[$index][$j + 1] = $nums[$i];
-    }
-    $k = 0;
-    for($i = 0; $i < $bucket; $i++) {
-        while($res[$i]) {
-            $nums[$k++] = array_shift($res[$i]);
-        }
-    }
-    return $nums;
+    return $res;
 }
 ```
 # 计数排序 #
@@ -197,24 +191,22 @@ function countSort($nums) {
     if($len <= 1) {
         return $nums;
     }
-    $min = min($nums);
-    $max = max($nums);
-    $offset = $max - $min;
+    list($max, $min) = [max($nums), min($nums)];
+    $range = $max - $min;
+    $list = [];
+    for ($i = 0; $i <= $range; $i++) {
+        $list[$i] = 0;
+    }
+    for ($i = 0; $i < $len; $i++) {
+        $list[$nums[$i] - $min]++;
+    }
     $res = [];
-    for($i = 0; $i <= $offset; $i++) {
-        $res[] = 0;
-    }
-    for($i = 0; $i < $len; $i++) {
-        $res[$nums[$i] - $min]++;
-    }
-    $k = 0;
-    for($i = 0; $i <= $offset; $i++) {
-        while($res[$i]) {
-            $nums[$k++] = $min + $i;
-            $res[$i]--;
+    for ($i = 0; $i <= $range; $i++) {
+        while ($list[$i]--) {
+            $res[] = $min + $i;
         }
     }
-    return $nums;
+    return $res;
 }
 ```
 # 基数排序 #
