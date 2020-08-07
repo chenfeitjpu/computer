@@ -159,18 +159,17 @@ function merge(&$nums, $start, $mid, $end) {
 ```
 function bucketSort($nums) {
     $len = count($nums);
-    if($len <=1 ) {
+    if ($len <= 1) {
         return $nums;
     }
-    $size = 3;
-    $buckets[] = [];
-    for ($i = 0; $i < $size; $i++) {
+    list($num, $buckets) = [3, []];
+    for ($i = 0; $i < $num; $i++) {
         $buckets[] = [];
     }
     list($max, $min) = [max($nums), min($nums)];
-    $range = ceil(($max - $min + 1) / $size);
+    $size = ceil(($max - $min + 1) / $num);
     for ($i = 0; $i < $len; $i++) {
-        $index = floor(($nums[$i] - $min) / $range);
+        $index = floor(($nums[$i] - $min) / $size);
         $radix = $nums[$i];
         for($j = count($buckets[$index]) - 1; $j >= 0 && $buckets[$index][$j] > $radix; $j--) {
             $buckets[$index][$j + 1] = $buckets[$index][$j];
@@ -178,7 +177,7 @@ function bucketSort($nums) {
         $buckets[$index][$j + 1] = $radix;
     }
     $res = [];
-    for ($i = 0; $i < $size; $i++) {
+    for ($i = 0; $i < $num; $i++) {
         $res = array_merge($res, $buckets[$i]);
     }
     return $res;
