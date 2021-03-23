@@ -3,7 +3,9 @@
 ## 常见问题 ##
 ### leetcode ###
 #### 455.分发饼干 ####
-```
+<details>
+<summary>代码</summary>
+<pre>
 /**
  * 给满足孩子需求最小尺寸的饼干
  */
@@ -17,9 +19,13 @@ function findContentChildren($g, $s) {
     }
     return $j;
 }
-```
-### 135.分发糖果 ###
-```
+</code>
+</details>
+
+#### 135.分发糖果 ####
+<details>
+<summary>代码</summary>
+<pre>
 /**
  * 先比较一边，再比较另一边
  */
@@ -38,7 +44,9 @@ function candy($ratings) {
     }
     return array_sum($res);
 }
-```
+</code>
+</details>
+
 ### 435.无重叠区间 ###
 ```
 /**
