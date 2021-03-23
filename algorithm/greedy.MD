@@ -3,7 +3,10 @@
 ## 常见问题 ##
 ### leetcode ###
 #### 455.分发饼干 ####
-```
+<details>
+<summary>test</summary>
+<pre>
+<code>
 /**
  * 给满足孩子需求最小尺寸的饼干
  */
@@ -17,7 +20,9 @@ function findContentChildren($g, $s) {
     }
     return $j;
 }
-```
+</code>
+</pre>
+</details>
 ### 135.分发糖果 ###
 ```
 /**
