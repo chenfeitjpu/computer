@@ -1,7 +1,10 @@
 ## 定义 ##
 通过局部最优得到全局最优
+
 ## 常见问题 ##
+
 ### leetcode ###
+
 #### 455.分发饼干 ####
 <details>
 <summary>代码</summary>
@@ -47,8 +50,10 @@ function candy($ratings) {
 </code>
 </details>
 
-### 435.无重叠区间 ###
-```
+#### 435.无重叠区间 ####
+<details>
+<summary>代码</summary>
+<pre>
 /**
  * 重叠区间保留终点较小的
  */
@@ -69,5 +74,6 @@ function eraseOverlapIntervals($intervals) {
     }
     return $total;
 }
-```
+</code>
+</details>
 
