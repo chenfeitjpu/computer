@@ -4,9 +4,8 @@
 ### leetcode ###
 #### 455.分发饼干 ####
 <details>
-<summary>test</summary>
-<pre>
-<code>
+<summary>代码</summary>
+<pre><code>
 /**
  * 给满足孩子需求最小尺寸的饼干
  */
@@ -20,10 +19,10 @@ function findContentChildren($g, $s) {
     }
     return $j;
 }
-</code>
-</pre>
+</code></pre>
 </details>
-### 135.分发糖果 ###
+
+#### 135.分发糖果 ####
 ```
 /**
  * 先比较一边，再比较另一边
@@ -44,7 +43,7 @@ function candy($ratings) {
     return array_sum($res);
 }
 ```
-### 435.无重叠区间 ###
+#### 435.无重叠区间 ####
 ```
 /**
  * 重叠区间保留终点较小的
