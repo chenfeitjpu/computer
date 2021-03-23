@@ -8,6 +8,7 @@
 #### 455.分发饼干 ####
 <details>
 <summary>代码</summary>
+<pre>
 <code>
 /**
  * 给满足孩子需求最小尺寸的饼干
@@ -23,6 +24,7 @@ function findContentChildren($g, $s) {
     return $j;
 }
 </code>
+</pre>
 </details>
 
 #### 135.分发糖果 ####
@@ -49,6 +51,7 @@ function candy($ratings) {
     return array_sum($res);
 }
 </code>
+</pre>
 </details>
 
 #### 435.无重叠区间 ####
@@ -77,5 +80,6 @@ function eraseOverlapIntervals($intervals) {
     return $total;
 }
 </code>
+</pre>
 </details>
 
