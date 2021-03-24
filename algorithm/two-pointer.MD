@@ -95,6 +95,54 @@ function detectCycle($head) {
 </pre>
 </details>
 
+#### 76.最小覆盖子串 ####
+<details>
+<summary>代码</summary>
+<pre>
+<code>
+/**
+ * 先添加后删除
+ */
+function minWindow($s, $t) {
+    $sl = strlen($s);
+    $tl = strlen($t);
+    if ($tl > $sl) {
+        return '';
+    }
+    $map = [];
+    for ($i = 0; $i < $tl; $i++) {
+        if(!isset($map[$t[$i]])) {
+            $map[$t[$i]] = 0;
+        }
+        $map[$t[$i]]++;
+    }
+    $start = $cnt = 0;
+    $minStart = 0;
+    $minSize = PHP_INT_MAX;
+    for ($end = 0; $end < $sl; $end++) {
+        if (!isset($map[$s[$end]])) {
+            continue;
+        }
+        if ($map[$s[$end]]-- > 0) {
+            $cnt++;
+        }
+        while ($cnt == $tl) {
+            $size = $end - $start + 1;
+            if($size < $minSize) {
+                list($minStart, $minSize) = [$start, $size];
+            }
+            if (isset($map[$s[$start]]) && $map[$s[$start]]++ == 0) {
+                $cnt--;
+            }
+            $start++;
+        }
+    }
+    return $minSize < PHP_INT_MAX ? substr($s, $minStart, $minSize) : '';
+}
+</code>
+</pre>
+</details>
+
 ####  ####
 <details>
 <summary>代码</summary>
