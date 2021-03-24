@@ -13,7 +13,7 @@
 <pre>
 <code>
 /**
- * 给满足孩子需求最小尺寸的饼干
+ * 贪心-给满足孩子需求最小尺寸的饼干
  */
 function findContentChildren($g, $s) {
     sort($g);
@@ -35,7 +35,7 @@ function findContentChildren($g, $s) {
 <pre>
 <code>
 /**
- * 先比较一边，再比较另一边
+ * 贪心-一次比较一个方向
  */
 function candy($ratings) {
     $len = count($ratings);
@@ -62,7 +62,7 @@ function candy($ratings) {
 <pre>
 <code>
 /**
- * 重叠区间保留终点较小的
+ * 贪心-重叠区间保留终点较小的
  */
 function eraseOverlapIntervals($intervals) {
     $len = count($intervals);
@@ -91,7 +91,7 @@ function eraseOverlapIntervals($intervals) {
 <pre>
 <code>
 /**
- * 有空位就种
+ * 贪心-有空位就种
  */
 function canPlaceFlowers($flowerbed, $n) {
     if ($n < 1) {
@@ -127,7 +127,7 @@ function canPlaceFlowers($flowerbed, $n) {
 <pre>
 <code>
 /**
- * 取每个区间的终点位置
+ * 贪心-保留区间的终点位置
  */
 function findMinArrowShots($points) {
     $len = count($points);
@@ -155,7 +155,7 @@ function findMinArrowShots($points) {
 <pre>
 <code>
 /**
- * 保留每个字母的最大位置
+ * 贪心-保留字母的最后一个位置
  */
 function partitionLabels($s) {
     $len = strlen($s);
@@ -190,7 +190,7 @@ function partitionLabels($s) {
 <pre>
 <code>
 /**
- * 盈利就卖
+ * 贪心-盈利就卖
  */
 function maxProfit($prices) {
     $len = count($prices);
@@ -216,7 +216,7 @@ function maxProfit($prices) {
 <pre>
 <code>
 /**
- * 先放高的
+ * 贪心-先放高的
  */
 function reconstructQueue($people) {
     $len = count($people);
@@ -240,7 +240,7 @@ function reconstructQueue($people) {
 <pre>
 <code>
 /**
- * 考虑前中后三个元素
+ * 贪心-考虑前中后三个元素
  */
 function checkPossibility($nums) {
     $len = count($nums);
