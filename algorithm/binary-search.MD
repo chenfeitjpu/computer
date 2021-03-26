@@ -129,6 +129,34 @@ function search($nums, $target) {
 </pre>
 </details>
 
+#### 154.寻找旋转排序数组中的最小值II ####
+<details>
+<summary>代码</summary>
+<pre>
+<code>
+/**
+ * 二分法
+ */
+function findMin($nums) {
+    $len = count($nums);
+    $l = 0;
+    $r = $len - 1;
+    while ($l < $r) {
+        $mid = $l + intval(($r - $l) / 2);
+        if($nums[$mid] > $nums[$r]) {
+            $l = $mid + 1;
+        } else if ($nums[$mid] < $nums[$r] ){
+            $r = $mid;
+        } else {
+            $r--;
+        }
+    }
+    return $nums[$l];
+}
+</code>
+</pre>
+</details>
+
 ####  ####
 <details>
 <summary>代码</summary>
