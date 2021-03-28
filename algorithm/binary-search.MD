@@ -157,6 +157,34 @@ function findMin($nums) {
 </pre>
 </details>
 
+#### 540.有序数组中的单一元素 ####
+<details>
+<summary>代码</summary>
+<pre>
+<code>
+/**
+ * 二分法－通过相邻位置的数值变化进行判断
+ */
+function singleNonDuplicate($nums) {
+	$len = count($nums);
+	list($left, $right) = [0, $len - 1];
+	while ($left < $right) {
+		$mid = $left + intval(($right - $left) / 2);
+		if ($mid & 1) {
+			$mid--;
+		}
+		if ($nums[$mid] == $nums[$mid + 1]) {
+			$left = $mid + 2;
+		} else {
+			$right = $mid;
+		}
+	}
+	return $nums[$left];
+}
+</code>
+</pre>
+</details>
+
 ####  ####
 <details>
 <summary>代码</summary>
