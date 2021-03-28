@@ -185,11 +185,43 @@ function singleNonDuplicate($nums) {
 </pre>
 </details>
 
-####  ####
+#### 4.寻找两个正序数组的中位数 ####
 <details>
 <summary>代码</summary>
 <pre>
 <code>
+/**
+ * 二分法－利用单个数组的有序性
+ */
+function findMedianSortedArrays($nums1, $nums2) {
+	$m = count($nums1);
+	$n = count($nums2);
+	$left = findK($nums1, 0, $m - 1, $nums2, 0, $n - 1, intval(($m + $n + 1) / 2));
+	$right = findK($nums1, 0, $m - 1, $nums2, 0, $n - 1, intval(($m + $n + 2) / 2));
+	return ($left + $right) / 2; 
+}
+function findK($nums1, $start1, $end1, $nums2, $start2, $end2, $k) {
+	$m = $end1 - $start1 + 1;
+	$n = $end2 - $start2 + 1;
+	if ($m > $n) {
+		return findK($nums2, $start2, $end2, $nums1, $start1, $end1, $k);
+	}
+	if ($m == 0) {
+		return $nums2[$start2 + $k - 1];
+	}
+	if ($k == 1) {
+		return min($nums1[$start1], $nums2[$start2]);
+	}
+	$k2 = intval($k / 2);
+	$i = $start1 + min($k2, $m) - 1;
+	$j = $start2 + min($k2, $n) - 1;
+
+	if ($nums1[$i] < $nums2[$j]) {
+		return findK($nums1, $i + 1, $end1, $nums2, $start2, $end2, $k - ($i - $start1 + 1));
+	} else{
+		return findK($nums1, $start1, $end1, $nums2, $j + 1, $end2, $k - ($j - $start2 + 1));
+	}
+}
 </code>
 </pre>
 </details>
