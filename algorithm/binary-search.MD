@@ -225,3 +225,39 @@ function findK($nums1, $start1, $end1, $nums2, $start2, $end2, $k) {
 </code>
 </pre>
 </details>
+<details>
+<summary>代码</summary>
+<pre>
+<code>
+/**
+ * 二分法－利用两个数组的有序性
+ */
+function findMedianSortedArrays($nums1, $nums2) {
+	$m = count($nums1);
+	$n = count($nums2);
+	if ($m > $n) {
+		return findMedianSortedArrays($nums2, $nums1);
+	}
+	$left = 0;
+	$right = 2 * $m;
+	while ($left <= $right) {
+		$c1 = $left + intval(($right - $left) / 2);
+		$c2 = $m + $n - $c1;
+		$lMax1 = $c1 == 0 ? PHP_INT_MIN : $nums1[intval(($c1 - 1) / 2)];
+		$rMin1 = $c1 == 2 * $m ? PHP_INT_MAX : $nums1[intval($c1 /2)];
+		$lMax2 = $c2 == 0 ? PHP_INT_MIN : $nums2[intval(($c2 - 1) / 2)];
+		$rMin2 = $c2 == 2 * $n ? PHP_INT_MAX : $nums2[intval($c2 /2)];
+		if ($lMax1 > $rMin2) {
+			$right = $c1 - 1;
+		} else if ($lMax2 > $rMin1) {
+			$left = $c1 + 1;
+		} else {
+			break;
+		}
+
+	}
+	return (max($lMax1, $lMax2) + min($rMin1, $rMin2)) / 2;
+}
+</code>
+</pre>
+</details>
