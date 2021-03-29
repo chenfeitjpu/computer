@@ -86,6 +86,118 @@ function insert($nums) {
 </details>
 
 <details>
+<summary>快排</summary>
+<pre>
+<code>
+function quick($nums) {
+    $len = count($nums);
+    if ($len <= 1) {
+        return $nums;
+    }
+    quickSort($nums, 0, $len - 1);
+    return $nums;
+}
+function quickSort(&$nums, $start, $end) {
+    if ($start >= $end) {
+        return;
+    }
+    $radix = $start;
+    list($left, $right) = [$start, $end];
+    while ($left < $right) {
+        while ($left < $right && $nums[$right] >= $nums[$radix]) {
+            $right--;
+        }
+        while ($left < $right && $nums[$left] <= $nums[$radix]) {
+            $left++;
+        }
+        if ($left < $right) {
+            list($nums[$left], $nums[$right]) = [$nums[$right], $nums[$left]];
+        }
+    }
+    list($nums[$radix], $nums[$right]) = [$nums[$right], $nums[$start]];
+    quickSort($nums, $start, $right - 1);
+    quickSort($nums, $right + 1, $end);
+}
+</code>
+</pre>
+</details>
+
+<details>
+<summary>归并排序</summary>
+<pre>
+<code>
+function merge($nums) {
+    $len = count($nums);
+    if ($len < 1) {
+        return $nums;
+    }
+    mergeSort($nums, 0, $len - 1);
+    return $nums;
+}
+function mergeSort(&$nums, $start, $end) {
+    if ($start >= $end) {
+        return;
+    }
+    $mid = $start + intval(($end - $start) / 2);
+    mergeSort($nums, $start, $mid);
+    mergeSort($nums, $mid + 1, $end);
+    mergeSortArray($nums, $start, $mid, $end);
+}
+function mergeSortArray(&$nums, $start, $mid, $end) {
+    if ($start >= $end) {
+        return;
+    }
+    list($i, $j) = [$start, $mid + 1];
+    $tmp = [];
+    while ($i <= $mid && $j <= $end) {
+        $tmp[] = $nums[$i] <= $nums[$j] ? $nums[$i++] : $nums[$j++];
+    }
+    while ($i <= $mid) {
+        $tmp[] = $nums[$i++];
+    }
+    while ($j <= $end) {
+        $tmp[] = $nums[$j++];
+    }
+    $k = 0;
+    while ($start <= $end) {
+        $nums[$start++] = $tmp[$k++];
+    }
+}
+</code>
+</pre>
+</details>
+
+<details>
+<summary>计数排序</summary>
+<pre>
+<code>
+/**
+ * 计数排序
+ */
+function countSort($nums) {
+    $len = count($nums);
+    if ($len <= 1) {
+        return $nums;
+    }
+    list($min, $max) = [min($nums), max($nums)];
+    $offset = $max - $min + 1;
+    $list = array_fill(0, $offset, 0);
+    for ($i = 0; $i < $len; $i++) {
+        $list[$nums[$i] - $min]++;
+    }
+    $res = [];
+    for ($j = 0; $j < $offset; $j++) {
+        while ($list[$j]-- > 0) {
+            $res[] = $min + $j;
+        }
+    }
+    return $res;
+}
+</code>
+</pre>
+</details>
+
+<details>
 <summary>代码</summary>
 <pre>
 <code>
