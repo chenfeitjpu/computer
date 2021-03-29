@@ -123,7 +123,7 @@ function quickSort(&$nums, $start, $end) {
 </details>
 
 <details>
-<summary>归并排序</summary>
+<summary>归并</summary>
 <pre>
 <code>
 function merge($nums) {
@@ -168,7 +168,7 @@ function mergeSortArray(&$nums, $start, $mid, $end) {
 </details>
 
 <details>
-<summary>计数排序</summary>
+<summary>计数</summary>
 <pre>
 <code>
 /**
