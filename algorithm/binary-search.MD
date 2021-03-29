@@ -166,20 +166,20 @@ function findMin($nums) {
  * 二分法－通过相邻位置的数值变化进行判断
  */
 function singleNonDuplicate($nums) {
-	$len = count($nums);
-	list($left, $right) = [0, $len - 1];
-	while ($left < $right) {
-		$mid = $left + intval(($right - $left) / 2);
-		if ($mid & 1) {
-			$mid--;
-		}
-		if ($nums[$mid] == $nums[$mid + 1]) {
-			$left = $mid + 2;
-		} else {
-			$right = $mid;
-		}
-	}
-	return $nums[$left];
+    $len = count($nums);
+    list($left, $right) = [0, $len - 1];
+    while ($left < $right) {
+        $mid = $left + intval(($right - $left) / 2);
+        if ($mid & 1) {
+            $mid--;
+        }
+        if ($nums[$mid] == $nums[$mid + 1]) {
+            $left = $mid + 2;
+        } else {
+            $right = $mid;
+        }
+    }
+    return $nums[$left];
 }
 </code>
 </pre>
@@ -194,33 +194,32 @@ function singleNonDuplicate($nums) {
  * 二分法－利用单个数组的有序性
  */
 function findMedianSortedArrays($nums1, $nums2) {
-	$m = count($nums1);
-	$n = count($nums2);
-	$left = findK($nums1, 0, $m - 1, $nums2, 0, $n - 1, intval(($m + $n + 1) / 2));
-	$right = findK($nums1, 0, $m - 1, $nums2, 0, $n - 1, intval(($m + $n + 2) / 2));
-	return ($left + $right) / 2; 
+    $m = count($nums1);
+    $n = count($nums2);
+    $left = findK($nums1, 0, $m - 1, $nums2, 0, $n - 1, intval(($m + $n + 1) / 2));
+    $right = findK($nums1, 0, $m - 1, $nums2, 0, $n - 1, intval(($m + $n + 2) / 2));
+    return ($left + $right) / 2;
 }
 function findK($nums1, $start1, $end1, $nums2, $start2, $end2, $k) {
-	$m = $end1 - $start1 + 1;
-	$n = $end2 - $start2 + 1;
-	if ($m > $n) {
-		return findK($nums2, $start2, $end2, $nums1, $start1, $end1, $k);
-	}
-	if ($m == 0) {
-		return $nums2[$start2 + $k - 1];
-	}
-	if ($k == 1) {
-		return min($nums1[$start1], $nums2[$start2]);
-	}
-	$k2 = intval($k / 2);
-	$i = $start1 + min($k2, $m) - 1;
-	$j = $start2 + min($k2, $n) - 1;
-
-	if ($nums1[$i] < $nums2[$j]) {
-		return findK($nums1, $i + 1, $end1, $nums2, $start2, $end2, $k - ($i - $start1 + 1));
-	} else{
-		return findK($nums1, $start1, $end1, $nums2, $j + 1, $end2, $k - ($j - $start2 + 1));
-	}
+    $m = $end1 - $start1 + 1;
+    $n = $end2 - $start2 + 1;
+    if ($m > $n) {
+        return findK($nums2, $start2, $end2, $nums1, $start1, $end1, $k);
+    }
+    if ($m == 0) {
+        return $nums2[$start2 + $k - 1];
+    }
+    if ($k == 1) {
+        return min($nums1[$start1], $nums2[$start2]);
+    }
+    $k2 = intval($k / 2);
+    $i = $start1 + min($k2, $m) - 1;
+    $j = $start2 + min($k2, $n) - 1;
+    if ($nums1[$i] < $nums2[$j]) {
+        return findK($nums1, $i + 1, $end1, $nums2, $start2, $end2, $k - ($i - $start1 + 1));
+    } else{
+        return findK($nums1, $start1, $end1, $nums2, $j + 1, $end2, $k - ($j - $start2 + 1));
+    }
 }
 </code>
 </pre>
@@ -233,30 +232,29 @@ function findK($nums1, $start1, $end1, $nums2, $start2, $end2, $k) {
  * 二分法－利用两个数组的有序性
  */
 function findMedianSortedArrays($nums1, $nums2) {
-	$m = count($nums1);
-	$n = count($nums2);
-	if ($m > $n) {
-		return findMedianSortedArrays($nums2, $nums1);
-	}
-	$left = 0;
-	$right = 2 * $m;
-	while ($left <= $right) {
-		$c1 = $left + intval(($right - $left) / 2);
-		$c2 = $m + $n - $c1;
-		$lMax1 = $c1 == 0 ? PHP_INT_MIN : $nums1[intval(($c1 - 1) / 2)];
-		$rMin1 = $c1 == 2 * $m ? PHP_INT_MAX : $nums1[intval($c1 /2)];
-		$lMax2 = $c2 == 0 ? PHP_INT_MIN : $nums2[intval(($c2 - 1) / 2)];
-		$rMin2 = $c2 == 2 * $n ? PHP_INT_MAX : $nums2[intval($c2 /2)];
-		if ($lMax1 > $rMin2) {
-			$right = $c1 - 1;
-		} else if ($lMax2 > $rMin1) {
-			$left = $c1 + 1;
-		} else {
-			break;
-		}
-
-	}
-	return (max($lMax1, $lMax2) + min($rMin1, $rMin2)) / 2;
+    $m = count($nums1);
+    $n = count($nums2);
+    if ($m > $n) {
+        return findMedianSortedArrays($nums2, $nums1);
+    }
+    $left = 0;
+    $right = 2 * $m;
+    while ($left <= $right) {
+        $c1 = $left + intval(($right - $left) / 2);
+        $c2 = $m + $n - $c1;
+        $lMax1 = $c1 == 0 ? PHP_INT_MIN : $nums1[intval(($c1 - 1) / 2)];
+        $rMin1 = $c1 == 2 * $m ? PHP_INT_MAX : $nums1[intval($c1 /2)];
+        $lMax2 = $c2 == 0 ? PHP_INT_MIN : $nums2[intval(($c2 - 1) / 2)];
+        $rMin2 = $c2 == 2 * $n ? PHP_INT_MAX : $nums2[intval($c2 /2)];
+        if ($lMax1 > $rMin2) {
+            $right = $c1 - 1;
+        } else if ($lMax2 > $rMin1) {
+            $left = $c1 + 1;
+        } else {
+            break;
+        }
+    }
+    return (max($lMax1, $lMax2) + min($rMin1, $rMin2)) / 2;
 }
 </code>
 </pre>
