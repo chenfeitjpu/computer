@@ -198,9 +198,71 @@ function countSort($nums) {
 </details>
 
 <details>
-<summary>代码</summary>
+<summary>基数</summary>
 <pre>
 <code>
+/**
+ * 基数计数
+ */
+function radix($nums) {
+    $len = count($nums);
+    if ($len <= 1) {
+        return $nums;
+    }
+    $d = strlen(max($nums));
+    $radix = 1;
+    for ($i = 0; $i < $d; $i++) {
+        $list = array_fill(0, 10, []);
+        for ($j = 0; $j < $len; $j++) {
+            $list[($nums[$j] / $radix) % 10][] = $nums[$j];
+        }
+        $m = 0;
+        for ($k = 0; $k < 10; $k++) {
+            while(count($list[$k])) {
+                $nums[$m++] = array_shift($list[$k]);
+            }
+        }
+        $radix *= 10;
+    }
+    return $nums;
+}
+</code>
+</pre>
+</details>
+
+<details>
+<summary>桶</summary>
+<pre>
+<code>
+/**
+ * 桶排序
+ */
+function bucket($nums) {
+    $len = count($nums);
+    if ($len <= 1) {
+        return $nums;
+    }
+    list($min, $max, $bucket) = [min($nums), max($nums), 3];
+    $cap = ceil(($max - $min + 1) / $bucket);
+    $buckets = array_fill(0, $bucket, []);
+    for ($i = 0; $i < $len; $i++) {
+        $index = intval(($nums[$i] - $min) / $cap);
+        for ($j = count($buckets[$index]) - 1; $j >= 0; $j--) {
+            if ($buckets[$index][$j] <= $nums[$i]) {
+               break;
+            }
+            $buckets[$index][$j + 1] = $buckets[$index][$j];
+        }
+        $buckets[$index][$j + 1] = $nums[$i];
+    }
+    $j = 0;
+    for ($i = 0; $i < $bucket; $i++) {
+        while (count($buckets[$i])) {
+            $nums[$j++] = array_shift($buckets[$i]);
+        }
+    }
+    return $nums;
+}
 </code>
 </pre>
 </details>
@@ -210,3 +272,10 @@ function countSort($nums) {
 ### leetcode ###
 
 #### 455.分发饼干 ####
+<details>
+<summary>桶排序</summary>
+<pre>
+<code>
+</code>
+</pre>
+</details>
