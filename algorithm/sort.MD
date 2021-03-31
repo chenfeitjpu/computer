@@ -271,9 +271,58 @@ function bucket($nums) {
 
 ### leetcode ###
 
-#### 455.分发饼干 ####
+#### 215.数组中的第K个最大元素 ####
 <details>
-<summary>桶排序</summary>
+<summary>代码</summary>
+<pre>
+<code>
+/**
+ * 利用快速排序
+ */
+function findKthLargest($nums, $k){
+    $len = count($nums);
+    if ($len < 1) {
+        return null;
+    }
+    list($left, $right) = [0, $len - 1];
+    while ($left <= $right) {
+        $mid = quick($nums, $left, $right);
+        var_dump($mid);exit;
+        if ($len - $k == $mid) {
+            return $nums[$mid];
+        } else if ($left - $k < $mid) {
+            $left = $mid + 1;
+        } else {
+            $right = $mid - 1;
+        }
+    }
+}
+function quick(&$nums, $start, $end) {
+    if ($start > $end) {
+        return;
+    }
+    list($left, $right) = [$start, $end];
+    while ($left < $right) {
+        while ($left < $right && $nums[$right] >= $nums[$start]) {
+            $right--;
+        }
+        while ($left < $right && $nums[$left] <= $nums[$start]) {
+            $left++;
+        }
+        if ($left < $right) {
+            list($nums[$left], $nums[$right]) = [$nums[$right], $nums[$left]];
+        }
+    }
+    list($nums[$start], $nums[$right]) = [$nums[$right], $nums[$start]];
+    return $right;
+}
+</code>
+</pre>
+</details>
+
+#### 模板 ####
+<details>
+<summary>代码</summary>
 <pre>
 <code>
 </code>
