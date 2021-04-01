@@ -320,11 +320,110 @@ function quick(&$nums, $start, $end) {
 </pre>
 </details>
 
-#### 模板 ####
+#### 347.前K个高频元素 ####
 <details>
 <summary>代码</summary>
 <pre>
 <code>
+/**
+ * 桶排序
+ */
+function topKFrequent($nums, $k) {
+    $len = count($nums);
+    $map = [];
+    for ($i = 0; $i < $len; $i++) {
+        if (!isset($map[$nums[$i]])) {
+            $map[$nums[$i]] = 0;
+        }
+        $map[$nums[$i]]++;
+    }
+    list($min, $max) = [min($map), max($map)];
+    $list = array_fill($min, $max - $min + 1, []);
+    foreach ($map as $key => $value) {
+        $list[$value][] = $key;
+    }
+    $res = [];
+    for ($i = $max; $i >= $min; $i--) {
+        while (count($list[$i])) {
+            $res[] = array_pop($list[$i]);
+            if (count($res) == $k) {
+                break 2;
+            }
+        }
+    }
+    return $res;
+}
+</code>
+</pre>
+</details>
+
+#### 451.根据字符出现频率排序 ####
+<details>
+<summary>代码</summary>
+<pre>
+<code>
+/**
+ * 桶排序
+ */
+function frequencySort($s) {
+    if (!$s) {
+        return $s;
+    }
+    $len = strlen($s);
+    $map = [];
+    for($i = 0; $i < $len; $i++) {
+        if (!isset($map[$s[$i]])) {
+            $map[$s[$i]] = 0;
+        }
+        $map[$s[$i]]++;
+    }
+    list($min, $max) = [min($map), max($map)];
+    $list = array_fill($min, $max - $min + 1, []);
+    foreach ($map as $key => $value) {
+        $list[$value][] = $key;
+    }
+    $res = '';
+    for ($i = $max; $i >= $min; $i--) {
+        while (count($list[$i])) {
+            $char = array_pop($list[$i]);
+            $cnt = $i;
+            while ($cnt > 0) {
+                $res .= $char;
+                $cnt--;
+            }
+        }
+    }
+    return $res;
+}
+</code>
+</pre>
+</details>
+
+#### 75.颜色分类 ####
+<details>
+<summary>代码</summary>
+<pre>
+<code>
+/**
+ * 计数排序
+ */
+function sortColors(&$nums) {
+    $len = count($nums);
+    if ($len <= 1) {
+        return;
+    }
+    $map = array_fill(0, 3, 0);
+    for ($i = 0; $i < $len; $i++) {
+        $map[$nums[$i]]++;
+    }
+    $j = 0;
+    foreach ($map as $k => $v) {
+        while ($v > 0) {
+            $nums[$j++] = $k;
+            $v--;
+        }
+    }
+}
 </code>
 </pre>
 </details>
