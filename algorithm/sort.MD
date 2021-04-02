@@ -432,6 +432,35 @@ function sortColors(&$nums) {
 <pre>
 <code>
 /**
+ * 选择排序
+ */
+function sortColors(&$nums) {
+    $len = count($nums);
+    if ($len <= 1) {
+        return $nums;
+    }
+    list($l, $r, $i) = [0, $len - 1, 0];
+    while ($i <= $r) {
+        if ($nums[$i] == 2) {
+            list($nums[$r], $nums[$i]) = [$nums[$i], $nums[$r]];
+            $r--;
+            continue;
+        }
+        if ($nums[$i] == 0) {
+            list($nums[$l], $nums[$i]) = [$nums[$i], $nums[$l]];
+            $l++;
+        }
+        $i++;
+    }
+}
+</code>
+</pre>
+</details>
+<details>
+<summary>代码</summary>
+<pre>
+<code>
+/**
  * 插入排序
  */
 function sortColors(&$nums) {
