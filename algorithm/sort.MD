@@ -427,3 +427,37 @@ function sortColors(&$nums) {
 </code>
 </pre>
 </details>
+<details>
+<summary>代码</summary>
+<pre>
+<code>
+/**
+ * 插入排序
+ */
+function sortColors(&$nums) {
+    $len = count($nums);
+    if ($len <= 1) {
+        return $nums;
+    }
+    list($red, $white, $blue) = [-1, -1, -1];
+    for ($i = 0; $i < $len; $i++) {
+        switch ($nums[$i]) {
+            case 0:
+                $nums[++$blue] = 2;
+                $nums[++$white] = 1;
+                $nums[++$red] = 0;
+                break;
+            case 1:
+                $nums[++$blue] = 2;
+                $nums[++$white] = 1;
+                break;
+            case 2:
+                $nums[++$blue] = 2;
+                break;
+
+        }
+    }
+}
+</code>
+</pre>
+</details>
