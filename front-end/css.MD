@@ -5,10 +5,10 @@
 
 ## 布局 ##
 ### 盒模型 ###
-    - margin 外边距
-    - border 边框
-    - padding 内填充
-    - content 内容
+    -  margin 外边距
+    -  border 边框
+    -  padding 内填充
+    -  content 内容
 	
 ### display ###
     - block 块级元素
