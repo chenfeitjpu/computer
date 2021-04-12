@@ -5,22 +5,22 @@
 
 ## 布局 ##
 ### 盒模型 ###
-    -  margin 外边距
-    -  border 边框
-    -  padding 内填充
-    -  content 内容
+  - margin 外边距
+  - border 边框
+  - padding 内填充
+  - content 内容
 	
 ### display ###
-    - block 块级元素
-	- inline 内联元素
-	- inline-block 内联块
+  - block 块级元素
+  - inline 内联元素
+  - inline-block 内联块
 	
 ### float ###
-    - left 左浮
-    - right 右浮
+  - left 左浮
+  - right 右浮
 
 ### position ###
-    - static 没有定位
-	- relation 相对
-	- absolute 绝对
-	- fixed 固定
+  - static 没有定位
+  - relation 相对
+  - absolute 绝对
+  - fixed 固定
