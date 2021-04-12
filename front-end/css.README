@@ -12,8 +12,8 @@
 	
 ### display ###
     - block 块级元素
-	- inline 内联元素
-	- inline-block 内联块
+    - inline 内联元素
+    - inline-block 内联块
 	
 ### float ###
     - left 左浮
@@ -21,6 +21,6 @@
 
 ### position ###
     - static 没有定位
-	- relation 相对
-	- absolute 绝对
-	- fixed 固定
+    - relation 相对
+    - absolute 绝对
+    - fixed 固定
