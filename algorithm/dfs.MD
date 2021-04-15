@@ -151,6 +151,106 @@ function findCircleNum($isConnected) {
 </pre>
 </details>
 
+#### 417.太平洋大西洋水流问题 ####
+<details>
+<summary>递归</summary>
+<pre>
+<code>
+/**
+ * DFS-递归
+ */
+function pacificAtlantic($heights) {
+    $m = count($heights);
+    $n = count($heights[0]);
+    $pacific = array_fill(0, $m, array_fill(0, $n, 0));
+    $atlantic = array_fill(0, $m, array_fill(0, $n, 0));
+    for ($i = 0; $i < $m; $i++) {
+        search($heights, $m, $n, $pacific, $i, 0);
+        search($heights, $m, $n, $atlantic, $i, $n - 1);
+    }
+    for ($j = 0; $j < $n; $j++) {
+        search($heights, $m, $n, $pacific, 0, $j);
+        search($heights, $m, $n, $atlantic, $m - 1, $j);
+    }
+    $res = [];
+    for ($i = 0; $i < $m; $i++) {
+        for ($j = 0; $j < $n; $j++) {
+            if ($pacific[$i][$j] && $atlantic[$i][$j]) {
+                array_push($res, [$i, $j]);
+            }
+        }
+    }
+    return $res;
+}
+function search($heights, $m, $n, &$reach, $row, $col) {
+    if ($reach[$row][$col] == 1) {
+        return;
+    }
+    $reach[$row][$col] = 1;
+    $direction = [[0, -1], [0, 1], [-1, 0], [1, 0]];
+    foreach ($direction as $d) {
+        $r = $row + $d[0];
+        $c = $col + $d[1];
+        if ($r >= 0 && $r < $m && $c >= 0 && $c < $n && $heights[$row][$col] <= $heights[$r][$c]) {
+            search($heights, $m, $n, $reach, $r, $c);
+        }
+    }
+}
+</code>
+</pre>
+</details>
+<details>
+<summary>迭代</summary>
+<pre>
+<code>
+/**
+ * DFS-迭代
+ */
+function pacificAtlantic($heights) {
+    $m = count($heights);
+    $n = count($heights[0]);
+    $pacific = array_fill(0, $m, array_fill(0, $n, 0));
+    $atlantic = array_fill(0, $m, array_fill(0, $n, 0));
+    for ($i = 0; $i < $m; $i++) {
+        search($heights, $m, $n, $pacific, $i, 0);
+        search($heights, $m, $n, $atlantic, $i, $n - 1);
+    }
+    for ($j = 0; $j < $n; $j++) {
+        search($heights, $m, $n, $pacific, 0, $j);
+        search($heights, $m, $n, $atlantic, $m - 1, $j);
+    }
+    $res = [];
+    for ($i = 0; $i < $m; $i++) {
+        for ($j = 0; $j < $n; $j++) {
+            if ($pacific[$i][$j] && $atlantic[$i][$j]) {
+                array_push($res, [$i, $j]);
+            }
+        }
+    }
+    return $res;
+}
+function search($heights, $m, $n, &$reach, $row, $col) {
+    $reach[$row][$col] = 1;
+    $stack = [[$row, $col]];
+    while ($stack) {
+        list($i, $j) = array_pop($stack);
+        $direction = [[0, -1], [0, 1], [-1, 0], [1, 0]];
+        foreach ($direction as $d) {
+            $r = $i + $d[0];
+            $c = $j + $d[1];
+            if ($r >= 0 && $r < $m && $c >= 0 && $c < $n && $heights[$i][$j] <= $heights[$r][$c]
+                && $reach[$r][$c] == 0
+            ) {
+                $reach[$r][$c ] = 1;
+                array_push($stack, [$r, $c]);
+            }
+        }
+    }
+}
+</code>
+</pre>
+</details>
+
 ####  ####
 <details>
 <summary>代码</summary>
