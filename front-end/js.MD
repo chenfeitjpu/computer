@@ -5,8 +5,8 @@
 ## 功能 ##
 ### 事件循环(Event Loop) ###
     - 同步任务
-    - 微任务
-    - 宏任务
+    - 微任务 Promise
+    - 宏任务 setTimeout、setInterval
 
 ### 原型 ###
 #### 原型链 ####
