@@ -1,7 +1,7 @@
 # 回溯 #
 
 ## 定义 ##
-在搜索到某一节点的时候，发现当前节点并不是需求目标时，把在当前节点的修改还原，回退到原来的节点继续搜索。
+对每个位置进行试探
 
 ## 常见问题 ##
 ### LEETCODE ###
@@ -33,6 +33,33 @@
 </details>
 
 #### 51.N皇后 ####
+<details>
+<summary>代码</summary>
+<pre>
+<code>
+</code>
+</pre>
+</details>
+
+#### 47.全排列II ####
+<details>
+<summary>代码</summary>
+<pre>
+<code>
+</code>
+</pre>
+</details>
+
+#### 40.组合总和II ####
+<details>
+<summary>代码</summary>
+<pre>
+<code>
+</code>
+</pre>
+</details>
+
+#### 37.解数独 ####
 <details>
 <summary>代码</summary>
 <pre>

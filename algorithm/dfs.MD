@@ -1,7 +1,7 @@
 # DFS #
 
 ## 定义 ##
-搜索到一个新节点，立即对该节点进行遍历
+对每个节点往下遍历
 
 ## 常见问题 ##
 ### LEETCODE ###
@@ -247,6 +247,24 @@ function search($heights, $m, $n, &$reach, $row, $col) {
         }
     }
 }
+</code>
+</pre>
+</details>
+
+#### 130.被围绕的区域 ####
+<details>
+<summary>代码</summary>
+<pre>
+<code>
+</code>
+</pre>
+</details>
+
+#### 257.二叉树的所有路径 ####
+<details>
+<summary>代码</summary>
+<pre>
+<code>
 </code>
 </pre>
 </details>
