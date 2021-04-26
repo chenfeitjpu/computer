@@ -26,16 +26,7 @@
 </pre>
 </details>
 
-####  ####
-<details>
-<summary>代码</summary>
-<pre>
-<code>
-</code>
-</pre>
-</details>
-
-####  ####
+#### 149.直线上最多的点数 ####
 <details>
 <summary>代码</summary>
 <pre>
