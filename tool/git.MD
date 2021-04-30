@@ -9,6 +9,10 @@
     - git clone path
   - add & remove
     - git add file
+<<<<<<< HEAD
+=======
+    - git add .
+>>>>>>> fbca0d36cc65661b3cd48294a31fee757acc784b
     - git rm file
   - commit & synchronize
     - git commit -m "msg"
