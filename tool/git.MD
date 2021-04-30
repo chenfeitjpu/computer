@@ -9,7 +9,7 @@
     - git clone path
   - add & remove
     - git add file
-    - git add .
+    - git add *
     - git rm file
   - commit & synchronize
     - git commit -m "msg"
