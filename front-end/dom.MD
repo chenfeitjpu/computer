@@ -3,8 +3,8 @@
 ## 定义 ##
 文档对象模型
 
-## 功能 ##
-### 接口 ###
+## 内容 ##
+### 常用接口 ###
     - document.getElementById(id)
 	- document.getElementsByTagName(name)
 	- document.createElement(name)
@@ -21,4 +21,4 @@
     - 冒泡
 	- 委托
     	
-###	虚拟DOM ###
+### 虚拟DOM ###

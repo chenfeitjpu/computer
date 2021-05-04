@@ -3,8 +3,8 @@
 ## 定义 ##
 浏览器对象模型
 
-## 功能 ##
-### 对象 ###
+## 内容 ##
+### 内置对象 ###
 	- window.navigator
 	- window.screen
 	- window.location
