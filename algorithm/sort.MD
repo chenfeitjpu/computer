@@ -3,7 +3,7 @@
 ## 定义 ##
 对元素进行排序
 
-## 常见排序 ##
+## 应用 ##
 <details>
 <summary>冒泡</summary>
 <pre>
