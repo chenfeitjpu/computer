@@ -62,6 +62,9 @@
     - update tablename set 
     - delete from tablename
     - select from 
+      - order by
+      - group by having
+      - limit start, length
 
 ### 运算符 ###
    - 算术  
@@ -74,9 +77,9 @@
    in, not in, is null, is not null
    - 通配  
    _, %
+
 ### 函数 ###
   - 数值
   - 字符串
   - 时间
   - 聚集
-  
