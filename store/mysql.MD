@@ -55,7 +55,7 @@
       - create table tablename
       - drop table tablename
       - alter table tablename
-    - column
+    - column  
       default、not null、primary key、unique、constraint
   - DML 
     - insert into tablename values
