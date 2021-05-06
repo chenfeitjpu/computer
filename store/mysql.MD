@@ -48,7 +48,16 @@
       - create database dbname 
       - drop database dbname
       - use dbname
+    - table
+      - show tables
+      - desc tablename
+      - show create table tablename
+      - create table tablename
+      - drop table tablename
+      - alter table tablename
+    - column
+      default、not null、primary key、unique、constraint
   - DML 
-    - 
-    - 
-    - 
+    - insert into tablename values
+    - update tablename set 
+    - delete from tablename
