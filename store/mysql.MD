@@ -61,7 +61,7 @@
     - insert into tablename values
     - update tablename set 
     - delete from tablename
-    - select from 
+    - select from   
       distinct, group by having, order by, limit start length
   - 运算符
     - 算术  
@@ -79,3 +79,15 @@
     - 字符串
     - 时间
     - 聚集
+
+### 视图 ###
+  - show create view
+  - create view viewname as
+  - drop view
+
+### 游标 ###
+  - declare cursorname cursor for
+  - open cursorname
+  - fetch cursorname into 
+  - declare continue handler for not found
+  - close cursorname
