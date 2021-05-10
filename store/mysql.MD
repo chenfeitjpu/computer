@@ -86,8 +86,37 @@
   - drop view
 
 ### 游标 ###
-  - declare cursorname cursor for
-  - open cursorname
-  - fetch cursorname into 
-  - declare continue handler for not found
-  - close cursorname
+操作  
+  - 新建 declare cursorname cursor for
+  - 打开 open cursorname
+  - 读取 fetch cursorname into 
+  - 异常处理 declare continue handler for not found
+  - 关系 close cursorname
+
+### 事务 ###
+特性  
+  - 原子性
+  - 一致性
+  - 隔离性
+  - 持久性  
+状态  
+  - 活动
+  - 部分提交
+  - 提交
+  - 失败
+  - 中止
+操作  
+  - start transaction | begin
+  - commit
+  - rollback
+  - savepoint pointname
+  - release savepoint pointname
+  - rollback to pointname
+并发问题  
+  - 脏写
+  - 脏读
+  - 不可重复读
+  - 幻读  
+隔离级别  
+  - 
+
