@@ -118,5 +118,20 @@
   - 不可重复读
   - 幻读  
 隔离级别  
-  - 
+  - READ UNCOMMITTED
+  - READ COMMITED
+  - REPEATABLE READ
+  - SERIALIZABLE
+
+日志
+redo日志
+undo日志
+
+锁
+类型  
+  - S锁
+  - X锁
+级别
+  - 表锁
+  - 行锁
 
