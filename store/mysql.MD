@@ -56,30 +56,26 @@
       - drop table tablename
       - alter table tablename
     - column  
-      default、not null、auto_increament、zerofill、primary key、unique key、constraint foreign key references
+      default, not null, auto_increament, zerofill, primary key, unique key, constraint foreign key references
   - DML 
     - insert into tablename values
     - update tablename set 
     - delete from tablename
     - select from 
-      - order by
-      - group by having
-      - limit start, length
-
-### 运算符 ###
-   - 算术  
-   +, -, *, /, %
-   - 比较  
-   >, >=, <, <=, =, !=, between and
-   - 逻辑  
-   and, or
-   - 匹配  
-   in, not in, is null, is not null
-   - 通配  
-   _, %
-
-### 函数 ###
-  - 数值
-  - 字符串
-  - 时间
-  - 聚集
+      distinct, group by having, order by, limit start length
+  - 运算符
+    - 算术  
+    +, -, *, /, %
+    - 比较  
+    \>, >=, <, <=, =, !=, between and
+    - 逻辑  
+    and, or
+    - 匹配  
+    in, not in, is null, is not null
+    - 通配  
+    _, %
+  - 函数
+    - 数值
+    - 字符串
+    - 时间
+    - 聚集
