@@ -123,7 +123,7 @@ default, not null, auto_increament, zerofill, primary key, unique key, constrain
   - REPEATABLE READ
   - SERIALIZABLE
 #### 日志 ####
-redo日志 
+redo日志  
 undo日志   
 #### 锁 ####
 类型    
