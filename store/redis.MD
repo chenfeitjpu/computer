@@ -37,8 +37,8 @@
   - setex <key> <second> <value>
   - psetex <key> <millisecond> <value>
   - setnx <key> <value>
-  - mset <key> <value> <key> <value>
-  - msetnx <key> <value> <key> <value>
+  - mset <key> <value> [<key> <value>]
+  - msetnx <key> <value> [<key> <value>]
   - getset <key> <value>
   - append <key> <value>
   - setrange <key> <offset> <value>
@@ -48,10 +48,20 @@
   - decr <key>
   - decyby <key> <decrement>
   - get <key>
-  - mget <key> <key>
+  - mget <key> [<key>]
   - getrange <key> <start> <end>
   - strlen <key>
-#### 内部编码 ####
+##### 内部编码 #####
   - int
   - embstr
   - raw
+
+#### list ####
+##### 操作 #####
+  - lpush <key> <value> [<value>]
+  - lpushx <key> <value> [<value>]
+  - rpush <key> <value> [<value>]
+  - rpushx <key> <value> [<value>]
+  - linsert <key> before|after <pivot> <value>
+  - lpop <key>
+  - blpop <key> [<key>] <timeout> 
