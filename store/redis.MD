@@ -58,10 +58,10 @@
 
 #### list ####
 ##### 操作 #####
-  - lpush <key> <value> [<value>]
-  - lpushx <key> <value> [<value>]
-  - rpush <key> <value> [<value>]
-  - rpushx <key> <value> [<value>]
-  - linsert <key> before|after <pivot> <value>
-  - lpop <key>
-  - blpop <key> [<key>] <timeout> 
+  - LPUSH key value [value]
+  - LPUSHX key value [value]
+  - RPUSH key value [value]
+  - RPUSHX key value [value]
+  - LINSERT key BEFORE|AFTER pivot value
+  - LPOP key
+  - BLPOP key [key] timeout 
