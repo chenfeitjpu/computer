@@ -6,51 +6,50 @@
 ## 内容 ##
 ### 键 ###
 #### 操作 ####
-  - keys <pattern>
-  - scan cursor match <pattern> count <count>
-  - exists <key>
-  - type <key>
-  - randomkey
-  - del <key>
-  - unlink <key>
-  - rename <key> <newkey>
-  - renamenx <key> <newkey>
-  - move <key> <db>
-  - dump <key>
-  - expire <key> <second>
-  - pexpire <key> <millisecond>
-  - expireat <key> <timestamp>
-  - pexpireat <key> <millitimestamp>
-  - persist <key>
-  - persist <key>
-  - dbsize
+  - KEYS pattern
+  - SCAN CURSOR MATCH pattern COUNT count
+  - EXISTS key
+  - TYPE key
+  - RANDOMKEY
+  - DEL key
+  - UNLINK key
+  - RENAME key newkey
+  - RENAMENX key newkey
+  - MOVE key db
+  - DUMP key
+  - EXPIRE key second
+  - PEXPIRE key millisecond
+  - EXPIREAT key timestamp
+  - PEXPIREAT key millitimestamp
+  - PERSIST key
+  - DBSIze
 ### 库 ###
 #### 操作 ####
-  - select <db>
-  - flushdb
-  - flushall
+  - SELECT db
+  - FLUSHDB
+  - FLUSHALL
 
 ### 数据结构 ###
 #### string ####
 ##### 操作 #####
-  - set <key> <value> [ex <second> | px <millisecond>] [nx | xx]
-  - setex <key> <second> <value>
-  - psetex <key> <millisecond> <value>
-  - setnx <key> <value>
-  - mset <key> <value> [<key> <value>]
-  - msetnx <key> <value> [<key> <value>]
-  - getset <key> <value>
-  - append <key> <value>
-  - setrange <key> <offset> <value>
-  - incr <key>
-  - incrby <key> <increment>
-  - incrbyfloat <key> <increment>
-  - decr <key>
-  - decyby <key> <decrement>
-  - get <key>
-  - mget <key> [<key>]
-  - getrange <key> <start> <end>
-  - strlen <key>
+  - SET key value [EX second | PX millisecond] [nx | xx]
+  - SETEX key second value
+  - PSETEX <key> <millisecond> <value>
+  - SETNX key value
+  - MSET key value [key value]
+  - MSETNX key value [key value]
+  - GETSET key value
+  - APPEND key value
+  - SETRANGE key offset value
+  - INCR key
+  - INCRBY key increment
+  - INCRBYFLOAT key increment
+  - DECR key
+  - DECRBY key decrement
+  - GET key
+  - MGET key [key]
+  - GETRANGE key start end
+  - STRLEN key
 ##### 内部编码 #####
   - int
   - embstr
