@@ -22,7 +22,7 @@
   - EXPIREAT key timestamp
   - PEXPIREAT key millitimestamp
   - PERSIST key
-  - DBSIze
+  - DBSIZE
 ### 库 ###
 #### 操作 ####
   - SELECT db
@@ -64,3 +64,7 @@
   - LINSERT key BEFORE|AFTER pivot value
   - LPOP key
   - BLPOP key [key] timeout 
+  - RPOP key
+  - BRPOP key [key] timeout
+  - RPOPLPUSH source destination
+  - BRPOPLPUSH source destination timeout
