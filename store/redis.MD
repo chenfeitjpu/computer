@@ -51,9 +51,9 @@
   - GETRANGE key start end
   - STRLEN key
 ##### 内部编码 #####
-  - int
-  - embstr
-  - raw
+  - int(整数)
+  - embstr(短字符串)
+  - raw(长字符串)
 
 #### list ####
 ##### 操作 #####
@@ -68,3 +68,41 @@
   - BRPOP key [key] timeout
   - RPOPLPUSH source destination
   - BRPOPLPUSH source destination timeout
+  - LREM key count value
+  - LTRIM key start stop
+  - LSET key index value
+  - LINDEX key index
+  - LRANGE key start stop
+  - LLEN key
+##### 内部编码 #####
+  - ziplist(压缩列表)
+  - linkedlist(链表)
+  - quicklist(快速列表)
+
+#### set ####
+##### 操作 #####
+  - SADD key member [member]
+  - SREM key member member
+  - SPOP key
+  - SMOVE source destination member
+  - SISMEMBER key member
+  - SRANDOMMEMBER key count
+  - SMEMBERS key
+  - SINNER key key
+  - SINNERSTORE destination key key
+  - SUNION key key
+  - SUNIONSTORE destination key key
+  - SDIFF key key
+  - SDIFFSTORE destination key key
+  - SCARD key
+##### 内部编码 #####
+  - intset(整数集合)
+  - hashtable(哈希表)
+
+#### sorted set ####
+##### 操作 #####
+  - 
+  - 
+  - 
+  - 
+##### 内部编码 #####
