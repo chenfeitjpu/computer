@@ -1,11 +1,11 @@
-# Redis #
+Redis
 
-## 定义 ##
+# 定义 #
 键值对数据库
 
-## 内容 ##
-### 键 ###
-#### 操作 ####
+# 内容 #
+## 键 ##
+### 操作 ###
   - KEYS pattern
   - SCAN CURSOR MATCH pattern COUNT count
   - EXISTS key
@@ -23,15 +23,15 @@
   - PEXPIREAT key millitimestamp
   - PERSIST key
   - DBSIZE
-### 库 ###
-#### 操作 ####
+## 库 ##
+### 操作 ###
   - SELECT db
   - FLUSHDB
   - FLUSHALL
 
-### 数据结构 ###
-#### string ####
-##### 操作 #####
+## 数据结构 ##
+### string ###
+#### 操作 ####
   - SET key value [EX second | PX millisecond] [nx | xx]
   - SETEX key second value
   - PSETEX <key> <millisecond> <value>
@@ -50,13 +50,13 @@
   - MGET key [key]
   - GETRANGE key start end
   - STRLEN key
-##### 内部编码 #####
+#### 内部编码 ####
   - int(整数)
   - embstr(短字符串)
   - raw(长字符串)
 
-#### list ####
-##### 操作 #####
+### list ###
+#### 操作 ####
   - LPUSH key value [value]
   - LPUSHX key value [value]
   - RPUSH key value [value]
@@ -74,13 +74,13 @@
   - LINDEX key index
   - LRANGE key start stop
   - LLEN key
-##### 内部编码 #####
+#### 内部编码 ####
   - ziplist(压缩列表)
   - linkedlist(链表)
   - quicklist(快速列表)
 
-#### set ####
-##### 操作 #####
+### set ###
+#### 操作 ####
   - SADD key member [member]
   - SREM key member member
   - SPOP key
@@ -95,14 +95,14 @@
   - SDIFF key key
   - SDIFFSTORE destination key key
   - SCARD key
-##### 内部编码 #####
+#### 内部编码 ####
   - intset(整数集合)
   - hashtable(哈希表)
 
-#### sorted set ####
-##### 操作 #####
+### sorted set ###
+#### 操作 ####
   - 
   - 
   - 
   - 
-##### 内部编码 #####
+#### 内部编码 ####
