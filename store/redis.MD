@@ -144,3 +144,20 @@ Redis
 #### 内部编码 ####
    - ziplist(压缩列表)
    - skiplist(跳表)
+
+### 基数统计(HyperLogLog) ###
+#### 操作 ####
+  - PFADD key element [element] 
+  - PFCOUNT key [key]
+  - PFMERGE destkey sourcekey sourcekey
+
+### 位图(bitmap) ###
+#### 操作 ####
+  - SETBIT key offset value
+  - GETBIT key offset
+  - BITPOS key bit [start] [end]
+  - BITCOUNT key [start] [end]
+  - BITOP operation destkey key key
+  - BITFIELD key [GET type offset] [SET TYPE offset value] [INCRBY type offset increment] [OVERFLOW WRAP|SAT|FAIL]
+
+
