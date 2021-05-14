@@ -30,7 +30,7 @@ Redis
   - FLUSHALL
 
 ## 数据结构 ##
-### string ###
+### 字符串(string) ###
 #### 操作 ####
   - SET key value [EX second | PX millisecond] [nx | xx]
   - SETEX key second value
@@ -55,7 +55,28 @@ Redis
   - embstr(短字符串)
   - raw(长字符串)
 
-### list ###
+### 哈希(hash) ###
+#### 操作 ####
+  - HSET key field value
+  - HSETNX key field value
+  - HMSET key field value field value
+  - HDEL key field [field]
+  - HINCR key field increment
+  - HINCRBYFLOAT key field increment
+  - HEXISTS key field
+  - HGET key field
+  - HMGET key field field
+  - HKEYS key
+  - HVALUES key
+  - HGETALL key
+  - HLEN key
+
+#### 内部编码 ####
+  - ziplist(压缩列表)
+  - hashtable(哈希表)
+  - 
+
+### 列表(list) ###
 #### 操作 ####
   - LPUSH key value [value]
   - LPUSHX key value [value]
@@ -79,7 +100,7 @@ Redis
   - linkedlist(链表)
   - quicklist(快速列表)
 
-### set ###
+### 集合(set) ###
 #### 操作 ####
   - SADD key member [member]
   - SREM key member member
@@ -99,10 +120,27 @@ Redis
   - intset(整数集合)
   - hashtable(哈希表)
 
-### sorted set ###
+### 有序集合(sorted set) ###
 #### 操作 ####
-  - 
-  - 
-  - 
-  - 
+  - ZADD key score member [score member]
+  - ZREM key member [member]
+  - ZREMRANGEBYRANK key start stop
+  - ZREMRANGEBYSCORE key min max
+  - ZREMRANGEBYLEX key min max
+  - ZINCRBY key increment member
+  - ZRANK key member
+  - ZREVRANK key member
+  - ZSCORE key member
+  - ZRANGE key start stop [WITHSCORES]
+  - ZREVRANGE key start stop [WITHSCORES] 
+  - ZRANGEBYSCORE key min max [WITHSCORES] [LIMIT offset count]
+  - ZREVRANGEBYSCORE key min max [WITHSCORES]
+  - ZRANGEBYLEX key min max [LIMIT offset count]
+  - ZINTERSTORE destination numkeys key key
+  - ZUNIONSTORE destination numkeys key key
+  - ZCARD key
+  - ZCOUNT key min max
+  - ZLEXCOUNT key min max
 #### 内部编码 ####
+   - ziplist(压缩列表)
+   - skiplist(跳表)
