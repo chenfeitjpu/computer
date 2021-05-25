@@ -160,4 +160,13 @@ Redis
   - BITOP operation destkey key key
   - BITFIELD key [GET type offset] [SET TYPE offset value] [INCRBY type offset increment] [OVERFLOW WRAP|SAT|FAIL]
 
+### 地理位置(GEO) ###
+#### 操作 ####
+  - GEOADD key longitude latitude member [longitude latitude member]
+  - GEOPOS key member [member]
+  - GEODIST key member member [m|km|ft|mi]
+  - GEORADIUS key longitude latitude m|km|ft|mi [WITHCOORD] [WITHDIST] [WITHHASH] [COUNT count] [AES|DESC] [STORE key]
+  - GEORADIUSBYMEMBER key member m|km|ft|mi [WITHCOORD] [WITHDIST] [WITHHASH] [COUNT count] [AES|DESC] [STORE key]
+  - GEOHASH key member [member]
 
+###  ###
