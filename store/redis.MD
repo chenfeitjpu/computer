@@ -169,4 +169,17 @@ Redis
   - GEORADIUSBYMEMBER key member m|km|ft|mi [WITHCOORD] [WITHDIST] [WITHHASH] [COUNT count] [AES|DESC] [STORE key]
   - GEOHASH key member [member]
 
-###  ###
+### 流(stream) ###
+#### 操作 ####
+  - XADD key ID field value [field value]
+  - XDEL key ID [ID]
+  - XTRIM key [MAXLEN|MINIID] threshold [LIMIT count]
+  - XRANGE key start end [COUNT count]
+  - XREVRANGE key end start [COUNT count]
+  - XREAD [COUNT count] [BLOCK milliseconds] STREAMS key [key] id [id]
+  - XLEN key
+
+## 事务 ##
+
+## 订阅 ##
+
