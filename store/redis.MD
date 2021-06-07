@@ -180,6 +180,12 @@ Redis
   - XLEN key
 
 ## 事务 ##
+### 操作 ###
+  - MULTI
+  - EXEC
+  - DISCARD
+  - WATCH key [key]
+  - UNWATCH
 
 ## 订阅 ##
 
