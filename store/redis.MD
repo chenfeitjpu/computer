@@ -188,4 +188,12 @@ Redis
   - UNWATCH
 
 ## 订阅 ##
+### 操作 ###
+  - SUBSCRIBE channel [channel]
+  - PSUBSCRIBE pattern [pattern]
+  - UNSUBSCRIBE channel [channel]
+  - PUNSUBSCRIBE pattern [pattern]
+  - PUBLISH channel message
+  - PUBSUB subcommand [argument]
+
 
