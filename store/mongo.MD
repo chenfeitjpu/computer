@@ -25,7 +25,7 @@ MongoDb
   - db.COLLECTION_NAME.find()
 
 ## 查询 ##
-### 操作 ###
+### 条件 ###
 #### 比较运算符 ####
   - $gt
   - $gte
@@ -42,4 +42,25 @@ MongoDb
 #### 正则 ####
   - //
   - $regex
+### 结果集 ###
+  - sort
+  - limit
+  - skip
+### 聚合 ###
+  - count
+  - distinct
+  - aggregate
+  - mapReduce 
+### 索引 ###
+  - db.COLLECTION_NAME.getIndexes
+  - db.COLLECTION_NAME.createIndex
+  - db.COLLECTION_NAME.dropIndex
+  - db.COLLECTION_NAME.dropIndexes
+
+  ## 运维 ##
+  ### 操作 ###
+    - mongodump
+    - mongorestore
+    - mongostat
+    - mongotop
   
