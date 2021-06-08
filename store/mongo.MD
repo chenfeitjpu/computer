@@ -57,10 +57,10 @@ MongoDb
   - db.COLLECTION_NAME.dropIndex
   - db.COLLECTION_NAME.dropIndexes
 
-  ## 运维 ##
-  ### 操作 ###
-    - mongodump
-    - mongorestore
-    - mongostat
-    - mongotop
+## 运维 ##
+### 操作 ###
+  - mongodump
+  - mongorestore
+  - mongostat
+  - mongotop
   
