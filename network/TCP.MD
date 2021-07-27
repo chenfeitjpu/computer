@@ -25,3 +25,14 @@ TCP
 两次只能同步发送方的序列号  
 2.防止重复建立连接
 两次无法阻止服务端建立重复连接  
+
+## 四次挥手 ##
+**流程**
+1.客户端(ESTABLISHED状态)发送FIN报文(FIN_WAIT_1状态)  
+2.服务端(ESTABLISHED状态)发送ACK报文(CLOSED_WAIT状态)  
+3.客户端(FIN_WAIT_1状态)接收ACK报文(FIN_WAIT_2状态)  
+4.服务端(CLOSED_WAIT状态)发送FIN报文(LAST_ACK状态)    
+5.客户端(FIN_WAIT_2状态)发送ACK报文(TIME_WAIT状态)  
+6.服务端(LAST_ACK状态)接收ACK报文(CLOSED状态)  
+7.客户端(TIME_WAIT状态)经过2MSL(CLOSED状态)  
+**为什么是四次**  
