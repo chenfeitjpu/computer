@@ -14,13 +14,13 @@ TCP
     - RST 强制断开连接
 
 ## 三次握手 ##
-**流程**
+**流程**  
 1.服务端(CLOSED状态)主动监听端口(LISTEN状态)  
 2.客户端(CLOSED状态)发送SYN报文(SYN_SENT状态)  
 3.服务端(Listend状态)发送SYN_ACK报文(SYN_RCVD状态)  
 4.客户端(SYN_SENT状态)发送ACK报文(ESTABLISHED状态)  
 5.服务端(SYN_RVCD状态)收到ACK报文(ESTABLISHED状态)  
-**为什么是三次**
+**为什么是三次**  
 1.同步初始序列号
 两次只能同步发送方的序列号 
 2.防止重复建立连接
