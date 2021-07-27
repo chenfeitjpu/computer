@@ -14,8 +14,8 @@ TCP
     - RST 强制断开连接
 
 ## 三次握手 ##
-1.服务端(CLOSED状态)主动监听端口(LISTEN状态)
-2.客户端(CLOSED状态)发送SYN报文(SYN_SENT状态)
-3.服务端(Listend状态)发送SYN_ACK报文(SYN_RCVD状态)
-4.客户端(SYN_SENT状态)发送ACK报文(ESTABLISHED状态)
-5.服务端(SYN_RVCD状态)收到ACK报文(ESTABLISHED状态)
+1.服务端(CLOSED状态)主动监听端口(LISTEN状态)  
+2.客户端(CLOSED状态)发送SYN报文(SYN_SENT状态)  
+3.服务端(Listend状态)发送SYN_ACK报文(SYN_RCVD状态)  
+4.客户端(SYN_SENT状态)发送ACK报文(ESTABLISHED状态)  
+5.服务端(SYN_RVCD状态)收到ACK报文(ESTABLISHED状态)  
