@@ -27,7 +27,7 @@ TCP
 两次无法阻止服务端建立重复连接  
 
 ## 四次挥手 ##
-**流程**
+**流程**  
 1.客户端(ESTABLISHED状态)发送FIN报文(FIN_WAIT_1状态)  
 2.服务端(ESTABLISHED状态)发送ACK报文(CLOSED_WAIT状态)  
 3.客户端(FIN_WAIT_1状态)接收ACK报文(FIN_WAIT_2状态)  
@@ -36,3 +36,5 @@ TCP
 6.服务端(LAST_ACK状态)接收ACK报文(CLOSED状态)  
 7.客户端(TIME_WAIT状态)经过2MSL(CLOSED状态)  
 **为什么是四次**  
+四次可以确保客户端和服务端正确关闭连接
+
