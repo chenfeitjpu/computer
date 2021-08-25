@@ -10,6 +10,20 @@
 <summary>代码</summary>
 <pre>
 <code>
+function findDisappearedNumbers($nums) {
+    $n = count($nums);
+    foreach ($nums as $num) {
+        $index = ($num - 1) % $n;
+        $nums[$index] += $n;
+    }
+    $res = [];
+    for ($i = 0; $i < $n; $i++) {
+        if ($nums[$i] <= $n) {
+            array_push($res, $i + 1);
+        }
+    }
+    return $res;
+}
 </code>
 </pre>
 </details>
