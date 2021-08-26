@@ -56,6 +56,21 @@ function rotate(&$matrix) {
 <summary>代码</summary>
 <pre>
 <code>
+function searchMatrix($matrix, $target) {
+    $m = count($matrix);
+    $n = count($matrix[0]);
+    list($row, $col) = [$m - 1, 0];
+    while ($row >= 0 && $col < $n) {
+        if ($matrix[$row][$col] > $target) {
+            $row--;
+        } else if ($matrix[$row][$col] < $target) {
+            $col++;
+        } else {
+            return true;
+        }
+    }
+    return false;
+}
 </code>
 </pre>
 </details>
