@@ -33,6 +33,20 @@ function findDisappearedNumbers($nums) {
 <summary>代码</summary>
 <pre>
 <code>
+function rotate(&$matrix) {
+    $m = count($matrix);
+    $n = count($matrix[0]);
+    for ($i = 0; $i < floor($m / 2); $i++) {
+        for ($j = 0; $j < $n; $j++) {
+            list($matrix[$i][$j], $matrix[$m - 1 - $i][$j]) = [$matrix[$m - 1 - $i][$j], $matrix[$i][$j]];
+        }
+    }
+    for ($i = 0; $i < $m; $i++) {
+        for ($j = 0; $j < $i; $j++) {
+            list($matrix[$i][$j], $matrix[$j][$i]) = [$matrix[$j][$i], $matrix[$i][$j]];
+        }
+    }
+}
 </code>
 </pre>
 </details>
