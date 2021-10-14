@@ -1,11 +1,14 @@
-# 树 #
+树
 
-## 定义 ##
-一个节点指向多个节点(一对多)
+# 定义 #
+一个节点对应多个子节点
 
-## 应用 ##
-### LEETCODE ###
-#### 104.二叉树的最大深度 ####
+# 特点 #
+一对多
+
+# 应用 #
+## LEETCODE ##
+### 104.二叉树的最大深度 ###
 <details>
 <summary>代码</summary>
 <pre>
@@ -14,7 +17,7 @@
 </pre>
 </details>
 
-#### 110.平衡二叉树 ####
+### 110.平衡二叉树 ###
 <details>
 <summary>代码</summary>
 <pre>
@@ -23,7 +26,7 @@
 </pre>
 </details>
 
-#### 543.二叉树的直径 ####
+### 543.二叉树的直径 ###
 <details>
 <summary>代码</summary>
 <pre>
@@ -105,33 +108,6 @@
 </details>
 
 #### 208.实现Trie(前缀树) ####
-<details>
-<summary>代码</summary>
-<pre>
-<code>
-</code>
-</pre>
-</details>
-
-####  ####
-<details>
-<summary>代码</summary>
-<pre>
-<code>
-</code>
-</pre>
-</details>
-
-####  ####
-<details>
-<summary>代码</summary>
-<pre>
-<code>
-</code>
-</pre>
-</details>
-
-####  ####
 <details>
 <summary>代码</summary>
 <pre>
