@@ -13,6 +13,22 @@
 <summary>代码</summary>
 <pre>
 <code>
+class TreeNode {
+    public $val = null;
+    public $left = null;
+    public $right = null;
+    function __construct($val = 0, $left = null, $right = null) {
+        $this->val = $val;
+        $this->left = $left;
+        $this->right = $right;
+    }
+}
+function maxDepth($root) {
+    if (!$root) {
+        return 0;
+    }
+    return max(maxDepth($root->left), maxDepth($root->right)) + 1;
+}
 </code>
 </pre>
 </details>
@@ -22,6 +38,36 @@
 <summary>代码</summary>
 <pre>
 <code>
+class TreeNode {
+    public $val = null;
+    public $left = null;
+    public $right = null;
+    function __construct($val = 0, $left = null, $right = null) {
+        $this->val = $val;
+        $this->left = $left;
+        $this->right = $right;
+    }
+}
+function isBalanced($root) {
+    return height($root) != -1;
+}
+function height($root) {
+    if (!$root) {
+        return 0;
+    }
+    $left = height($root->left);
+    if ($left == -1) {
+        return -1;
+    }
+    $right = height($root->right);
+    if ($right == -1) {
+        return -1;
+    }
+    if (abs($left - $right) > 1) {
+        return -1;
+    }
+    return max($left, $right) + 1;
+}
 </code>
 </pre>
 </details>
@@ -31,6 +77,33 @@
 <summary>代码</summary>
 <pre>
 <code>
+class TreeNode {
+    public $val = null;
+    public $left = null;
+    public $right = null;
+    function __construct($val = 0, $left = null, $right = null) {
+        $this->val = $val;
+        $this->left = $left;
+        $this->right = $right;
+    }
+}
+function diameterOfBinaryTree($root) {
+    $ans = 0;
+    height($root, $ans);
+    return $ans - 1;
+}
+function height($root, &$ans) {
+    if (!$root) {
+        return 0;
+    }
+    $left = height($root->left, $ans);
+    $right = height($root->right, $ans);
+    $nodes = $left + $right + 1;
+    if ($nodes> $ans) {
+        $ans = $nodes;
+    }
+    return max($left, $right) + 1;
+}
 </code>
 </pre>
 </details>
