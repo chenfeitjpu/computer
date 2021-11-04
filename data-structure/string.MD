@@ -1,7 +1,7 @@
 # 字符串 #
 
 ## 定义 ##
-字符组成的数组
+一串字符
 
 ## 应用 ##
 ### LEETCODE ###
@@ -10,6 +10,27 @@
 <summary>代码</summary>
 <pre>
 <code>
+function isAnagram($s, $t) {
+    $sL = strlen($s);
+    $tL = strlen($t);
+    if ($sL != $tL) {
+        return false;
+    }
+    $map = [];
+    for ($i = 0; $i < $sL; $i++) {
+        if (!isset($map[$s[$i]])) {
+            $map[$s[$i]] = 0;
+        }
+        $map[$s[$i]]++;
+    }
+    for ($j = 0; $j < $tL; $j++) {
+        if (!isset($map[$t[$j]]) || $map[$t[$j]] <= 0) {
+            return false;
+        }
+        $map[$t[$j]]--;
+    }
+    return true;
+}
 </code>
 </pre>
 </details>
@@ -19,6 +40,23 @@
 <summary>代码</summary>
 <pre>
 <code>
+function isIsomorphic($s, $t) {
+    $sL = strlen($s);
+    $map = [];
+    for ($i = 0; $i < $sL; $i++) {
+        if (isset($map[$s[$i]])) {
+            if ($map[$s[$i]] != $t[$i]) {
+                return false;
+            }
+        } else {
+            if (in_array($t[$i], $map)) {
+                return false;
+            }
+            $map[$s[$i]] = $t[$i];
+        }
+    }
+    return true;
+}
 </code>
 </pre>
 </details>
@@ -28,6 +66,24 @@
 <summary>代码</summary>
 <pre>
 <code>
+function countSubstrings($s) {
+    $count = 0;
+    $len = strlen($s);
+    if ($len <= 0) {
+        return $count;
+    }
+    $dp = [];
+    for ($end = 0; $end < $len; $end++) {
+        for ($start = 0; $start <= $end; $start++) {
+            if ($s[$start] == $s[$end] && ($end - $start < 2 || $dp[$start + 1][$end - 1])) {
+                $dp[$start][$end] = true;
+                $count++;
+                continue;
+            }
+        }
+    }
+    return $count;
+}
 </code>
 </pre>
 </details>
