@@ -58,6 +58,29 @@ function longestConsecutive($nums) {
 <summary>代码</summary>
 <pre>
 <code>
+function maxPoints($points) {
+    $ans = 0;
+    $len = count($points);
+    for ($i = 0; $i < $len; $i++) {
+        $max = 0;
+        $map = [];
+        for ($j = $i + 1; $j < $len; $j++) {
+            $x = $points[$j][0] - $points[$i][0];
+            $y = $points[$j][1] - $points[$i][1];
+            $k = GCD($x, $y);
+            $key = $x / $k . '_' . $y / $k;
+            if (!isset($map[$key])) {
+                $map[$key] = 0;
+            }
+            $max = max($max, ++$map[$key]);
+        }
+        $ans = max($ans, $max);
+    }
+    return $ans + 1;
+}
+function GCD($a, $b) {
+    return $b == 0 ? $a : GCD($b, $a % $b);
+}
 </code>
 </pre>
 </details>
