@@ -93,6 +93,33 @@ function countSubstrings($s) {
 <summary>代码</summary>
 <pre>
 <code>
+/**
+ * 中心扩展
+ */
+function countBinarySubstrings($s) {
+    $len = strlen($s);
+    $list = [];
+    $cnt = 0;
+    for ($i = 0; $i < $len; $i++) {
+        if ($i == 0 || $s[$i] == $s[$i - 1]) {
+            $cnt++;
+        } else {
+            array_push($list, $cnt);
+            $cnt = 1;
+        }
+        if ($i == $len - 1) {
+            array_push($list, $cnt);
+        }
+    }
+
+    $ans = 0;
+    $prev = array_shift($list);
+    foreach ($list as $cnt) {
+        $ans += min($prev, $cnt);
+        $prev = $cnt;
+    }
+    return $ans;
+}
 </code>
 </pre>
 </details>
