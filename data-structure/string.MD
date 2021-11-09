@@ -35,7 +35,7 @@ function isAnagram($s, $t) {
 </pre>
 </details>
 
-#### 205.同构字符串 ####
+### 205.同构字符串 ###
 <details>
 <summary>代码</summary>
 <pre>
@@ -61,7 +61,7 @@ function isIsomorphic($s, $t) {
 </pre>
 </details>
 
-#### 647.回文子串 ####
+### 647.回文子串 ###
 <details>
 <summary>代码</summary>
 <pre>
@@ -97,7 +97,7 @@ function countSubstrings($s) {
 </pre>
 </details>
 
-#### 227.基本计算器II ####
+### 28.实现strStr() ###
 <details>
 <summary>代码</summary>
 <pre>
@@ -106,47 +106,103 @@ function countSubstrings($s) {
 </pre>
 </details>
 
-#### 28.实现strStr() ####
+### 409.最长回文串 ###
 <details>
 <summary>代码</summary>
 <pre>
 <code>
+/**
+ * 哈希
+ */
+function longestPalindrome($s) {
+    $len = strlen($s);
+    if ($len <= 1) {
+        return $len;
+    }
+
+    $charList = [];
+    for ($i = 0; $i < $len; $i++) {
+        $char = $s[$i];
+        if (!isset($charList[$char])) {
+            $charList[$char] = 1;
+            continue;
+        }
+        $charList[$char]++;
+    }
+
+    $ans = 0;
+    foreach ($charList as $cnt) {
+        $ans += intval($cnt / 2) * 2;
+        if (($cnt & 1) == 1 && ($ans & 1) == 0) {
+            $ans++;
+        }
+    }
+    return $ans;
+}
 </code>
 </pre>
 </details>
 
-#### 409.最长回文串 ####
+### 3.无重复字符的最长子串 ###
 <details>
 <summary>代码</summary>
 <pre>
 <code>
+/**
+ * 哈希+滑动窗口
+ */
+function lengthOfLongestSubstring($s) {
+    $len = strlen($s);
+    if ($len <= 1) {
+        return $len;
+    }
+
+    $max = 0;
+    $map = [];
+    $start = 0;
+    for ($end = 0; $end < $len; $end++) {
+        $start  = max($start, ($map[$s[$end]] ?? - 1) + 1);
+        $map[$s[$end]] = $end;
+        $max = max($max, $end - $start + 1);
+    }
+    return $max;
+}
 </code>
 </pre>
 </details>
 
-#### 3.无重复字符的最长子串 ####
+### 5.最长回文子串 ###
 <details>
 <summary>代码</summary>
 <pre>
 <code>
-</code>
-</pre>
-</details>
+/**
+ * 动态规划
+ */
+function longestPalindrome($s) {
+    $len = strlen($s);
+    if ($len <= 1) {
+        return $s;
+    }
 
-#### 772.基本计算器III ####
-<details>
-<summary>代码</summary>
-<pre>
-<code>
-</code>
-</pre>
-</details>
-
-#### 5.最长回文子串 ####
-<details>
-<summary>代码</summary>
-<pre>
-<code>
+    $start = 0;
+    $max = 0;
+    $map = [];
+    for ($i = $len - 1; $i >= 0; $i--) {
+        $map[$i][$i] = 1;
+        for ($j = $i; $j < $len; $j++) {
+            $l = $j - $i + 1;
+            if ($s[$i] == $s[$j] && ($l <= 3 || isset($map[$i + 1][$j - 1]))) {
+                $map[$i][$j] = 1;
+                if ($l > $max) {
+                    $start = $i;
+                    $max = $l;
+                }
+            }
+        }
+    }
+    return substr($s, $start, $max);
+}
 </code>
 </pre>
 </details>
