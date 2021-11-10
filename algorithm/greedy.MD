@@ -147,7 +147,7 @@ function findMinArrowShots($points) {
 </pre>
 </details>
 
-#### 763.划分字母区间 ####
+### 763.划分字母区间 ###
 <details>
 <summary>代码</summary>
 <pre>
@@ -232,7 +232,7 @@ function reconstructQueue($people) {
 </pre>
 </details>
 
-#### 665.非递减数列 ####
+### 665.非递减数列 ###
 <details>
 <summary>代码</summary>
 <pre>
