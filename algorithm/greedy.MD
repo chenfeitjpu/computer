@@ -1,11 +1,11 @@
-# 贪心算法 #
+贪心算法
 
-## 定义 ##
+# 定义 #
 通过局部最优得到全局最优
 
-## 应用 ##
-### LEETCODE ###
-#### 455.分发饼干 ####
+# 应用 #
+## LEETCODE ##
+### 455.分发饼干 ###
 <details>
 <summary>代码</summary>
 <pre>
@@ -27,7 +27,7 @@ function findContentChildren($g, $s) {
 </pre>
 </details>
 
-#### 135.分发糖果 ####
+### 135.分发糖果 ###
 <details>
 <summary>代码</summary>
 <pre>
@@ -54,7 +54,7 @@ function candy($ratings) {
 </pre>
 </details>
 
-#### 435.无重叠区间 ####
+### 435.无重叠区间 ###
 <details>
 <summary>代码</summary>
 <pre>
@@ -83,7 +83,7 @@ function eraseOverlapIntervals($intervals) {
 </pre>
 </details>
 
-#### 605.种花问题 ####
+### 605.种花问题 ###
 <details>
 <summary>代码</summary>
 <pre>
@@ -119,7 +119,7 @@ function canPlaceFlowers($flowerbed, $n) {
 </pre>
 </details>
 
-#### 452.用最少数量的箭引爆气球 ####
+### 452.用最少数量的箭引爆气球 ###
 <details>
 <summary>代码</summary>
 <pre>
