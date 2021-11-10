@@ -182,7 +182,7 @@ function partitionLabels($s) {
 </pre>
 </details>
 
-#### 122.买卖股票的最佳时机 II ####
+### 122.买卖股票的最佳时机 II ###
 <details>
 <summary>代码</summary>
 <pre>
@@ -208,7 +208,7 @@ function maxProfit($prices) {
 </pre>
 </details>
 
-#### 406.根据身高重建队列 ####
+### 406.根据身高重建队列 ###
 <details>
 <summary>代码</summary>
 <pre>
