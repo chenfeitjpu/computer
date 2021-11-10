@@ -129,6 +129,41 @@ function countBinarySubstrings($s) {
 <summary>代码</summary>
 <pre>
 <code>
+/**
+ * KMP
+ */
+function mystrstr($haystack, $needle) {
+    $nl = strlen($needle);
+    if ($nl <= 0) {
+        return 0;
+    }
+
+    $prev = 0;
+    $next[0] = 0;
+    for ($cur = 1; $cur < $nl; $cur++) {
+        while ($prev > 0 && $needle[$prev] != $needle[$cur]) {
+            $prev = $next[$prev - 1];
+        }
+        if ($needle[$prev] == $needle[$cur]) {
+            $next[$cur] = ++$prev;
+        } else {
+            $next[$cur] = 0;
+        }
+    }
+
+    for ($i = 0, $j = 0; $i < strlen($haystack); $i++) {
+        while ($j > 0 && $needle[$j] != $haystack[$i]) {
+            $j = $next[$j - 1];
+        }
+        if ($needle[$j] == $haystack[$i]) {
+            $j++;
+            if ($j == $nl) {
+                return $i - $nl + 1;
+            }
+        }
+    }
+    return -1;
+}
 </code>
 </pre>
 </details>
