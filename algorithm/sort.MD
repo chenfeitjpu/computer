@@ -89,7 +89,7 @@ function insert($nums) {
 <pre>
 <code>
 /**
- * 对集合进行分类
+ * 对集合进行拆分
  */
  function quick($nums) {
     $len = count($nums);
