@@ -4,6 +4,7 @@
 对集合进行排序
 
 # 应用 #
+## 常见算法 ##
 <details>
 <summary>冒泡</summary>
 <pre>
@@ -176,26 +177,25 @@ function mergeSortArray(&$nums, $start, $mid, $end) {
 <pre>
 <code>
 /**
- * 计数排序
+ * 统计元素数量
  */
-function countSort($nums) {
+ function countSort($nums) {
     $len = count($nums);
     if ($len <= 1) {
         return $nums;
     }
     list($min, $max) = [min($nums), max($nums)];
-    $offset = $max - $min + 1;
-    $list = array_fill(0, $offset, 0);
-    for ($i = 0; $i < $len; $i++) {
-        $list[$nums[$i] - $min]++;
+    $list = array_fill(0, $max - $min + 1, 0);
+    foreach ($nums as $num) {
+        $list[$num - $min]++;
     }
-    $res = [];
-    for ($j = 0; $j < $offset; $j++) {
-        while ($list[$j]-- > 0) {
-            $res[] = $min + $j;
+    $i = 0;
+    foreach ($list as $key => $value) {
+        while ($value-- > 0) {
+            $nums[$i++] = $min + $key;
         }
     }
-    return $res;
+    return $nums;
 }
 </code>
 </pre>
@@ -217,13 +217,14 @@ function radix($nums) {
     $radix = 1;
     for ($i = 0; $i < $d; $i++) {
         $list = array_fill(0, 10, []);
-        for ($j = 0; $j < $len; $j++) {
-            $list[($nums[$j] / $radix) % 10][] = $nums[$j];
+        foreach ($nums as $num) {
+            $list[($num / $radix) % 10][] = $num;
         }
-        $m = 0;
-        for ($k = 0; $k < 10; $k++) {
-            while(count($list[$k])) {
-                $nums[$m++] = array_shift($list[$k]);
+
+        $j = 0;
+        foreach ($list as $value) {
+            while ($value) {
+                $nums[$j++] = array_shift($value);
             }
         }
         $radix *= 10;
@@ -246,23 +247,23 @@ function bucket($nums) {
     if ($len <= 1) {
         return $nums;
     }
-    list($min, $max, $bucket) = [min($nums), max($nums), 3];
-    $cap = ceil(($max - $min + 1) / $bucket);
-    $buckets = array_fill(0, $bucket, []);
-    for ($i = 0; $i < $len; $i++) {
-        $index = intval(($nums[$i] - $min) / $cap);
-        for ($j = count($buckets[$index]) - 1; $j >= 0; $j--) {
-            if ($buckets[$index][$j] <= $nums[$i]) {
-               break;
+    list($cnt, $min, $max) = [3, min($nums), max($nums)];
+    $cap = ceil(($max - $min + 1) / $cnt);
+    $buckets = array_fill(0, $cnt, []);
+    foreach ($nums as $num) {
+        $index = intval(($num - $min) / $cap);
+        for ($i = count($buckets[$index]) - 1; $i >= 0; $i--) {
+            if ($buckets[$index][$i] <= $num) {
+                break;
             }
-            $buckets[$index][$j + 1] = $buckets[$index][$j];
+            $buckets[$index][$i + 1] =$buckets[$index][$i];
         }
-        $buckets[$index][$j + 1] = $nums[$i];
+        $buckets[$index][$i + 1] = $num;
     }
     $j = 0;
-    for ($i = 0; $i < $bucket; $i++) {
-        while (count($buckets[$i])) {
-            $nums[$j++] = array_shift($buckets[$i]);
+    foreach ($buckets as $bucket) {
+        while ($bucket) {
+            $nums[$j++] = array_shift($bucket);
         }
     }
     return $nums;
@@ -271,11 +272,8 @@ function bucket($nums) {
 </pre>
 </details>
 
-## 常见问题 ##
-
-### leetcode ###
-
-#### 215.数组中的第K个最大元素 ####
+## leetcode ##
+### 215.数组中的第K个最大元素 ###
 <details>
 <summary>代码</summary>
 <pre>
@@ -324,7 +322,7 @@ function quick(&$nums, $start, $end) {
 </pre>
 </details>
 
-#### 347.前K个高频元素 ####
+### 347.前K个高频元素 ###
 <details>
 <summary>代码</summary>
 <pre>
@@ -361,7 +359,7 @@ function topKFrequent($nums, $k) {
 </pre>
 </details>
 
-#### 451.根据字符出现频率排序 ####
+### 451.根据字符出现频率排序 ###
 <details>
 <summary>代码</summary>
 <pre>
@@ -403,7 +401,7 @@ function frequencySort($s) {
 </pre>
 </details>
 
-#### 75.颜色分类 ####
+### 75.颜色分类 ###
 <details>
 <summary>代码</summary>
 <pre>
