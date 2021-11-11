@@ -1,9 +1,9 @@
-# 排序算法 #
+排序
 
-## 定义 ##
-对元素进行排序
+# 定义 #
+对集合进行排序
 
-## 应用 ##
+# 应用 #
 <details>
 <summary>冒泡</summary>
 <pre>
@@ -16,8 +16,8 @@ function bubble($nums) {
     if ($len <= 1) {
         return $nums;
     }
-    for ($i = 0; $i < $len - 1; $i++) {
-        for ($j = 0; $j < $len - $i - 1; $j++) {
+    for ($i = $len - 1; $i > 0; $i--) {
+        for ($j = 0; $j < $i; $j++) {
             if ($nums[$j] > $nums[$j + 1]) {
                 list($nums[$j], $nums[$j + 1]) = [$nums[$j + 1], $nums[$j]];
             }
@@ -41,14 +41,14 @@ function select($nums) {
     if ($len <= 1) {
         return $nums;
     }
-    for ($i = 0; $i < $len - 1; $i++) {
-        $min = $i;
-        for ($j = $i + 1; $j < $len; $j++) {
-            if ($nums[$j] < $nums[$min]) {
-                $min = $j;
+    for ($i = $len - 1; $i > 0; $i--) {
+        $radix = 0;
+        for ($j = 1; $j <= $i; $j++) {
+            if ($nums[$j] > $nums[$radix]) {
+                $radix = $j;
             }
+            list($nums[$radix], $nums[$i]) = [$nums[$i], $nums[$radix]];
         }
-        list($nums[$i], $nums[$min]) = [$nums[$min], $nums[$i]];
     }
     return $nums;
 }
@@ -65,17 +65,16 @@ function select($nums) {
  */
 function insert($nums) {
     $len = count($nums);
-    if($len <= 1) {
+    if ($len <= 1) {
         return $nums;
     }
     for ($i = 1; $i < $len; $i++) {
         $radix = $nums[$i];
         for ($j = $i - 1; $j >= 0; $j--) {
-            if ($nums[$j] > $radix) {
-                $nums[$j + 1] = $nums[$j];
-            } else {
+            if ($nums[$j] <= $radix) {
                 break;
             }
+            $nums[$j + 1] = $nums[$j];
         }
         $nums[$j + 1] = $radix;
     }
@@ -89,7 +88,10 @@ function insert($nums) {
 <summary>快排</summary>
 <pre>
 <code>
-function quick($nums) {
+/**
+ * 对集合进行分类
+ */
+ function quick($nums) {
     $len = count($nums);
     if ($len <= 1) {
         return $nums;
@@ -98,7 +100,7 @@ function quick($nums) {
     return $nums;
 }
 function quickSort(&$nums, $start, $end) {
-    if ($start >= $end) {
+    if ($end <= $start) {
         return;
     }
     $radix = $start;
@@ -114,7 +116,7 @@ function quickSort(&$nums, $start, $end) {
             list($nums[$left], $nums[$right]) = [$nums[$right], $nums[$left]];
         }
     }
-    list($nums[$radix], $nums[$right]) = [$nums[$right], $nums[$start]];
+    list($nums[$radix], $nums[$right]) = [$nums[$right], $nums[$radix]];
     quickSort($nums, $start, $right - 1);
     quickSort($nums, $right + 1, $end);
 }
@@ -126,16 +128,19 @@ function quickSort(&$nums, $start, $end) {
 <summary>归并</summary>
 <pre>
 <code>
+/**
+ * 合并两个有序集合
+ */
 function merge($nums) {
     $len = count($nums);
-    if ($len < 1) {
+    if ($len <= 1) {
         return $nums;
     }
     mergeSort($nums, 0, $len - 1);
     return $nums;
 }
 function mergeSort(&$nums, $start, $end) {
-    if ($start >= $end) {
+    if ($end <= $start) {
         return;
     }
     $mid = $start + intval(($end - $start) / 2);
@@ -144,23 +149,22 @@ function mergeSort(&$nums, $start, $end) {
     mergeSortArray($nums, $start, $mid, $end);
 }
 function mergeSortArray(&$nums, $start, $mid, $end) {
-    if ($start >= $end) {
+    if ($end <= $start) {
         return;
     }
-    list($i, $j) = [$start, $mid + 1];
     $tmp = [];
+    list($i, $j) = [$start, $mid + 1];
     while ($i <= $mid && $j <= $end) {
         $tmp[] = $nums[$i] <= $nums[$j] ? $nums[$i++] : $nums[$j++];
     }
-    while ($i <= $mid) {
+    while($i <= $mid) {
         $tmp[] = $nums[$i++];
     }
     while ($j <= $end) {
         $tmp[] = $nums[$j++];
     }
-    $k = 0;
-    while ($start <= $end) {
-        $nums[$start++] = $tmp[$k++];
+    for ($k = $start; $k <= $end; $k++) {
+        $nums[$k] = $tmp[$k -$start];
     }
 }
 </code>
