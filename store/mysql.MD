@@ -5,7 +5,7 @@ MySql
 
 # 内容 #
 ## 数据类型 ##
-#### 数值 ####
+### 数值 ###
   - 整型
     - tinyint
     - smallint
@@ -17,22 +17,22 @@ MySql
     - double
   - 定点数
     - decimal
-#### 字符串 ####
-  - char
-  - varchar
+### 时间 ###
+  - year
+  - date
+  - time
+  - datetime
+  - timestamp
+### 字符串 ###
+  - char(M) 1-255
+  - varchar(M) 1~65535
   - tinytext
   - text
   - mediumtext
   - longtext
   - enum
   - set
-#### 时间 ####
-  - year
-  - date
-  - time
-  - datetime
-  - timestamp
-#### 二进制 ####
+### 二进制 ###
   - bit
   - binary
   - varbinary
@@ -41,7 +41,7 @@ MySql
   - medibumblob
   - longblob
 
-### SQL ###
+## SQL ##
 #### DDL ####
 ##### database #####
   - show databases 
