@@ -42,28 +42,35 @@ MySql
   - longblob
 
 ## SQL ##
-#### DDL ####
-##### database #####
-  - show databases 
-  - create database dbname 
-  - drop database dbname
-  - use dbname
-##### table #####
-  - show tables
-  - desc tablename
-  - show create table tablename
-  - create table tablename
-  - drop table tablename
-  - alter table tablename
-##### column #####  
-default, not null, auto_increament, zerofill, primary key, unique key, constraint foreign key  references
-#### DML #### 
+### DDL ###
+  - database
+    - show databases 
+    - create database dbname 
+    - drop database dbname
+    - use dbname
+  - table
+    - show tables
+    - desc tablename
+    - show create table tablename
+    - create table tablename
+    - drop table tablename
+    - alter table tablename
+  - column
+    - default
+    - not null
+    - auto_increament
+    - zerofill
+    - constraint
+      - primary key
+      - unique key
+      - foreign key
+### DML ### 
   - insert into tablename values
   - update tablename set 
   - delete from tablename
   - select from   
     distinct, group by having, order by, limit start length
-#### 运算符 ####
+### 运算符 ###
   - 算术  
   +, -, *, /, %
   - 比较  
@@ -74,18 +81,18 @@ default, not null, auto_increament, zerofill, primary key, unique key, constrain
   in, not in, is null, is not null
   - 通配  
   _, %
-#### 函数 ####
+### 函数 ###
   - 数值
   - 字符串
   - 时间
   - 聚集
 
-### 视图 ###
-#### 操作 ####
+## 视图 ##
+### 操作 ###
   - create view viewname as
   - drop view
 
-### 游标 ###
+## 游标 ##
 #### 操作 ####  
   - 新建 declare cursorname cursor for
   - 打开 open cursorname
