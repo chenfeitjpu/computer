@@ -7,11 +7,11 @@ MySql
 ## 数据类型 ##
 ### 数值 ###
   - 整型
-    - tinyint 1字节
-    - smallint 2字节
-    - mediumint 3字节
-    - int 4字节
-    - longint 8字节
+    - tinyint 占用1个字节
+    - smallint 占用2个字节
+    - mediumint 占用3个字节
+    - int 占用4个字节
+    - longint 占用8个字节
   - 浮点数
     - float 4字节
     - double 8字节
