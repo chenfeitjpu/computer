@@ -49,11 +49,11 @@ MySql
     - use dbname
   - table
     - show tables
-    - desc tablename
     - show create table tablename
+    - desc tablename
     - create table tablename
-    - drop table tablename
     - alter table tablename [add column|modify column|alter column|change column|drop column|rename to]
+    - drop table tablename
   - column
     - default
     - not null
