@@ -76,6 +76,20 @@ MySql
   - limit start length
   - distinct
 
+### 分组查询 ###
+  - group by having
+
+### 子查询 ###
+
+### 连接查询 ###
+  - inner join on
+  - left join on 
+  - right join on
+
+### 组合查询 ###
+  - union all
+  - union
+
 ### 运算符 ###
   - 算术 +, -, *, /, %
   - 比较 \>, \>=, \<, \<=, =, !=, between and
@@ -84,7 +98,7 @@ MySql
   - 通配 _, %
 
 ### 函数 ###
-  - 文本处理
+  - 文本
     - LEFT 从左边取指定长度的子串
     - RIGHT 从右边取指定长度的子串
     - LENGTH 获取字符串长度
