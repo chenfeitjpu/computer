@@ -142,10 +142,37 @@ MySql
   - drop view viewname 删除视图
 
 ## 存储程序 ##
-### 变量 ###
+### 语法 ###
+  - 变量
+    - declare name 类型 default value 定义局部变量
+    - set name=value 变量赋值
+    - into name, name 多个变量赋值
+    - delimiter 结束分隔符
+  - 选择语句
+    - if then
+      elseif then
+      else
+      end if
+  - 循环语句
+    - while do
+      end while;
+    - repeat
+      until end repeat;
+    - loop
+      end loop;
+    
 ### 存储函数 ###
+  - show function status like 查看所有函数
+  - show create function functionname 查看函数定义
+  - create function functionname(参数名 数据类型, 参数名 数据类型)
+    returns 返回值类型, 返回值类型
+    begin
+        函数体内容
+    end
+  - drop function functionname 删除函数
 ### 存储过程 ###
 ### 触发器 ###
+### 事件 ###
 
 
 ## 游标 ##
