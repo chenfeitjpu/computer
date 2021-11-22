@@ -165,13 +165,19 @@ MySql
   - show function status like 查看所有函数
   - show create function functionname 查看函数定义
   - create function functionname(参数名 数据类型, 参数名 数据类型)
-    returns 返回值类型, 返回值类型
+    returns 返回值类型
     begin
         函数体内容
     end
   - drop function functionname 删除函数
 
 ### 存储过程 ###
+  - show procedure status like 查看所有存储过程
+  - show create procedure procedurename 查看存储过程定义
+  - create procedure procedurename([in|out|inout]参数名 数据类型)
+    begin
+    end
+  - drop procedure procedurename 删除存储过程
 
 ### 触发器 ###
 
