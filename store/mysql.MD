@@ -68,12 +68,21 @@ MySql
   - update tablename set 
   - delete from tablename
   - select [distinct] from [group by having] [order by] [limit start length]
+
+## 查询 ##
+### 简单查询 ###
+  - where
+  - order by asc, desc
+  - limit start length
+  - distinct
+
 ### 运算符 ###
   - 算术 +, -, *, /, %
-  - 比较 \>, >=, <, <=, =, !=, between and
+  - 比较 \>, \>=, \<, \<=, =, !=, between and
   - 逻辑 and, or
   - 匹配 in, not in, is null, is not null
   - 通配 _, %
+
 ### 函数 ###
   - 数值
   - 字符串
