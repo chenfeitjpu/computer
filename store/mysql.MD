@@ -84,10 +84,41 @@ MySql
   - 通配 _, %
 
 ### 函数 ###
-  - 数值
-  - 字符串
+  - 文本处理
+    - LEFT 从左边取指定长度的子串
+    - RIGHT 从右边取指定长度的子串
+    - LENGTH 获取字符串长度
+    - UPPER 大写格式
+    - LOWER 小写格式
+    - LTRIM 去掉字符串左边空格
+    - RTRIM 去掉字符串右边空格
+    - SUBSTRING 字符串截取
+    - CONCAT 字符串拼接
   - 时间
+    - NOW 当前日期和时间
+    - CURDATE 当前日期
+    - CURTIME 当前时间
+    - DATE 提取日期
+    - DATE_ADD 添加指定的时间间隔
+    - DATE_SUB 减去指定的时间间隔
+    - DATE_DIFF 返回两个日期之间的天数
+    - DATE_FORMAT 格式显示日期和时间
+  - 数值
+    - RAND 随机数
+    - MOD 取余
+    - ABS 绝对值
+    - Pi 圆周率
+    - EXP e的指定次方
+    - SQRT 平方根
+    - SIN 正弦
+    - COS 余弦
+    - TAN 正切
   - 聚集
+    - COUNT 总数
+    - MAX 最大值
+    - MIN 最小值
+    - SUM 求和
+    - AVG 平均值
 
 ## 视图 ##
 ### 操作 ###
