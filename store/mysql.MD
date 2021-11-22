@@ -134,10 +134,19 @@ MySql
     - SUM 求和
     - AVG 平均值
 
-## 视图 ##
-### 操作 ###
-  - create view viewname as
-  - drop view
+### 视图 ###
+  - show tables 查看所有视图
+  - desc viewname 查看视图描述
+  - show create view viewname 查看视图创建语句
+  - create view viewname as select 创建视图
+  - drop view viewname 删除视图
+
+## 存储程序 ##
+### 变量 ###
+### 存储函数 ###
+### 存储过程 ###
+### 触发器 ###
+
 
 ## 游标 ##
 ### 操作 ###
