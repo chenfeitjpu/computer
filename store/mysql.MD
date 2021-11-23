@@ -76,8 +76,8 @@ MySql
 ## SQL ##
 ### DDL ###
   - database
-    - show databases 
-    - create database dbname 
+    - show databases `查看所有数据库`
+    - create database dbname 穿  
     - drop database dbname
     - use dbname
   - table
