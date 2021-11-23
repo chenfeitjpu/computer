@@ -65,21 +65,21 @@ MySql
   - **二进制**
     | 类型 | 最大长度 | 取值范围 | 存储空间 |
     | :--- | :--- | :--- | :--- |
-    | bit(M) | M个比特位 | 1\~64 | (M+7)/8个字节 | 
-    | binary(M) | M个字节 | 0~255 | M个字节 | 
-    | varbinary(M) | M个字节 | 1~65535 | L+1或2个字节 | 
-    | tinyblob | 2⁸-1个字节 |  | L+1个字节 | 
-    | blob | 2¹⁶-1个字节 |  | L+2个字节 | 
-    | mediumblob | 2²⁴-1个字节 |  | L+3个字节 | 
-    | longblob | 2³²-1个字节 |  | L+4个字节 | 
+    | **bit(M)** | M个比特位 | 1\~64 | (M+7)/8个字节 | 
+    | **binary(M)** | M个字节 | 0~255 | M个字节 | 
+    | **varbinary(M)** | M个字节 | 1~65535 | L+1或2个字节 | 
+    | **tinyblob** | 2⁸-1个字节 |  | L+1个字节 | 
+    | **blob** | 2¹⁶-1个字节 |  | L+2个字节 | 
+    | **mediumblob** | 2²⁴-1个字节 |  | L+3个字节 | 
+    | **longblob** | 2³²-1个字节 |  | L+4个字节 | 
 
 ## SQL ##
 ### DDL ###
-  - database
-    - show databases `查看所有数据库`
-    - create database dbname 穿  
-    - drop database dbname
-    - use dbname
+  - **database**
+    - `show databases` 查看所有数据库
+    - `create database dbname` 查看数据库定义  
+    - `drop database dbname` 删除数据库
+    - `use dbname` 选择数据库
   - table
     - show tables
     - show create table tablename
