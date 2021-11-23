@@ -1,4 +1,36 @@
 MySql
+- [定义](#定义)
+- [内容](#内容)
+  - [数据类型](#数据类型)
+  - [SQL](#sql)
+    - [DDL](#ddl)
+    - [DML ###](#dml-)
+  - [查询](#查询)
+    - [简单查询](#简单查询)
+    - [分组查询](#分组查询)
+    - [子查询](#子查询)
+    - [连接查询](#连接查询)
+    - [组合查询](#组合查询)
+    - [运算符](#运算符)
+    - [函数](#函数)
+    - [视图](#视图)
+  - [存储程序](#存储程序)
+    - [语法](#语法)
+    - [存储函数](#存储函数)
+    - [存储过程](#存储过程)
+    - [触发器](#触发器)
+    - [事件](#事件)
+  - [事务](#事务)
+      - [特性 ####](#特性-)
+      - [状态 ####](#状态-)
+      - [操作 ####](#操作-)
+      - [并发问题 ####](#并发问题-)
+      - [隔离级别 ####](#隔离级别-)
+      - [日志](#日志)
+      - [锁](#锁)
+    - [查询](#查询-1)
+      - [访问方式](#访问方式)
+      - [多表查询](#多表查询)
 
 # 定义 #
 关系型数据库
@@ -152,7 +184,7 @@ MySql
     - if then
       elseif then
       else
-      end if
+      end if;
   - 循环语句
     - while do
       end while;
@@ -160,7 +192,13 @@ MySql
       until end repeat;
     - loop
       end loop;
-    
+  - 游标
+    - declare cursorname cursor for select 创建游标 
+    - declare continue handler for not found 事件响应
+    - open cursorname 打开游标  
+    - fetch cursorname into 移动游标
+    - close cursorname 关闭游标
+  
 ### 存储函数 ###
   - show function status like 查看所有函数
   - show create function functionname 查看函数定义
@@ -180,18 +218,32 @@ MySql
   - drop procedure procedurename 删除存储过程
 
 ### 触发器 ###
-
+  - show triggers 查看所有触发器
+  - show create trigger triggername 查看触发器定义
+  - create trigger triggername 
+    {before|after} on {insert|update|delete} on tablename
+    for each row
+    begin
+      {old|new}
+    end
+  - drop trigger triggername 删除触发器
+  
 ### 事件 ###
+  - show events 查看所有事件
+  - show create event eventname 查看事件定义
+  - create event eventname
+    on schedual
+    {
+      at 某个确定的时间点
+      every 期望的时间间隔 [STARTS datetime][END datetime]
+    }
+    do
+    begin
+    end
+  - drop event eventname 删除事件
 
-## 游标 ##
-### 操作 ###
-  - 新建 declare cursorname cursor for
-  - 打开 open cursorname
-  - 读取 fetch cursorname into 
-  - 异常处理 declare continue handler for not found
-  - 关系 close cursorname
 
-### 事务 ###
+## 事务 ##
 #### 特性 ####  
   - 原子性
   - 一致性
