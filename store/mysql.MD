@@ -159,88 +159,103 @@ MySql
     - `datediff(date, date)` 返回两个日期之间的天数
     - `date_format(datetime, format)` 格式化显示日期和时间
   - **数值**
-    - RAND 随机数
-    - MOD 取余
-    - ABS 绝对值
-    - Pi 圆周率
-    - EXP e的指定次方
-    - SQRT 平方根
-    - SIN 正弦
-    - COS 余弦
-    - TAN 正切
+    - `rand` 随机数
+    - `mod` 取余
+    - `abs` 绝对值
+    - `pi` 圆周率
+    - `exp` e的指定次方
+    - `sqrt` 平方根
+    - `sin` 正弦
+    - `cos` 余弦
+    - `tan` 正切
   - **聚集**
-    - COUNT 总数
-    - MAX 最大值
-    - MIN 最小值
-    - SUM 求和
-    - AVG 平均值
+    - `count` 总数
+    - `max` 最大值
+    - `min` 最小值
+    - `sum` 求和
+    - `avg` 平均值
 
 ### 视图 ###
-  - show tables 查看所有视图
-  - desc viewname 查看视图描述
-  - show create view viewname 查看视图创建语句
-  - create view viewname as select 创建视图
-  - drop view viewname 删除视图
+  - `show tables` 查看所有视图
+  - `desc viewname` 查看视图描述
+  - `show create view viewname` 查看视图定义
+  - `create view viewname as select` 创建视图
+  - `drop view viewname` 删除视图
 
 ## 存储程序 ##
 ### 语法 ###
-  - 变量
-    - declare name 类型 default value 定义局部变量
-    - set name=value 变量赋值
-    - into name, name 多个变量赋值
-    - delimiter 结束分隔符
-  - 选择语句
-    - if then  
-      elseif then  
-      else  
-      end if;  
-  - 循环语句
-    - while do  
-      end while;
-    - repeat  
-      until end repeat;
-    - loop  
-      end loop;
-  - 游标
-    - declare cursorname cursor for select 创建游标 
-    - declare continue handler for not found 事件响应
-    - open cursorname 打开游标  
-    - fetch cursorname into 移动游标
-    - close cursorname 关闭游标
+  - **变量**
+    - `declare name 类型 default value` 定义局部变量
+    - `set name=value` 变量赋值
+    - `into name, name` 多个变量赋值
+    - `delimiter` 结束分隔符
+  - **选择语句**
+    ```
+    if then  
+    elseif then  
+    else  
+    end if;
+    ```
+  - **循环语句**
+    ```
+    while do  
+    end while;
+    ```
+    ```
+    repeat  
+    until end repeat;
+    ```
+    ```
+    loop  
+    end loop;
+    ```
+  - **游标**
+    - `declare cursorname cursor for select` 创建游标 
+    - `declare continue handler for not found` 事件响应
+    - `open cursorname` 打开游标  
+    - `fetch cursorname into` 移动游标
+    - `close cursorname` 关闭游标
   
 ### 存储函数 ###
-  - show function status like 查看所有函数
-  - show create function functionname 查看函数定义
-  - create function functionname(参数名 数据类型, 参数名 数据类型)  
+  - `show function status like` 查看所有函数
+  - `show create function functionname` 查看函数定义
+  - ```
+    create function functionname(参数名 数据类型, 参数名 数据类型)  
     returns 返回值类型  
     begin  
         函数体内容  
-    end  
-  - drop function functionname 删除函数
+    end;
+    ```
+  - `drop function functionname` 删除函数
 
 ### 存储过程 ###
-  - show procedure status like 查看所有存储过程
-  - show create procedure procedurename 查看存储过程定义
-  - create procedure procedurename([in|out|inout]参数名 数据类型)  
+  - `show procedure status like` 查看所有存储过程
+  - `show create procedure procedurename` 查看存储过程定义
+  - ```
+    create procedure procedurename([in|out|inout]参数名 数据类型)  
     begin  
-    end  
-  - drop procedure procedurename 删除存储过程
+    end
+    ```
+  - `drop procedure procedurename` 删除存储过程
 
 ### 触发器 ###
-  - show triggers 查看所有触发器
-  - show create trigger triggername 查看触发器定义
-  - create trigger triggername  
+  - `show triggers` 查看所有触发器
+  - `show create trigger triggername` 查看触发器定义
+  - ```
+    create trigger triggername  
     {before|after} on {insert|update|delete} on tablename  
     for each row  
     begin  
       {old|new}  
-    end  
-  - drop trigger triggername 删除触发器
+    end
+    ``` 
+  - `drop trigger triggername` 删除触发器
   
 ### 事件 ###
-  - show events 查看所有事件
-  - show create event eventname 查看事件定义
-  - create event eventname  
+  - `show events` 查看所有事件
+  - `show create event eventname` 查看事件定义
+  - ```
+    create event eventname  
     on schedual  
     {  
       at 某个确定的时间点  
@@ -248,5 +263,6 @@ MySql
     }  
     do  
     begin  
-    end  
-  - drop event eventname 删除事件
+    end 
+    ```
+  - `drop event eventname` 删除事件
