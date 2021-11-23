@@ -72,7 +72,7 @@ MySql
     | blob | 2¹⁶-1个字节 |  | L+2个字节 | 
     | mediumblob | 2²⁴-1个字节 |  | L+3个字节 | 
     | longblob | 2³²-1个字节 |  | L+4个字节 | 
-    
+
 ## SQL ##
 ### DDL ###
   - database
