@@ -4,7 +4,7 @@ MySql
   - [数据类型](#数据类型)
   - [SQL](#sql)
     - [DDL](#ddl)
-    - [DML ###](#dml-)
+    - [DML](#dml)
   - [查询](#查询)
     - [简单查询](#简单查询)
     - [分组查询](#分组查询)
@@ -84,7 +84,7 @@ MySql
       - primary key
       - unique key
       - foreign key
-### DML ### 
+### DML ###
   - insert into tablename values
   - update tablename set 
   - delete from tablename
@@ -170,16 +170,16 @@ MySql
     - into name, name 多个变量赋值
     - delimiter 结束分隔符
   - 选择语句
-    - if then
-      elseif then
-      else
-      end if;
+    - if then  
+      elseif then  
+      else  
+      end if;  
   - 循环语句
-    - while do
+    - while do  
       end while;
-    - repeat
+    - repeat  
       until end repeat;
-    - loop
+    - loop  
       end loop;
   - 游标
     - declare cursorname cursor for select 创建游标 
@@ -191,42 +191,42 @@ MySql
 ### 存储函数 ###
   - show function status like 查看所有函数
   - show create function functionname 查看函数定义
-  - create function functionname(参数名 数据类型, 参数名 数据类型)
-    returns 返回值类型
-    begin
-        函数体内容
-    end
+  - create function functionname(参数名 数据类型, 参数名 数据类型)  
+    returns 返回值类型  
+    begin  
+        函数体内容  
+    end  
   - drop function functionname 删除函数
 
 ### 存储过程 ###
   - show procedure status like 查看所有存储过程
   - show create procedure procedurename 查看存储过程定义
-  - create procedure procedurename([in|out|inout]参数名 数据类型)
-    begin
-    end
+  - create procedure procedurename([in|out|inout]参数名 数据类型)  
+    begin  
+    end  
   - drop procedure procedurename 删除存储过程
 
 ### 触发器 ###
   - show triggers 查看所有触发器
   - show create trigger triggername 查看触发器定义
-  - create trigger triggername 
-    {before|after} on {insert|update|delete} on tablename
-    for each row
-    begin
-      {old|new}
-    end
+  - create trigger triggername  
+    {before|after} on {insert|update|delete} on tablename  
+    for each row  
+    begin  
+      {old|new}  
+    end  
   - drop trigger triggername 删除触发器
   
 ### 事件 ###
   - show events 查看所有事件
   - show create event eventname 查看事件定义
-  - create event eventname
-    on schedual
-    {
-      at 某个确定的时间点
-      every 期望的时间间隔 [STARTS datetime][END datetime]
-    }
-    do
-    begin
-    end
+  - create event eventname  
+    on schedual  
+    {  
+      at 某个确定的时间点  
+      every 期望的时间间隔 [STARTS datetime][END datetime]  
+    }  
+    do  
+    begin  
+    end  
   - drop event eventname 删除事件
