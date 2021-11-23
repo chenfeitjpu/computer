@@ -5,6 +5,8 @@ MySql
   - [SQL](#sql)
     - [DDL](#ddl)
     - [DML](#dml)
+    - [DQL](#dql)
+    - [DCL](#dcl)
   - [查询](#查询)
     - [简单查询](#简单查询)
     - [分组查询](#分组查询)
@@ -76,81 +78,87 @@ MySql
 ## SQL ##
 ### DDL ###
   - **database**
-    - `show databases` 查看所有数据库
-    - `create database dbname` 查看数据库定义  
-    - `drop database dbname` 删除数据库
-    - `use dbname` 选择数据库
-  - table
-    - show tables
-    - show create table tablename
-    - desc tablename
-    - create table tablename
-    - alter table tablename [add column|modify column|alter column|change column|drop column|rename to]
-    - drop table tablename
-  - column
-    - default
-    - not null
-    - auto_increament
-    - zerofill
-    - constraint
-      - primary key
-      - unique key
-      - foreign key
+    - `show databases` 查看所有库
+    - `create database dbname` 查看库定义  
+    - `drop database dbname` 删除库
+    - `use dbname` 选择库
+  - **table**
+    - `show tables` 查看所有表
+    - `show create table tablename` 查看表定义
+    - `desc tablename` 查看表描述
+    - `create table tablename` 创建表
+    - `alter table tablename [add column|modify column|alter column|change column|drop column|rename to]` 修改表
+    - `drop table tablename` 删除表
+  - **column**
+    - `default` 默认值
+    - `not null` 非空
+    - `auto_increament` 自增
+    - `zerofill` 零填充
+    - `constraint` 约束
+      - `primary key` 主键
+      - `unique key` 唯一键
+      - `foreign key` 外键
+  
 ### DML ###
-  - insert into tablename values
-  - update tablename set 
-  - delete from tablename
-  - select [distinct] from [group by having] [order by] [limit start length]
+  - `insert into tablename values` 插入数据
+  - `update tablename set` 修改数据 
+  - `delete from tablename` 删除数据
+  - 
+
+### DQL ###
+  - `select [distinct] [column] from tablename [where] [group by having] [order by] [limit start length]` 查询数据
+  
+### DCL ###
 
 ## 查询 ##
 ### 简单查询 ###
-  - where
-  - order by asc, desc
-  - limit start length
-  - distinct
+  - `where`
+  - `order by asc, desc`
+  - `limit start length`
+  - `distinct`
 
 ### 分组查询 ###
-  - group by having
+  - `group by having`
 
 ### 子查询 ###
 
 ### 连接查询 ###
-  - inner join on
-  - left join on 
-  - right join on
+  - `inner join on`
+  - `left join on`
+  - `right join on`
 
 ### 组合查询 ###
-  - union all
-  - union
+  - `union all`
+  - `union`
 
 ### 运算符 ###
-  - 算术 +, -, *, /, %
-  - 比较 \>, \>=, \<, \<=, =, !=, between and
-  - 逻辑 and, or
-  - 匹配 in, not in, is null, is not null
-  - 通配 _, %
+  - **算术** `+, -, *, /, %`
+  - **比较** `\>, \>=, \<, \<=, =, !=, between and`
+  - **逻辑** `and, or`
+  - **匹配** `in, not in, is null, is not null`
+  - **通配** `_, %`
 
 ### 函数 ###
-  - 文本
-    - LEFT 从左边取指定长度的子串
-    - RIGHT 从右边取指定长度的子串
-    - LENGTH 获取字符串长度
-    - UPPER 大写格式
-    - LOWER 小写格式
-    - LTRIM 去掉字符串左边空格
-    - RTRIM 去掉字符串右边空格
-    - SUBSTRING 字符串截取
-    - CONCAT 字符串拼接
-  - 时间
-    - NOW 当前日期和时间
-    - CURDATE 当前日期
-    - CURTIME 当前时间
-    - DATE 提取日期
-    - DATE_ADD 添加指定的时间间隔
-    - DATE_SUB 减去指定的时间间隔
-    - DATE_DIFF 返回两个日期之间的天数
-    - DATE_FORMAT 格式显示日期和时间
-  - 数值
+  - **文本**
+    - `left` 从左边取指定长度的子串
+    - `right` 从右边取指定长度的子串
+    - `length` 获取字符串长度
+    - `upper` 大写格式
+    - `lower` 小写格式
+    - `ltrim` 去掉字符串左边空格
+    - `rtrim` 去掉字符串右边空格
+    - `substring` 字符串截取
+    - `concat` 字符串拼接
+  - **时间**
+    - `now` 获取当前日期和时间
+    - `curdate` 获取当前日期
+    - `curtime` 获取当前时间
+    - `date(datetime)` 提取日期
+    - `date_add(datetime, interval value type)` 添加指定的时间间隔
+    - `date_sub(datetime, interval value type)` 减去指定的时间间隔
+    - `datediff(date, date)` 返回两个日期之间的天数
+    - `date_format(datetime, format)` 格式化显示日期和时间
+  - **数值**
     - RAND 随机数
     - MOD 取余
     - ABS 绝对值
@@ -160,7 +168,7 @@ MySql
     - SIN 正弦
     - COS 余弦
     - TAN 正切
-  - 聚集
+  - **聚集**
     - COUNT 总数
     - MAX 最大值
     - MIN 最小值
