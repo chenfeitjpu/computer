@@ -1,6 +1,9 @@
 MySql
 - [定义](#定义)
 - [内容](#内容)
+  - [系统](#系统)
+    - [变量](#变量)
+    - [字符集](#字符集)
   - [数据类型](#数据类型)
   - [SQL](#sql)
     - [DDL](#ddl)
@@ -8,11 +11,7 @@ MySql
     - [DQL](#dql)
     - [DCL](#dcl)
   - [查询](#查询)
-    - [简单查询](#简单查询)
-    - [分组查询](#分组查询)
-    - [子查询](#子查询)
-    - [连接查询](#连接查询)
-    - [组合查询](#组合查询)
+    - [分类](#分类)
     - [运算符](#运算符)
     - [函数](#函数)
     - [视图](#视图)
@@ -27,6 +26,13 @@ MySql
 关系型数据库
 
 # 内容 #
+## 系统 ##
+### 变量 ###
+  - `show variables` 查看系统变量
+  - `show status` 查看系统状态
+  
+### 字符集 ###
+
 ## 数据类型 ##
   - **整型**  
     | 类型 | 取值范围 | 存储空间 |
@@ -111,25 +117,22 @@ MySql
 ### DCL ###
 
 ## 查询 ##
-### 简单查询 ###
-  - `where`
-  - `order by asc, desc`
-  - `limit start length`
-  - `distinct`
-
-### 分组查询 ###
-  - `group by having`
-
-### 子查询 ###
-
-### 连接查询 ###
-  - `inner join on`
-  - `left join on`
-  - `right join on`
-
-### 组合查询 ###
-  - `union all`
-  - `union`
+### 分类 ###
+  - **简单查询**
+    - `where`
+    - `order by asc, desc`
+    - `limit start length`
+    - `distinct`
+  - **分组查询**
+    - `group by having`
+  - **子查询**
+  - **连接查询**
+    - `inner join on`
+    - `left join on`
+    - `right join on`
+  - **组合查询**
+    - `union all`
+    - `union`
 
 ### 运算符 ###
   - **算术** `+, -, *, /, %`
