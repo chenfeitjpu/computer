@@ -3,7 +3,7 @@
 - [内容](#内容)
   - [系统](#系统)
     - [变量](#变量)
-    - [字符集](#字符集)
+    - [字符集和比较规则](#字符集和比较规则)
   - [数据类型](#数据类型)
   - [SQL](#sql)
     - [DDL](#ddl)
@@ -31,9 +31,44 @@
   - `show variables` 查看系统变量
   - `show status` 查看系统状态
   
-### 字符集 ###
-1. 
-> 从发送请求到接收结果过程中发生的字符集转换 
+### 字符集和比较规则 ###
+1. 查看  
+  + `show (character set | charset)` 查看字符集
+  + `show collation` 查看比较规则
+2. 级别
+  + 服务器级别
+    `character_set_server` 字符集  
+    `collation_server` 比较规则   
+  + 数据库级别
+    ```
+    create database 数据库名
+    [[default] character set 字符集名称]
+    [[default] collate 比较规则名称]
+
+    alter database 数据库名
+    [[default] character set 字符集名称]
+    [[default] collate 比较规则名称]
+    
+    ```
+  - 表级别
+    ```
+    create table 表名 (列的信息)
+    [[default] character set 字符集名称]
+    [collate 比较规则名称]]
+
+    alter table 表名
+    [[default] character set 字符集名称]
+    [collate 比较规则名称]
+    ```
+  - 列级别
+    ```
+    CREATE TABLE 表名(
+        列名 字符串类型 [CHARACTER SET 字符集名称] [COLLATE 比较规则名称]
+    )
+
+    ALTER TABLE 表名 MODIFY 列名 字符串类型 [CHARACTER SET 字符集名称] [COLLATE 比较规则名称]
+    ```
+3. 转换过程 
 > + 客户端使用操作系统的字符集编码请求字符串，向服务器发送的是经过编码的一个字节串  
 > + 服务器将客户端发送来的字节串采用character_set_client代表的字符集进行解码，将解码后的字符串再按照character_set_connection代表的字符集进行编码  
 > + 如果character_set_connection代表的字符集和具体操作的列使用的字符集一致，则直接进行相应操作，否则的话需要将请求中的字符串从character_set_connection代表的字符集转换为具体操作的列使用的字符集之后再进行操作  
