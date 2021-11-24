@@ -21,11 +21,11 @@
     - [存储过程](#存储过程)
     - [触发器](#触发器)
     - [事件](#事件)
-  - [结构](#结构)
+  - [存储结构](#存储结构)
     - [Innodb记录存储结构](#innodb记录存储结构)
       - [操作行格式](#操作行格式)
       - [行格式分类](#行格式分类)
-        - [Compact #####](#compact-)
+        - [Compact](#compact)
         - [Redundant](#redundant)
         - [Dynamic](#dynamic)
         - [Compressed](#compressed)
@@ -320,7 +320,7 @@
     ```
   - `drop event eventname` 删除事件
 
-## 结构 ##
+## 存储结构 ##
 ### Innodb记录存储结构 ###
 #### 操作行格式 ####
   + 查看  
@@ -333,7 +333,7 @@
     ```  
 
 #### 行格式分类 ####
-##### Compact #####  
+##### Compact #####
   <table>
       <tr><td colspan="3">记录的额外信息</td><td>记录的真实数据</td></tr>
       <tr><td>变长字段长度列表</td><td>NULL值列表</td><td>记录头信息</td><td>列的值</td></tr>
