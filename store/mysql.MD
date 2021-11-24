@@ -317,12 +317,7 @@
 ## 结构 ##
 ### 记录结构 ###
 1. **compact**  
-<style>
-table {
-margin: auto;
-}
-</style>
-<table align="center">
+<table style="margin: auto;">
     <tr><td colspan="3">记录的额外信息</td><td>记录的真实数据</td></tr>
     <tr><td>变长字段长度列表</td><td>NULL值列表</td><td>记录头信息</td><td>列的值</td></tr>
 </table>
