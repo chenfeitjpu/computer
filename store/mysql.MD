@@ -38,6 +38,8 @@
       - [Page Directory](#page-directory)
       - [File Trailer](#file-trailer)
     - [InnoDB索引结构](#innodb索引结构)
+    - [数据目录](#数据目录)
+    - [InnoDB表空间](#innodb表空间)
 
 # 定义 #
 关系型数据库
@@ -564,3 +566,13 @@
     - 为了尽可能少的让聚簇索引发生页面分裂和记录移位的情况，建议让主键拥有AUTO_INCREMENT属性
     - 定位并删除表中的重复和冗余索引
     - 尽量使用覆盖索引进行查询，避免回表带来的性能损耗
+
+### 数据目录 ###
+  + 查看
+    `SHOW VARIABLES LIKE 'datadir'`
+  
+  + 结构
+    - 数据库在文件系统中的表示
+    -  
+
+### InnoDB表空间 ###
