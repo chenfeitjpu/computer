@@ -32,7 +32,7 @@
       - [行溢出](#行溢出)
     - [InnoDB数据页结构](#innodb数据页结构)
       - [File Header](#file-header)
-      - [Page Header ####](#page-header-)
+      - [Page Header](#page-header)
       - [Infimun + Supremum](#infimun--supremum)
       - [User Records](#user-records)
       - [Page Directory](#page-directory)
@@ -451,7 +451,7 @@
   | FIL_PAGE_FILE_FLUSH_LSN | 8字节 | 仅在系统表空间的一个页中定义，代表文件至少被刷新到了对应的LSN值 |
   | FIL_PAGE_ARCH_LOG_NO_OR_SPACE_ID | 4字节 | 页属于哪个表空间 |
 
-#### Page Header ####   
+#### Page Header ####
   | 名称 | 占用空间大小 | 描述 |
   | :---: | :---: | :---: |
   | PAGE_N_DIR_SLOTS | 2字节 | 在页目录中的槽数量 |
