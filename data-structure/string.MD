@@ -88,7 +88,7 @@ function countSubstrings($s) {
 </pre>
 </details>
 
-#### 696.计数二进制子串 ####
+### 696.计数二进制子串 ###
 <details>
 <summary>代码</summary>
 <pre>
