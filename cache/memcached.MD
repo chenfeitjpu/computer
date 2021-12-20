@@ -23,7 +23,7 @@
   - `flush_all` 刷新所有数据
  
 ## 内存管理 ##
-slab allocator机制
+slab allocator
 
 ## 删除机制 ##
   - **惰性删除**
