@@ -3,6 +3,7 @@
 - [内容](#内容)
   - [系统](#系统)
     - [变量](#变量)
+    - [状态](#状态)
     - [字符集和比较规则](#字符集和比较规则)
   - [数据类型](#数据类型)
   - [SQL](#sql)
@@ -48,17 +49,30 @@
 ## 系统 ##
 ### 变量 ###
   - `show variables` 查看系统变量
+  
+### 状态 ###
   - `show status` 查看系统状态
   
 ### 字符集和比较规则 ###
-1. 查看  
+**查看**  
   + `show (character set | charset)` 查看字符集
   + `show collation` 查看比较规则
-2. 级别
-  + 服务器级别
-    `character_set_server` 字符集  
-    `collation_server` 比较规则   
-  + 数据库级别
+  
+**级别**
+  + 服务器级别  
+    *查看*  
+    `show variables like 'character_set_server'`  
+    `show variables like 'collation_server'`
+
+    *设置*  
+    `set character_set_server='utf8mb4'`
+    `set collation_server='utf8mb4_0900_ai_ci'`
+
+  + 数据库级别  
+    *查看*  
+    `show create database 数据库名`
+    
+    *设置*  
     ```
     create database 数据库名
     [[default] character set 字符集名称]
@@ -67,9 +81,12 @@
     alter database 数据库名
     [[default] character set 字符集名称]
     [[default] collate 比较规则名称]
-    
     ```
-  - 表级别
+
+  - 表级别  
+    *查看*  
+
+    *设置*  
     ```
     create table 表名 (列的信息)
     [[default] character set 字符集名称]
@@ -79,15 +96,17 @@
     [[default] character set 字符集名称]
     [collate 比较规则名称]
     ```
+    
   - 列级别
     ```
     CREATE TABLE 表名(
         列名 字符串类型 [CHARACTER SET 字符集名称] [COLLATE 比较规则名称]
     )
-
+**
     ALTER TABLE 表名 MODIFY 列名 字符串类型 [CHARACTER SET 字符集名称] [COLLATE 比较规则名称]
     ```
-3. 转换过程 
+    
+**转换** 
 > + 客户端使用操作系统的字符集编码请求字符串，向服务器发送的是经过编码的一个字节串  
 > + 服务器将客户端发送来的字节串采用character_set_client代表的字符集进行解码，将解码后的字符串再按照character_set_connection代表的字符集进行编码  
 > + 如果character_set_connection代表的字符集和具体操作的列使用的字符集一致，则直接进行相应操作，否则的话需要将请求中的字符串从character_set_connection代表的字符集转换为具体操作的列使用的字符集之后再进行操作  
