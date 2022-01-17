@@ -176,16 +176,18 @@
 ### DDL ###
   - **database**
     - `show databases` 查看所有库
-    - `create database dbname` 查看库定义  
-    - `drop database dbname` 删除库
-    - `use dbname` 选择库
+    - `create database 库名` 创建库
+    - `drop database 库名` 删除库
+    - `use 库名` 选择库
+  
   - **table**
     - `show tables` 查看所有表
-    - `show create table tablename` 查看表定义
-    - `desc tablename` 查看表描述
-    - `create table tablename` 创建表
-    - `alter table tablename [add column|modify column|alter column|change column|drop column|rename to]` 修改表
-    - `drop table tablename` 删除表
+    - `show create table 表名` 查看表定义
+    - `desc 表名` 查看表描述
+    - `create table 表名` 创建表
+    - `alter table 表名 [add column|modify column|alter column|change column|drop column|rename to]` 修改表
+    - `drop table 表名` 删除表
+  
   - **column**
     - `default` 默认值
     - `not null` 非空
@@ -197,40 +199,51 @@
       - `foreign key` 外键
   
 ### DML ###
-  - `insert into tablename values` 插入数据
-  - `update tablename set` 修改数据 
-  - `delete from tablename` 删除数据
+  - `insert into 表名 values` 插入数据
+  - `update 表名 set` 修改数据 
+  - `delete from 表名` 删除数据
   - 
 
 ### DQL ###
-  - `select [distinct] [column] from tablename [where] [group by having] [order by] [limit start length]` 查询数据
+  - `select [distinct] [column] from tablename [where] [group by having] [order by] [limit offset length]` 查询数据
   
 ### DCL ###
+  - `grant 权限 on 库名.表名 to 用户@主机 identified by 密码` 授权
+  - `revoke 权限 on 库名.表名 to 用户@主机` 回收权限  
 
 ## 查询 ##
 ### 分类 ###
-  - **简单查询**
+  - *简单查询*
     - `where`
     - `order by asc, desc`
-    - `limit start length`
+    - `limit offset length`
     - `distinct`
-  - **分组查询**
+  
+  - *分组查询*
     - `group by having`
-  - **子查询**
-  - **连接查询**
+  
+  - *子查询*
+  
+  - *连接查询*
     - `inner join on`
     - `left join on`
     - `right join on`
-  - **组合查询**
+     
+  - *组合查询*
     - `union all`
     - `union`
 
 ### 运算符 ###
-  - **算术** `+, -, *, /, %`
-  - **比较** `\>, \>=, \<, \<=, =, !=, between and`
-  - **逻辑** `and, or`
-  - **匹配** `in, not in, is null, is not null`
-  - **通配** `_, %`
+  - *算术*  
+    `+, -, *, /, %`
+  - *比较*  
+    `\>, \>=, \<, \<=, =, !=, between and`
+  - *逻辑*  
+    `and, or`
+  - *匹配*  
+    `in, not in, is null, is not null`
+  - *通配*  
+    `_, %`
 
 ### 函数 ###
   - **文本**
@@ -243,6 +256,7 @@
     - `rtrim` 去掉字符串右边空格
     - `substring` 字符串截取
     - `concat` 字符串拼接
+   
   - **时间**
     - `now` 获取当前日期和时间
     - `curdate` 获取当前日期
@@ -252,6 +266,7 @@
     - `date_sub(datetime, interval value type)` 减去指定的时间间隔
     - `datediff(date, date)` 返回两个日期之间的天数
     - `date_format(datetime, format)` 格式化显示日期和时间
+     
   - **数值**
     - `rand` 随机数
     - `mod` 取余
@@ -262,6 +277,7 @@
     - `sin` 正弦
     - `cos` 余弦
     - `tan` 正切
+     
   - **聚集**
     - `count` 总数
     - `max` 最大值
