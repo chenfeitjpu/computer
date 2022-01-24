@@ -195,9 +195,9 @@
     - `auto_increament` 自增
     - `zerofill` 零填充
     - `constraint` 约束
-      - `primary key` 主键
-      - `unique key` 唯一键
-      - `foreign key` 外键
+    - `primary key` 主键
+    - `unique key` 唯一键
+    - `foreign key` 外键
   
 ### DML ###
   - `insert into 表名 values` 插入数据
