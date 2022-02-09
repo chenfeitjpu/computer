@@ -646,4 +646,5 @@
     *索引 表名.MYI*
 
 ### InnoDB表空间 ###
+![avatar](./images/mysql/innodb-table-space.awebp)
 
