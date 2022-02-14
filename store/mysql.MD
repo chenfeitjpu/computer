@@ -298,18 +298,18 @@
 ### 优化 ###
 #### 访问方式 ####  
 **单表访问**  
- *方法*
- - const
- - ref
- - ref_or_null
- - range
- - index
- - all
+*方法*
+  - const
+  - ref
+  - ref_or_null
+  - range
+  - index
+  - all
   
 *索引合并*
- - Intersection合并
- - Union合并
- - Sort-Union合并
+  - Intersection合并
+  - Union合并
+  - Sort-Union合并
   
 **连接查询**  
 *分类*
@@ -322,8 +322,8 @@
 
 #### 基于成本优化 ####
 **成本计算**
- - IO成本
- - CPU成本 
+  - IO成本
+  - CPU成本 
 
 **单表查询成本**  
 1. 根据搜索条件，找出所有可能使用的索引
@@ -331,7 +331,62 @@
 3. 计算使用不同索引执行查询的代价
 4. 对比各种执行方案的代价，找出成本最低的那一个
 
+*区间记录计算*
+  - index dive
+  - 索引统计
+   
 **连接查询成本**
+1. 单次查询驱动表的成本  
+2. 多次查询被驱动表的成本
+
+*condition filtering(扇出值)*
+
+**调节成本常数**
+  - server层(mysql.server_cos)
+  - 存储引擎层(mysql.engine_cost)
+
+**InnoDB统计数据收集**  
+*存储方式*  
+  - 永久性的统计数据
+  - 非永久性的统计数据  
+可通过innodb_stats_persistent变量设置系统的存储方式  
+可通过STATS_PERSISTENT属性指明表的存储方式
+
+*存储位置*
+  - innodb_table_stats
+    | 字段名 |	描述 |
+    | :---: | :---: |
+    | database_name | 数据库名 |
+    | table_name | 表名 |
+    | last_update | 本条记录最后更新时间 |
+    | n_rows | 表中记录的条数 |
+    | clustered_index_size | 表的聚簇索引占用的页面数量 |
+    | sum_of_other_index_sizes | 表的其他索引占用的页面数量 | 
+
+  - innodb_index_stats
+    | 字段名 | 描述 |
+    | :---: | :---: |
+    | database_name | 数据库名 |
+    | table_name | 表名 |
+    | index_name | 索引名 |
+    | last_update | 本条记录最后更新时间 |
+    | stat_name | 统计项的名称 | 
+    | stat_value | 对应的统计项的值 |
+    | sample_size | 为生成统计数据而采样的页面数量 |
+    | stat_description| 对应的统计项的描述 |
+
+*更新*  
+  - 定期更新
+    `innodb_stats_auto_recalc`
+
+  - 手动更新
+    `ANALYZE TABLE`
+
+*NULL值处理*  
+innodb_stats_method  
+  - nulls_equal
+  - nulls_unequal
+  - nulls_ignored    
 
 #### 基于规则优化 ####
 
