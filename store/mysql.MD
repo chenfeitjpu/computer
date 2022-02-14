@@ -17,7 +17,7 @@
     - [函数](#函数)
     - [视图](#视图)
     - [优化](#优化)
-      - [访问方式 ####](#访问方式-)
+      - [访问方式](#访问方式)
       - [基于成本优化](#基于成本优化)
       - [基于规则优化](#基于规则优化)
   - [存储程序](#存储程序)
@@ -296,9 +296,9 @@
   - `drop view 视图名` 删除视图
 
 ### 优化 ###
-#### 访问方式 ####  
+#### 访问方式 ####
 **单表访问**  
-*方法*
+方法
   - const
   - ref
   - ref_or_null
@@ -306,17 +306,17 @@
   - index
   - all
   
-*索引合并*
+索引合并
   - Intersection合并
   - Union合并
   - Sort-Union合并
   
 **连接查询**  
-*分类*
+分类
   - 内连接
   - 外连接
 
-*原理*
+原理
   - 嵌套循环查询(Nested Loop Join)  
   - 基于块的嵌套循环查询(Block Nested Loop Join)
 
@@ -331,7 +331,7 @@
 3. 计算使用不同索引执行查询的代价
 4. 对比各种执行方案的代价，找出成本最低的那一个
 
-*区间记录计算*
+区间记录计算
   - index dive
   - 索引统计
    
@@ -339,20 +339,21 @@
 1. 单次查询驱动表的成本  
 2. 多次查询被驱动表的成本
 
-*condition filtering(扇出值)*
+condition filtering(扇出值)
 
 **调节成本常数**
   - server层(mysql.server_cos)
   - 存储引擎层(mysql.engine_cost)
 
 **InnoDB统计数据收集**  
-*存储方式*  
+存储方式  
   - 永久性的统计数据
-  - 非永久性的统计数据  
+  - 非永久性的统计数据 
+  
 可通过innodb_stats_persistent变量设置系统的存储方式  
 可通过STATS_PERSISTENT属性指明表的存储方式
 
-*存储位置*
+存储位置
   - innodb_table_stats
     | 字段名 |	描述 |
     | :---: | :---: |
@@ -375,15 +376,15 @@
     | sample_size | 为生成统计数据而采样的页面数量 |
     | stat_description| 对应的统计项的描述 |
 
-*更新*  
+更新  
   - 定期更新
     `innodb_stats_auto_recalc`
 
   - 手动更新
     `ANALYZE TABLE`
 
-*NULL值处理*  
-innodb_stats_method  
+NULL值处理  
+*innodb_stats_method*  
   - nulls_equal
   - nulls_unequal
   - nulls_ignored    
