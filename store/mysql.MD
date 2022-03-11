@@ -45,7 +45,7 @@
       - [基本操作](#基本操作-1)
       - [结构](#结构)
     - [InnoDB表空间](#innodb表空间)
-    - [](#)
+    - [InnoDB的Buffer Pool](#innodb的buffer-pool)
 
 # 定义 #
 关系型数据库
@@ -1244,4 +1244,20 @@ INSUFFICIENT_PRIVILEGES: 0
 ### InnoDB表空间 ###
 ![avatar](./images/mysql/innodb-table-space.awebp)
 
-###  ###
+### InnoDB的Buffer Pool###
+*** 定义 ***  
+InnoDB为了缓存磁盘中的页，在MySQL服务器启动的时候就向操作系统申请了一片连续的内存，他们给这片内存起了个名，叫做Buffer Pool  
+
+*** 内部组成 ***  
+![avatar](./images/mysql/innodb-buffer-pool.awebp)
+
+*** 缓存页的哈希处理 ***
+表空间号 + 页号作为key，缓存页作为value创建一个哈希表
+
+*** free链表的管理 ***  
+把所有空闲的缓存页对应的控制块作为一个节点放到一个链表中
+
+*** flush链表的管理 ***
+凡是修改过的缓存页对应的控制块都会作为一个节点加入到一个链表中
+
+*** LRU链表的管理 ***
