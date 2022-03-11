@@ -446,76 +446,94 @@ IN子查询优化
 **table**  
 EXPLAIN语句输出的每条记录都对应着某个单表的访问方法
   
-**id**
+**id**  
 查询语句中每出现一个SELECT关键字，就会为它分配一个唯一的id值
 
-**select_type**
+**select_type**  
   - SIMPLE  
     查询语句中不包含UNION或者子查询的查询都算作是SIMPLE类型
+
   - PRIMARY  
     对于包含UNION、UNION ALL或者子查询的大查询来说，它是由几个小查询组成的，其中最左边的那个查询的select_type值就是PRIMARY   
+  
   - UNION  
     对于包含UNION或者UNION ALL的大查询来说，它是由几个小查询组成的，其中除了最左边的那个小查询以外，其余的小查询的select_type值就是UNION   
+  
   - UNION RESULT  
     MySQL选择使用临时表来完成UNION查询的去重工作，针对该临时表的查询的select_type就是UNION RESULT 
+  
   - SUBQUERY  
     子查询是不相关子查询   
+  
   - DEPENDENT SUBQUERY  
     子查询是相关子查询
+  
   - DEPENDENT UNION  
     子查询都依赖于外层查询的话
+  
   - DERIVED  
     采用物化的方式执行的包含派生表的查询
+  
   - MATERIALIZED  
     将子查询物化之后与外层查询进行连接查询
 
 **type**     
   - system  
     当表中只有一条记录并且该表使用的存储引擎的统计数据是精确的，比如MyISAM、Memory
+ 
   - const  
     根据主键或者唯一二级索引列与常数进行等值匹配
+  
   - eq_rel  
     在连接查询时，如果被驱动表是通过主键或者唯一二级索引列等值匹配的方式进行访问               
+  
   - ref  
     普通的二级索引列与常量进行等值匹配
+  
   - ref_or_null  
     普通二级索引进行等值匹配查询，该索引列的值也可以是NULL值时
+  
   - index_merge  
     使用Intersection、Union、Sort-Union这三种索引合并的方式来执行查询   
+  
   - unique_subquery
     子查询可以使用主键进行等值匹配
+  
   - index_subquery
     子查询使用的普通索引进行等值匹配
+  
   - range  
     使用索引获取某些范围区间的记录
+  
   - index  
     扫描全部的索引记录
+  
   - all  
     全表扫描
 
-**possible_keys**
+**possible_keys**  
 可能用到的索引
 
-**key**
+**key**  
 实际用到的索引
 
-**key_len**
+**key_len**  
 索引记录的最大长度，由三个部分构成，主要用来区分某个使用联合索引的查询具体用了几个索引列
 - 索实际占用的存储空间的最大长度
 - 如果该索引列可以存储NULL值，则key_len比不可以存储NULL值时多1个字节
 - 对于变长字段来说，都会有2个字节的空间来存储该变长列的实际长度
   
-**ref**
+**ref**  
 与索引列作等值匹配的内容
 
-**rows**
+**rows**  
 预计需要扫描的行数
 
-**filtered**
+**filtered**  
 驱动表扇出值
 
-**Extra**
-额外信息  
+**Extra**  
+额外信息    
 - No tables used  
   查询语句的没有FROM子句 
 
