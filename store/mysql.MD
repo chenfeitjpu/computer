@@ -443,31 +443,124 @@ IN子查询优化
 | filtered | 某个表经过搜索条件过滤后剩余记录条数的百分比 |
 | Extra | 一些额外的信息 |
 
-- table  
-  EXPLAIN语句输出的每条记录都对应着某个单表的访问方法
+**table**  
+EXPLAIN语句输出的每条记录都对应着某个单表的访问方法
   
-- id
-  查询语句中每出现一个SELECT关键字，就会为它分配一个唯一的id值
+**id**
+查询语句中每出现一个SELECT关键字，就会为它分配一个唯一的id值
 
-- select_type
-  - SIMPLE
+**select_type**
+  - SIMPLE  
     查询语句中不包含UNION或者子查询的查询都算作是SIMPLE类型
-  - PRIMARY
+  - PRIMARY  
     对于包含UNION、UNION ALL或者子查询的大查询来说，它是由几个小查询组成的，其中最左边的那个查询的select_type值就是PRIMARY   
-  - UNION
+  - UNION  
     对于包含UNION或者UNION ALL的大查询来说，它是由几个小查询组成的，其中除了最左边的那个小查询以外，其余的小查询的select_type值就是UNION   
-  - UNION RESULT
+  - UNION RESULT  
     MySQL选择使用临时表来完成UNION查询的去重工作，针对该临时表的查询的select_type就是UNION RESULT 
   - SUBQUERY  
-  - DEPENDENT SUBQUERY
-  - DEPENDENT UNION
-  - DERIVED
+    子查询是不相关子查询   
+  - DEPENDENT SUBQUERY  
+    子查询是相关子查询
+  - DEPENDENT UNION  
+    子查询都依赖于外层查询的话
+  - DERIVED  
     采用物化的方式执行的包含派生表的查询
-  - MATERIALIZED
-   
-- type     
-  -         
-    
+  - MATERIALIZED  
+    将子查询物化之后与外层查询进行连接查询
+
+**type**     
+  - system  
+    当表中只有一条记录并且该表使用的存储引擎的统计数据是精确的，比如MyISAM、Memory
+  - const  
+    根据主键或者唯一二级索引列与常数进行等值匹配
+  - eq_rel  
+    在连接查询时，如果被驱动表是通过主键或者唯一二级索引列等值匹配的方式进行访问               
+  - ref  
+    普通的二级索引列与常量进行等值匹配
+  - ref_or_null  
+    普通二级索引进行等值匹配查询，该索引列的值也可以是NULL值时
+  - index_merge  
+    使用Intersection、Union、Sort-Union这三种索引合并的方式来执行查询   
+  - unique_subquery
+    子查询可以使用主键进行等值匹配
+  - index_subquery
+    子查询使用的普通索引进行等值匹配
+  - range  
+    使用索引获取某些范围区间的记录
+  - index  
+    扫描全部的索引记录
+  - all  
+    全表扫描
+
+**possible_keys**
+可能用到的索引
+
+**key**
+实际用到的索引
+
+**key_len**
+索引记录的最大长度，由三个部分构成，主要用来区分某个使用联合索引的查询具体用了几个索引列
+- 索实际占用的存储空间的最大长度
+- 如果该索引列可以存储NULL值，则key_len比不可以存储NULL值时多1个字节
+- 对于变长字段来说，都会有2个字节的空间来存储该变长列的实际长度
+  
+**ref**
+与索引列作等值匹配的内容
+
+**rows**
+预计需要扫描的行数
+
+**filtered**
+驱动表扇出值
+
+**Extra**
+额外信息  
+- No tables used  
+  查询语句的没有FROM子句 
+
+- Impossible WHERE   
+  查询语句的WHERE子句永远为FALSE  
+
+- No matching min/max row  
+  当查询列表处有MIN或者MAX聚集函数，但是并没有符合WHERE子句中的搜索条件的记录时
+
+- Using index  
+  查询列表以及搜索条件中只包含属于某个索引的列，也就是在可以使用索引覆盖的情况下
+
+- Using index condition  
+  索引条件下推
+
+- Using where  
+  WHERE子句中有搜索条件
+
+- Using join buffer (Block Nested Loop)  
+  基于块的嵌套循环算法
+
+- Not exists  
+  使用左（外）连接时，如果WHERE子句中包含要求被驱动表的某个列等于NULL值的搜索条件，而且那个列又是不允许存储NULL值的
+
+- Using intersect(...)、Using union(...)和Using sort_union(...)  
+  使用索引合并的方式执行查询
+
+- Zero limit  
+  当LIMIT子句的参数为0时   
+
+- Using filesort  
+  使用文件排序
+
+- Using temporary  
+  使用到了内部临时表
+
+- Start temporary, End temporary  
+  查询优化器会优先尝试将IN子查询转换成semi-join，而semi-join又有好多种执行策略，当执行策略为DuplicateWeedout时，也就是通过建立临时表来实现为外层查询中的记录进行去重操作时，驱动表查询执行计划的Extra列将显示Start temporary提示，被驱动表查询执行计划的Extra列将显示End temporary提示
+
+- LooseScan  
+  在将In子查询转为semi-join时，如果采用的是LooseScan执行策略，则在驱动表执行计划的Extra列就是显示LooseScan提示
+
+- FirstMatch  
+  在将In子查询转为semi-join时，如果采用的是FirstMatch执行策略，则在被驱动表执行计划的Extra列就是显示FirstMatch(tbl_name)提示
+
 ## 存储程序 ##
 ### 语法 ###
   - *变量*
