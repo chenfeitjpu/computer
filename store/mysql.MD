@@ -390,7 +390,7 @@ NULL值处理
   - nulls_ignored    
 
 #### 基于规则优化 ####
-- 条件化简
+**条件化简**
   - 移除不必要的括号
   - 常量传递
   - 等值传递
@@ -399,6 +399,30 @@ NULL值处理
   - HAVING子句和WHERE子句的合并
   - 常量表检测
   - 外连接消除
+   
+**子查询优化**
+标量子查询、行子查询
+  - 不相关查询  
+    - 单独执行子查询  
+    - 再执行外层查询
+  - 相关查询  
+    - 先从外层查询中获取一条记录  
+    - 执行子查询  
+    - 检测外层查询  
+
+IN子查询优化  
+  - 将子查询转换为semi-join
+    - Table pullout（子查询中的表上拉） 
+    - DuplicateWeedout execution strategy（重复值消除）
+    - LooseScan execution strategy（松散扫描）
+    - Semi-join Materialization execution strategy（物化连接）
+    - FirstMatch execution strategy（首次匹配）
+  - 将子查询物化之后再执行查询
+  - 执行IN to EXISTS转换  
+
+表子查询优化
+  - 把派生表物化
+  - 将派生表和外层的表合并
 
 ## 存储程序 ##
 ### 语法 ###
