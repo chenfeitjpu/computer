@@ -23,8 +23,12 @@
     - [执行计划](#执行计划)
       - [Explain](#explain)
       - [optimizer trace](#optimizer-trace)
-  - [存储程序](#存储程序)
+  - [事务](#事务)
+    - [特性](#特性)
+    - [状态](#状态-1)
     - [语法](#语法)
+  - [存储程序](#存储程序)
+    - [语法](#语法-1)
     - [存储函数](#存储函数)
     - [存储过程](#存储过程)
     - [触发器](#触发器)
@@ -885,7 +889,46 @@ INSUFFICIENT_PRIVILEGES: 0
 - optimize阶段
 - execute阶段
 
+## 事务 ##
+### 特性 ###
+- 原子性（Atomicity）
+- 隔离性（Isolation）
+- 一致性（Consistency）
+- 持久性（Durability）
 
+### 状态 ###
+- 活动的（active
+- 部分提交的（partially committed）
+- 失败的（failed）
+- 中止的（aborted）
+- 提交的（committed）
+
+![avatar](./images/mysql/transaction-state.awebp)
+
+### 语法 ###
+**开启事务**  
+- `BEGIN [WORK]`  
+- `START TRANSACTION [READ ONLY | READ WRITE | WITH CONSISTENT SNAPSHOT]`  
+
+**提交事务**
+`COMMIT [WORK]`
+
+**手动中止事务**
+`ROLLBACK [WORK]`
+
+**自动提交**  
+`autocommit`
+
+**隐藏提交**  
+
+**保存点**
+- 定义  
+  `SAVEPOINT 保存点名称`
+- 回滚  
+  `ROLLBACK [WORK] TO [SAVEPOINT] 保存点名称`
+- 删除  
+  `RELEASE SAVEPOINT 保存点名称`
+  
 ## 存储程序 ##
 ### 语法 ###
   - *变量*
@@ -1245,19 +1288,51 @@ INSUFFICIENT_PRIVILEGES: 0
 ![avatar](./images/mysql/innodb-table-space.awebp)
 
 ### InnoDB的Buffer Pool###
-*** 定义 ***  
+***定义***  
 InnoDB为了缓存磁盘中的页，在MySQL服务器启动的时候就向操作系统申请了一片连续的内存，他们给这片内存起了个名，叫做Buffer Pool  
 
-*** 内部组成 ***  
+***内部组成***  
 ![avatar](./images/mysql/innodb-buffer-pool.awebp)
 
-*** 缓存页的哈希处理 ***
-表空间号 + 页号作为key，缓存页作为value创建一个哈希表
+***缓存页的哈希处理***
+表空间号+页号作为key，缓存页作为value创建一个哈希表
 
-*** free链表的管理 ***  
+***free链表的管理***  
 把所有空闲的缓存页对应的控制块作为一个节点放到一个链表中
 
-*** flush链表的管理 ***
+***flush链表的管理***
 凡是修改过的缓存页对应的控制块都会作为一个节点加入到一个链表中
 
-*** LRU链表的管理 ***
+***LRU链表的管理***
+**问题**
+- 预读，InnoDB认为执行当前的请求可能之后会读取某些页面，就预先把它们加载到Buffer Pool中  
+  - 线性预读，顺序访问了某个区的页面超过系统变量（innodb_read_ahead_threshold）的值，就会触发一次异步读取下一个区中全部的页面到Buffer Pool的请求  
+  - 随机预读，如果Buffer Pool中已经缓存了某个区的13个连续的页面，不论这些页面是不是顺序读取的，都会触发一次异步读取本区中所有其的页面到Buffer Pool的请求  
+  
+- 全表扫描的查询语句
+
+**划分区域的LRU链表** 
+把LRU链表按照一定比例分成两截  
+- 一部分存储使用频率非常高的缓存页，所以这一部分链表也叫做热数据，或者称young区域  
+- 另一部分存储使用频率不是很高的缓存页，所以这一部分链表也叫做冷数据，或者称old区域  
+
+优化
+- 针对预读的页面可能不进行后续访问情况的优化 
+  当磁盘上的某个页面在初次加载到Buffer Pool中的某个缓存页时，该缓存页对应的控制块会被放到old区域的头部  
+
+- 针对全表扫描时，短时间内访问大量使用频率非常低的页面情况的优化
+  在对某个处在old区域的缓存页进行第一次访问时就在它对应的控制块中记录下来这个访问时间，如果后续的访问时间与第一次访问的时间在某个时间间隔内，那么该页面就不会被从old区域移动到young区域的头部
+
+- young区域节点频繁移动
+  只有被访问的缓存页位于young区域的1/4的后边，才会被移动到LRU链表头部  
+
+***刷新脏页到磁盘***
+- 从LRU链表的冷数据中刷新一部分页面到磁盘（BUF_FLUSH_LRU）
+- 从flush链表中刷新一部分页面到磁盘（BUF_FLUSH_LIST）
+- 将LRU链表尾部的一个脏页同步刷新到磁盘（BUF_FLUSH_SINGLE_PAGE）
+  
+***多个Buffer Pool实例***
+`innodb_buffer_pool_instances`  设置Buffer Pool实例的个数  
+`innodb_buffer_pool_chunk_size`  一个Buffer Pool实例其实是由若干个chunk组成的  
+
+
