@@ -1397,7 +1397,7 @@ redo日志都放在了大小为512字节的页中，我们这里把用来存储r
 `lsn`  日志序列号，初始值为8704  
 `flushed_to_disk_lsn`  刷新到磁盘中的redo日志量
 
-**flush链表中的LSN**
+**flush链表中的LSN**  
 - oldest_modification  
   某个页面被加载到Buffer Pool后进行第一次修改，那么就将修改该页面的mtr开始时对应的lsn值写入这个属性  
 
@@ -1406,63 +1406,63 @@ redo日志都放在了大小为512字节的页中，我们这里把用来存储r
 
 flush链表中的脏页按照修改发生的时间顺序进行排序
 
-***checkpoint***
-**过程**
+***checkpoint***  
+**过程**  
 - 计算一下当前系统中可以被覆盖的redo日志对应的lsn值最大是多少  
 - 将checkpoint_lsn和对应的redo日志文件组偏移量以及此次checkpint的编号写到日志文件的管理信息
 ![avatar](./images/mysql/redo-log-file-lsn.awebp)
 
-***innodb_flush_log_at_trx_commit的用法***
+***innodb_flush_log_at_trx_commit的用法***  
 - 0 在事务提交时不立即向磁盘中同步redo日志
 - 1 在事务提交时需要将redo日志同步到磁盘
 - 2 在事务提交时需要将redo日志写到操作系统的缓冲区中，但并不需要保证将日志真正的刷新到磁盘
 
 ***崩溃恢复***  
-**确定恢复的起点**  
+**确定恢复的起点**   
 我们只要把checkpoint1和checkpoint2这两个block中的checkpoint_no值读出来比一下大小，哪个的checkpoint_no值更大，说明哪个block存储的就是最近的一次checkpoint信息。这样我们就能拿到最近发生的checkpoint对应的checkpoint_lsn值以及它在redo日志文件组中的偏移量checkpoint_offset
 
 **确定恢复的终点**  
 普通block的log block header部分有一个称之为LOG_BLOCK_HDR_DATA_LEN的属性，该属性值记录了当前block里使用了多少字节的空间。对于被填满的block来说，该值永远为512。如果该属性的值不为512，那么就是它了，它就是此次崩溃恢复中需要扫描的最后一个block
 
-**怎么恢复**
-- 使用哈希表
-- 跳过已经刷新到磁盘的页面
+**怎么恢复**  
+- 使用哈希表  
+- 跳过已经刷新到磁盘的页面  
 
 ### undo日志 ###
-***事务id***
+***事务id***  
 - 对于只读事务来说，只有在它第一次对某个用户创建的临时表执行增、删、改操作时才会为这个事务分配一个事务id，否则的话是不分配事务id的  
 - 对于读写事务来说，只有在它第一次对某个表（包括用户创建的临时表）执行增、删、改操作时才会为这个事务分配一个事务id，否则的话也是不分配事务id的
   
-***undo日志的格式***
-**INSERT操作对应的undo日志**
+***undo日志的格式***  
+**INSERT操作对应的undo日志**  
 
-**DELETE操作对应的undo日志**
+**DELETE操作对应的undo日志**  
 
-**UPDATE操作对应的undo日志**
+**UPDATE操作对应的undo日志**  
 
-***undo页面链表***
+***undo页面链表***  
 ![avatar](./images/mysql/undo-log-list.awebp)
 
-***undo日志具体写入过程***
-**Undo Log Segment Header**
+***undo日志具体写入过程***  
+**Undo Log Segment Header**  
 ![avatar](./images/mysql/undo-log-segment-header.awebp)
 
-***重用Undo页面***  
-**重用的条件**
+***重用Undo页面***    
+**重用的条件**  
 - 该链表中只包含一个Undo页面  
 - 该Undo页面已经使用的空间小于整个页面空间的3/4
 
-**策略**
+**策略**  
 - insert undo链表  
   insert undo链表中只存储类型为TRX_UNDO_INSERT_REC的undo日志，这种类型的undo日志在事务提交之后就没用了，就可以被清除掉
 
-- update undo链表 
+- update undo链表   
   在一个事务提交后，它的update undo链表中的undo日志也不能立即删除掉（这些日志用于MVCC）
 
 ***回滚段***  
-**Rollback Segment Header**
+**Rollback Segment Header**  
 MySQL设计了一个称之为Rollback Segment Header的页面，在这个页面中存放了各个Undo页面链表的frist undo page的页号
 
-**多个回滚段**
+**多个回滚段**  
 MySQL默认定义了128个回滚段  
 ![avatar](./images/mysql/undo-log-rollback-segment.awebp)
