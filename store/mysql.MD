@@ -1442,3 +1442,27 @@ flush链表中的脏页按照修改发生的时间顺序进行排序
 
 ***undo页面链表***
 ![avatar](./images/mysql/undo-log-list.awebp)
+
+***undo日志具体写入过程***
+**Undo Log Segment Header**
+![avatar](./images/mysql/undo-log-segment-header.awebp)
+
+***重用Undo页面***  
+**重用的条件**
+- 该链表中只包含一个Undo页面  
+- 该Undo页面已经使用的空间小于整个页面空间的3/4
+
+**策略**
+- insert undo链表  
+  insert undo链表中只存储类型为TRX_UNDO_INSERT_REC的undo日志，这种类型的undo日志在事务提交之后就没用了，就可以被清除掉
+
+- update undo链表 
+  在一个事务提交后，它的update undo链表中的undo日志也不能立即删除掉（这些日志用于MVCC）
+
+***回滚段***  
+**Rollback Segment Header**
+MySQL设计了一个称之为Rollback Segment Header的页面，在这个页面中存放了各个Undo页面链表的frist undo page的页号
+
+**多个回滚段**
+MySQL默认定义了128个回滚段  
+![avatar](./images/mysql/undo-log-rollback-segment.awebp)
