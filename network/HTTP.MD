@@ -12,6 +12,7 @@ HTTP
     - [HTTP1.0](#http10)
     - [HTTP1.1](#http11)
     - [HTTP2](#http2)
+    - [HTTP3.0/QUIC](#http30quic)
 
 # 定义 #
 超文本传输协议(HyperText Transfer Protocol)
@@ -113,3 +114,6 @@ HTTP
 - 多路复用
 - 头信息压缩
 - 服务器推送
+  
+### HTTP3.0/QUIC ###
+- 启用UDP协议解决传输层的队头阻塞问题  
