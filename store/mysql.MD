@@ -27,6 +27,7 @@
     - [特性](#特性)
     - [状态](#状态-1)
     - [语法](#语法)
+    - [并发](#并发)
   - [存储程序](#存储程序)
     - [语法](#语法-1)
     - [存储函数](#存储函数)
@@ -931,7 +932,53 @@ INSUFFICIENT_PRIVILEGES: 0
   `ROLLBACK [WORK] TO [SAVEPOINT] 保存点名称`
 - 删除  
   `RELEASE SAVEPOINT 保存点名称`
-  
+
+### 并发 ###
+***问题***
+- 脏写 
+  一个事务修改了另一个未提交事务修改过的数据，那就意味着发生了脏写  
+
+- 脏读 
+  一个事务读到了另一个未提交事务修改过的数据，那就意味着发生了脏读   
+
+- 不可重复读 
+  一个事务读到另一个已经提交的事务修改过的数据，并且其他事务每对该数据进行一次修改并提交后，该事务都能查询得到最新值，那就意味着发生了不可重复读  
+
+- 幻读
+  一个事务先根据某些条件查询出一些记录，之后另一个事务又向表中插入了符合这些条件的记录，原先的事务再次按照该条件查询时，能把另一个事务插入的记录也读出来，那就意味着发生了幻读
+
+***隔离级别***
+- READ UNCOMMITTED 未提交读
+- READ COMMITTED 已提交读   
+- REPEATABLE READ 可重复读
+- SERIALIZABLE 可串行化
+
+| 隔离级别 | 脏读 | 不可重复读 | 幻读 |  
+| :---: | :---: | :---: | :---: |
+| READ UNCOMMITTED | Possible | Possible | Possible |
+| READ COMMITTED | Not | Possible | Possible | Possible |
+| REPEATABLE READ | Not Possible | Not Possible | Possible |
+| SERIALIZABLE | Not Possible | Not Possible | Not Possible |
+
+**设置隔离级别**
+`SET [GLOBAL|SESSION] TRANSACTION ISOLATION LEVEL level`
+```
+level: {
+    REPEATABLE READ
+    READ COMMITTED
+    READ UNCOMMITTED
+    SERIALIZABLE
+}
+```
+
+***MVCC原理***
+**版本链**
+记录中包含两个必要的隐藏列  
+- trx_id 每次一个事务对某条聚簇索引记录进行改动时，都会把该事务的事务id赋值给trx_id隐藏列
+- roll_pointer 每次对某条聚簇索引记录进行改动时，都会把旧的版本写入到undo日志中，然后这个隐藏列就相当于一个指针，可以通过它来找到该记录修改前的信息
+
+记录每次更新后，都会将旧值放到一条undo日志中，就算是该记录的一个旧版本，随着更新次数的增多，所有的版本都会被roll_pointer属性连接成一个链表，我们把这个链表称之为版本链
+**
 ## 存储程序 ##
 ### 语法 ###
   - *变量*
@@ -1466,3 +1513,4 @@ MySQL设计了一个称之为Rollback Segment Header的页面，在这个页面�
 **多个回滚段**  
 MySQL默认定义了128个回滚段  
 ![avatar](./images/mysql/undo-log-rollback-segment.awebp)
+
