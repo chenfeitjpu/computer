@@ -29,6 +29,10 @@ Redis
       - [常用命令](#常用命令-9)
     - [流(stream)](#流stream)
       - [常用命令](#常用命令-10)
+  - [数据结构](#数据结构-4)
+    - [Redis存储模型 ###](#redis存储模型-)
+    - [Redis对象 ###](#redis对象-)
+    - [SDS](#sds)
   - [事务](#事务)
     - [常用命令](#常用命令-11)
   - [订阅](#订阅)
@@ -218,6 +222,56 @@ Redis
 - XREVRANGE key end start [COUNT count]
 - XREAD [COUNT count] [BLOCK milliseconds] STREAMS key [key] id [id]
 - XLEN key
+
+## 数据结构 ##
+### Redis存储模型 ###  
+![avatar](./images/redis/redis-struct.png)  
+- redisDb结构  Redis数据库的结构，结构体里存放了指向了dict结构的指针   
+- dict结构  结构体里存放了2个哈希表，正常情况下都是用「哈希表1」，「哈希表2」只有在 rehash 的时候才用  
+- ditctht结构 结构里存放了哈希表数组，数组中的每个元素都是指向一个哈希表节点结构（dictEntry）的指针  
+- dictEntry结构  结构里存放了void *key和void *value指针，*key 指向的是String对象，而*value则可以指向String对象，也可以指向集合类型的对象，比如List对象、Hash对象、Set对象和Zset对象  
+
+### Redis对象 ###  
+![avatar](./images/redis/redis-object-struct.png)  
+- type  标识该对象是什么类型的对象（String对象、List对象、Hash对象、Set对象和Zset对象） 
+- encoding  标识该对象使用了哪种底层的数据结构  
+- ptr  指向底层数据结构的指针  
+
+### SDS ###
+简单动态字符串（simple dynamic string）
+![avatar](./images/redis/redis-sds-struct.png)  
+- len  记录了字符串长度    
+- alloc  分配给字符数组的空间长度  
+- flags  不同类型的SDS，sdshdr5、sdshdr8、sdshdr16、sdshdr32和sdshdr64
+- buf[]  字符数组，用来保存实际数据 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ## 事务 ##
 ### 常用命令 ###
