@@ -242,20 +242,20 @@ Redis
 ![avatar](./images/redis/redis-sds-struct.png)  
 - len  记录了字符串长度    
 - alloc  分配给字符数组的空间长度  
-- flags  不同类型的SDS，sdshdr5、sdshdr8、sdshdr16、sdshdr32和sdshdr64
+- flags  不同类型的SDS，sdshdr5、sdshdr8、sdshdr16、sdshdr32和sdshdr64  
 - buf[]  字符数组，用来保存实际数据  
 
-*优点* 
-- 高效
+*优点*  
+- 高效  
   直接获取长度 
   柔型数组  
 
-- 二进制安全
+- 二进制安全  
   不以\0结束
 
-- 节省空间
+- 节省空间  
   不同的flags
-  不使用字节拉齐
+  不字节拉齐
 
 
 
