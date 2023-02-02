@@ -5,12 +5,8 @@
   - [前缀和](#前缀和)
   - [差分数组](#差分数组)
   - [双指针](#双指针)
-- [应用](#应用)
-  - [LEETCODE](#leetcode)
-    - [448.找到所有数组中消失的数字](#448找到所有数组中消失的数字)
-    - [48.旋转图像](#48旋转图像)
-    - [240.搜索二维矩阵II](#240搜索二维矩阵ii)
-    - [769.最多能完成排序的块](#769最多能完成排序的块)
+  - [滑动窗口](#滑动窗口)
+  - [二分搜索](#二分搜索)
 
 # 定义 #
 顺序存储元素
@@ -20,105 +16,40 @@
 
 # 算法 #
 ## 前缀和 ##
+*简介*  
 前缀和的适用场景是原始数组不会被修改的情况下，频繁查询某个区间的累加和  
 - 一维数组
 - 二维数组
 - 子数组
-
+  
+*应用*  
+leetcode
+- 303.区域和检索 - 数组不可变（中等）
+- 304.二维区域和检索 - 矩阵不可变（中等）
+- 560.和为K的子数组（中等）
+    
 ## 差分数组 ##
+*简介*  
 差分数组的适用场景是频繁对原始数组的某个区间的元素进行增减
 
+*应用*    
+leetcode
+- 370.区间加法（中等）
+- 1109.航班预订统计（中等）
+- 1094.拼车（中等）
+
 ## 双指针 ##
+*简介*  
+- 左右指针 两个指针相向而行或者相背而行
+- 快慢指针 两个指针同向而行，一快一慢
 
-# 应用 #
-## LEETCODE ##
-### 448.找到所有数组中消失的数字 ###
-<details>
-<summary>代码</summary>
-<pre>
-<code>
-function findDisappearedNumbers($nums) {
-    $n = count($nums);
-    foreach ($nums as $num) {
-        $index = ($num - 1) % $n;
-        $nums[$index] += $n;
-    }
-    $res = [];
-    for ($i = 0; $i < $n; $i++) {
-        if ($nums[$i] <= $n) {
-            array_push($res, $i + 1);
-        }
-    }
-    return $res;
-}
-</code>
-</pre>
-</details>
+*应用*
+leetcode
+- 26.删除有序数组中的重复项（简单）
+- 167.两数之和 II - 输入有序数组（中等）
+- 27.移除元素（简单）
+- 283.移动零（简单）
 
-### 48.旋转图像 ###
-<details>
-<summary>代码</summary>
-<pre>
-<code>
-function rotate(&$matrix) {
-    $m = count($matrix);
-    $n = count($matrix[0]);
-    for ($i = 0; $i < floor($m / 2); $i++) {
-        for ($j = 0; $j < $n; $j++) {
-            list($matrix[$i][$j], $matrix[$m - 1 - $i][$j]) = [$matrix[$m - 1 - $i][$j], $matrix[$i][$j]];
-        }
-    }
-    for ($i = 0; $i < $m; $i++) {
-        for ($j = 0; $j < $i; $j++) {
-            list($matrix[$i][$j], $matrix[$j][$i]) = [$matrix[$j][$i], $matrix[$i][$j]];
-        }
-    }
-}
-</code>
-</pre>
-</details>
+## 滑动窗口 ##
 
-### 240.搜索二维矩阵II ###
-<details>
-<summary>代码</summary>
-<pre>
-<code>
-function searchMatrix($matrix, $target) {
-    $m = count($matrix);
-    $n = count($matrix[0]);
-    list($row, $col) = [$m - 1, 0];
-    while ($row >= 0 && $col < $n) {
-        if ($matrix[$row][$col] > $target) {
-            $row--;
-        } else if ($matrix[$row][$col] < $target) {
-            $col++;
-        } else {
-            return true;
-        }
-    }
-    return false;
-}
-</code>
-</pre>
-</details>
-
-### 769.最多能完成排序的块 ###
-<details>
-<summary>代码</summary>
-<pre>
-<code>
-function maxChunksToSorted($arr) {
-    $len = count($arr);
-    $sum = 0;
-    $max = 0;
-    for ($i = 0; $i < $len; $i++) {
-        $max = max($max, $arr[$i]);
-        if ($max == $i) {
-            $sum++;
-        }
-    }
-    return $sum;
-}
-</code>
-</pre>
-</details>
+## 二分搜索 ##
