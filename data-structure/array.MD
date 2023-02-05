@@ -25,7 +25,18 @@
 *技巧*
 - 问题抽象转化为前缀和
 - 虚拟节点解决边界判断
-  
+
+*模版*
+<details>
+<summary>代码</summary>
+<pre>
+<code>
+1.初始化
+2.计算差值
+</code>
+</pre>
+</details>
+
 *应用*  
 LeetCode
 - 303.区域和检索 - 数组不可变（中等）
@@ -35,6 +46,18 @@ LeetCode
 ## 差分数组 ##
 *简介*  
 差分数组的适用场景是频繁对原始数组的某个区间的元素进行增减
+
+*模版*
+<details>
+<summary>代码</summary>
+<pre>
+<code>
+1.初始化
+2.更新变化
+3.生成数组
+</code>
+</pre>
+</details>
 
 *应用*    
 LeetCode
