@@ -1,5 +1,9 @@
-队列
-
+**队列**
+- [定义](#定义)
+- [特点](#特点)
+- [应用](#应用)
+  - [优先级队列](#优先级队列)
+  
 # 定义 #
 只能在尾部添加数据、首部删除数据
 
@@ -7,165 +11,9 @@
 先进先出
 
 # 应用 #
-## LEETCODE ##
-### 23.合并K个升序链表 ###
-<details>
-<summary>代码</summary>
-<pre>
-<code>
-class ListNode {
-    public $val = 0;
-    public $next = null;
-    function __construct($val = 0, $next = null) {
-        $this->val = $val;
-        $this->next = $next;
-    }
-}
-class MyQueue extends SplPriorityQueue {
-    public function compare($val1, $val2) {
-        return $val2 - $val1;
-    }
-}
-function mergeKLists($lists) {
-    if (!$lists) {
-        return [];
-    }
-    $queue = new MyQueue();
-    foreach ($lists as $list) {
-        if ($list) {
-            $queue->insert($list, $list->val);
-        }
-    }
-    $dummy = new ListNode(-1);
-    $cur = $dummy;
-    while (!$queue->isEmpty()) {
-        $node = $queue->extract();
-        $cur->next = $node;
-        $cur = $cur->next;
-        if ($node->next) {
-            $queue->insert($node->next, $node->next->val);
-        }
-    }
-    return $dummy->next;
-}
-</code>
-</pre>
-</details>
+## 优先级队列 ##
+*简介*
+按元素优先级出队
 
-### 218.天际线问题 ###
-<details>
-<summary>代码</summary>
-<pre>
-<code>
-class MyQueue {
-
-    private $data = [];
-
-    public function insert($val) {
-        if (!$this->data) {
-            array_push($this->data, $val);
-            return;
-        }
-        list($left, $right) = [0, count($this->data) - 1];
-        while ($left <= $right) {
-            $mid = $left + intval(($right - $left) / 2);
-            if ($this->data[$mid] >= $val) {
-                $right--;
-            } else {
-                $left++;
-            }
-        }
-        array_splice($this->data, $right + 1, 0, [$val]);
-    }
-
-    public function remove($val) {
-        list($left, $right) = [0, count($this->data) - 1];
-        while ($left <= $right) {
-            $mid = $left + intval(($right - $left) / 2);
-            if ($this->data[$mid] > $val) {
-                $right--;
-            } else if ($this->data[$mid] < $val) {
-                $left++;
-            } else {
-                unset($this->data[$mid]);
-                $this->data = array_values($this->data);
-                return;
-            }
-        }
-    }
-
-    public function top() {
-        return end($this->data);
-    }
-
-}
-function multiSort(&$arr) {
-    usort($arr, function ($a, $b) {
-        if ($a[0] != $b[0]) {
-            return $a[0] - $b[0];
-        }
-        return $a[1] - $b[1];
-    });
-}
-function getSkyline($buildings) {
-    $pos = [];
-    foreach ($buildings as $build) {
-        list($x, $y, $z) =  $build;
-        array_push($pos, [$x, -$z]);
-        array_push($pos, [$y, $z]);
-    }
-    multiSort($pos);
-
-    $res = [];
-    $queue = new MyQueue();
-    $prev = 0;
-    $queue->insert($prev);
-    foreach ($pos as $p) {
-        list($x, $z) = $p;
-        if ($z < 0) {
-            $queue->insert(-$z);
-        } else {
-            $queue->remove($z);
-        }
-        $cur = $queue->top();
-        if ($cur != $prev) {
-            array_push($res, [$x, $cur]);
-            $prev = $cur;
-        }
-    }
-    return $res;
-}
-</code>
-</pre>
-</details>
-
-### 239.滑动窗口最大值 ###
-<details>
-<summary>代码</summary>
-<pre>
-<code>
-    $len = count($nums);
-    if ($len <= 1) {
-        return $nums;
-    }
-    $res = [];
-    $queue = [];
-    for ($i = 0; $i < $len; $i++) {
-        while ($queue && $nums[end($queue)] < $nums[$i]) {
-            array_pop($queue);
-        }
-        array_push($queue, $i);
-        if ($i - $queue[0] >= $k ) {
-            array_shift($queue);
-        }
-        if ($i >= $k -1) {
-            array_push($res, $nums[$queue[0]]);
-        }
-    }
-    if ($len < $k) {
-        $res[] = $nums[$queue[0]];
-    }
-    return $res;
-</code>
-</pre>
-</details>
+*LeetCode*
+- 23. 合并K个升序链表（困难）
