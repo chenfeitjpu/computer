@@ -44,10 +44,18 @@ func (this *DoubleLinked) Insert(node *Node, prev *Node) {
 	this.Size++
 }
 
+func (this *DoubleLinked) InsertFirst(node *Node) {
+	this.Insert(node, this.Head)
+}
+
 func (this *DoubleLinked) Delete(node *Node) {
 	node.Prev.Next = node.Next
 	node.Next.Prev = node.Prev
 	this.Size--
+}
+
+func (this *DoubleLinked) DeleteLast() {
+	this.Delete(this.Tail.Prev)
 }
 
 func (this *DoubleLinked) Len() int {
@@ -77,7 +85,7 @@ func (this *LinkedHash) Get(key int) int {
 		return -1
 	}
 	this.Linked.Delete(node)
-	this.Linked.Insert(node, this.Linked.Head)
+	this.Linked.InsertFirst(node)
 	return node.Value
 }
 
@@ -90,7 +98,7 @@ func (this *LinkedHash) Put(key, value int) {
 		node.Value = value
 		this.Linked.Delete(node)
 	}
-	this.Linked.Insert(node, this.Linked.Head)
+	this.Linked.InsertFirst(node)
 }
 
 func (this *LinkedHash) Delete(key int) {
@@ -107,20 +115,19 @@ func (this *LinkedHash) Len() int {
 	return len(this.Data)
 }
 
-func (this *LinkedHash) DeleteLast() {
-	last := this.Linked.Tail.Prev
-	this.Delete(last.Key)
+func (this *LinkedHash) GetLastKey() int {
+	return this.Linked.Tail.Prev.Key
 }
 
 type LRUCache struct {
-	capacity   int
 	linkedHash *LinkedHash
+	capacity   int
 }
 
 func Constructor(capacity int) LRUCache {
 	return LRUCache{
-		capacity:   capacity,
 		linkedHash: NewLinkedHash(),
+		capacity:   capacity,
 	}
 }
 
@@ -129,10 +136,9 @@ func (this *LRUCache) Get(key int) int {
 }
 
 func (this *LRUCache) Put(key int, value int) {
-	if !this.linkedHash.Contain(key) {
-		if this.linkedHash.Len() == this.capacity {
-			this.linkedHash.DeleteLast()
-		}
+	if !this.linkedHash.Contain(key) && this.linkedHash.Len() == this.capacity {
+		lastKey := this.linkedHash.GetLastKey()
+		this.linkedHash.Delete(lastKey)
 	}
 	this.linkedHash.Put(key, value)
 }
