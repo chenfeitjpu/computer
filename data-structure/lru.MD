@@ -1,6 +1,7 @@
-# LRU #
-
-LRU
+**LRU**
+- [定义](#定义)
+- [实现](#实现)
+- [应用](#应用)
 
 # 定义 #
 最近最少使用
@@ -17,82 +18,123 @@ type Node struct {
 	Next  *Node
 }
 
-type DoubleList struct {
+type DoubleLinked struct {
 	Head *Node
 	Tail *Node
 	Size int
 }
 
-func ConstructorDoubleList() *DoubleList {
+func NewDoubleLinked() *DoubleLinked {
 	head := &Node{}
 	tail := &Node{}
 	head.Next = tail
 	tail.Prev = head
-	return &DoubleList{
+	return &DoubleLinked{
 		Head: head,
 		Tail: tail,
 	}
 }
 
-func (this *DoubleList) insertFirst(node *Node) {
-	next := this.Head.Next
+func (this *DoubleLinked) Insert(node *Node, prev *Node) {
+	next := prev.Next
 	node.Next = next
 	next.Prev = node
-	this.Head.Next = node
-	node.Prev = this.Head
+	prev.Next = node
+	node.Prev = prev
 	this.Size++
 }
 
-func (this *DoubleList) delete(node *Node) {
+func (this *DoubleLinked) Delete(node *Node) {
 	node.Prev.Next = node.Next
 	node.Next.Prev = node.Prev
 	this.Size--
 }
 
-func (this *DoubleList) len() int {
+func (this *DoubleLinked) Len() int {
 	return this.Size
+}
+
+type LinkedHash struct {
+	Linked *DoubleLinked
+	Data   map[int]*Node
+}
+
+func NewLinkedHash() *LinkedHash {
+	return &LinkedHash{
+		Linked: NewDoubleLinked(),
+		Data:   make(map[int]*Node),
+	}
+}
+
+func (this *LinkedHash) Contain(key int) bool {
+	_, ok := this.Data[key]
+	return ok
+}
+
+func (this *LinkedHash) Get(key int) int {
+	node, ok := this.Data[key]
+	if !ok {
+		return -1
+	}
+	this.Linked.Delete(node)
+	this.Linked.Insert(node, this.Linked.Head)
+	return node.Value
+}
+
+func (this *LinkedHash) Put(key, value int) {
+	node, ok := this.Data[key]
+	if !ok {
+		node = &Node{Key: key, Value: value}
+		this.Data[key] = node
+	} else {
+		node.Value = value
+		this.Linked.Delete(node)
+	}
+	this.Linked.Insert(node, this.Linked.Head)
+}
+
+func (this *LinkedHash) Delete(key int) {
+	node, ok := this.Data[key]
+	if !ok {
+		return
+	}
+	delete(this.Data, key)
+	this.Linked.Delete(node)
+
+}
+
+func (this *LinkedHash) Len() int {
+	return len(this.Data)
+}
+
+func (this *LinkedHash) DeleteLast() {
+	last := this.Linked.Tail.Prev
+	this.Delete(last.Key)
 }
 
 type LRUCache struct {
 	capacity   int
-	data       map[int]*Node
-	doubleList *DoubleList
+	linkedHash *LinkedHash
 }
 
 func Constructor(capacity int) LRUCache {
 	return LRUCache{
 		capacity:   capacity,
-		data:       make(map[int]*Node),
-		doubleList: ConstructorDoubleList(),
+		linkedHash: NewLinkedHash(),
 	}
 }
 
 func (this *LRUCache) Get(key int) int {
-	node, ok := this.data[key]
-	if !ok {
-		return -1
-	}
-	this.doubleList.delete(node)
-	this.doubleList.insertFirst(node)
-	return node.Value
+	return this.linkedHash.Get(key)
 }
 
 func (this *LRUCache) Put(key int, value int) {
-	node, ok := this.data[key]
-	if !ok {
-
-		if this.capacity == this.doubleList.len() {
-			last := this.doubleList.Tail.Prev
-			this.doubleList.delete(last)
-			delete(this.data, last.Key)
+	if !this.linkedHash.Contain(key) {
+		if this.linkedHash.Len() == this.capacity {
+			this.linkedHash.DeleteLast()
 		}
-		node = &Node{Key: key, Value: value}
-		this.data[key] = node
-	} else {
-		node.Value = value
-		this.doubleList.delete(node)
 	}
-	this.doubleList.insertFirst(node)
+	this.linkedHash.Put(key, value)
 }
 </code>
 </pre>
