@@ -5,95 +5,99 @@ LRU
 # 定义 #
 最近最少使用
 
-# 应用 #
-## LEETCODE ##
-### 146.LRU缓存机制 ###
+# 实现 #
 <details>
 <summary>代码</summary>
 <pre>
 <code>
-class DoubleLinkedList {
-
-    public $key;
-
-    public $value;
-
-    public $prev;
-
-    public $next;
-
-    public function __construct($key, $value) {
-        $this->key = $key;
-        $this->value = $value;
-    }
-
+type Node struct {
+	Key   int
+	Value int
+	Prev  *Node
+	Next  *Node
 }
-class LRUCache {
 
-    private $size = 0;
+type DoubleList struct {
+	Head *Node
+	Tail *Node
+	Size int
+}
 
-    private $capaticy = 0;
+func ConstructorDoubleList() *DoubleList {
+	head := &Node{}
+	tail := &Node{}
+	head.Next = tail
+	tail.Prev = head
+	return &DoubleList{
+		Head: head,
+		Tail: tail,
+	}
+}
 
-    private $map = [];
+func (this *DoubleList) insertFirst(node *Node) {
+	next := this.Head.Next
+	node.Next = next
+	next.Prev = node
+	this.Head.Next = node
+	node.Prev = this.Head
+	this.Size++
+}
 
-    private $head;
+func (this *DoubleList) delete(node *Node) {
+	node.Prev.Next = node.Next
+	node.Next.Prev = node.Prev
+	this.Size--
+}
 
-    private $tail;
+func (this *DoubleList) len() int {
+	return this.Size
+}
 
-    function __construct($capacity) {
-        $this->capaticy = $capacity;
-        $this->head = new DoubleLinkedList(PHP_INT_MIN, PHP_INT_MIN);
-        $this->tail = new DoubleLinkedList(PHP_INT_MAX, PHP_INT_MAX);
-        $this->head->next = $this->tail;
-        $this->tail->prev = $this->head;
-    }
+type LRUCache struct {
+	capacity   int
+	data       map[int]*Node
+	doubleList *DoubleList
+}
 
-    function get($key) {
-        $node = $this->map[$key] ?? null;
-        if (!$node) {
-            return -1;
-        }
-        $this->moveToHead($node);
-        return $node->value;
-    }
+func Constructor(capacity int) LRUCache {
+	return LRUCache{
+		capacity:   capacity,
+		data:       make(map[int]*Node),
+		doubleList: ConstructorDoubleList(),
+	}
+}
 
-    function put($key, $value) {
-        $node = $this->map[$key] ?? null;
-        if ($node) {
-            $node->value = $value;
-            $this->moveToHead($node);
-        } else {
-            if ($this->size == $this->capaticy) {
-                $tail = $this->tail->prev;
-                $this->removeNode($tail);
-                unset($this->map[$tail->key]);
-                $this->size--;
-            }
-            $new = new DoubleLinkedList($key, $value);
-            $this->addToHead($new);
-            $this->size++;
-            $this->map[$key] = $new;
-        }
-    }
+func (this *LRUCache) Get(key int) int {
+	node, ok := this.data[key]
+	if !ok {
+		return -1
+	}
+	this.doubleList.delete(node)
+	this.doubleList.insertFirst(node)
+	return node.Value
+}
 
-    private function moveToHead($node) {
-        $this->removeNode($node);
-        $this->addToHead($node);
-    }
+func (this *LRUCache) Put(key int, value int) {
+	node, ok := this.data[key]
+	if !ok {
 
-    private function addToHead($node) {
-        $node->next = $this->head->next;
-        $node->prev = $this->head;
-        $this->head->next->prev = $node;
-        $this->head->next = $node;
-    }
-
-    private function removeNode($node) {
-        $node->prev->next = $node->next;
-        $node->next->prev =$node->prev;
-    }
-
+		if this.capacity == this.doubleList.len() {
+			last := this.doubleList.Tail.Prev
+			this.doubleList.delete(last)
+			delete(this.data, last.Key)
+		}
+		node = &Node{Key: key, Value: value}
+		this.data[key] = node
+	} else {
+		node.Value = value
+		this.doubleList.delete(node)
+	}
+	this.doubleList.insertFirst(node)
 }
 </code>
 </pre>
 </details>
+
+# 应用 #
+*LEETCODE*
+- 146.LRU缓存 
