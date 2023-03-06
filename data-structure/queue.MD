@@ -30,33 +30,33 @@ LeetCode
 <pre>
 <code>
 type ListNode struct {
-    Val  int
-    Next *ListNode
+	Val  int
+	Next *ListNode
 }
 
 type HeapListNode []*ListNode
 
 func (h HeapListNode) Len() int {
-    return len(h)
+	return len(h)
 }
 
 func (h HeapListNode) Swap(i, j int) {
-    h[i], h[j] = h[j], h[i]
+	h[i], h[j] = h[j], h[i]
 }
 
 func (h HeapListNode) Less(i, j int) bool {
-    return h[i].Val < h[j].Val
+	return h[i].Val < h[j].Val
 }
 
 func (h *HeapListNode) Push(value interface{}) {
-    *h = append(*h, value.(*ListNode))
+	*h = append(*h, value.(*ListNode))
 }
 
 func (h *HeapListNode) Pop() interface{} {
-    old := *h
-    n := len(old)
-    *h = old[:n-1]
-    return old[n-1]
+	old := *h
+	n := len(old)
+	*h = old[:n-1]
+	return old[n-1]
 }
 </code>
 </pre>
