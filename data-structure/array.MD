@@ -27,8 +27,22 @@
 <summary>代码</summary>
 <pre>
 <code>
-1.初始化区间值
-2.计算差值
+type NumArray struct {
+	sumArray []int
+}
+func Constructor(nums []int) *NumArray {
+	length := len(nums) + 1
+	sumArray := make([]int, 0, length)
+	for i := 1; i <= length; i++ {
+		sumArray[i] = sumArray[i-1] + nums[i-1]
+	}
+	return &NumArray{
+		sumArray: sumArray,
+	}
+}
+func (this *NumArray) GetRange(start, end int) int {
+	return this.sumArray[end+1] - this.sumArray[start]
+}
 </code>
 </pre>
 </details>
@@ -48,9 +62,35 @@ LeetCode
 <summary>代码</summary>
 <pre>
 <code>
-1.初始化差值
-2.更新差值
-3.生成变化后的数组
+type Difference struct {
+	diffArray []int
+}
+func Constructor(nums []int) *Difference {
+	length := len(nums)
+	diffArray := make([]int, length)
+	diffArray[0] = nums[0]
+	for i := 1; i < length; i++ {
+		diffArray[i] = nums[i] - nums[i-1]
+	}
+	return &Difference{
+		diffArray: diffArray,
+	}
+}
+func (this *Difference) Increment(start, end, value int) {
+	this.diffArray[start] += value
+	if end+1 < len(this.diffArray) {
+		this.diffArray[end+1] -= value
+	}
+}
+func (this *Difference) GetResult() []int {
+	length := len(this.diffArray)
+	res := make([]int, length)
+	res[0] = this.diffArray[0]
+	for i := 1; i < length; i++ {
+		res[i] = res[i-1] + this.diffArray[i]
+	}
+	return res
+}
 </code>
 </pre>
 </details>
@@ -77,6 +117,27 @@ LeetCode
 **简介**    
 通过快慢指针，不停滑动搜索区间
 
+**模版**
+<details>
+<summary>代码</summary>
+<pre>
+<code>
+func SlideWindow(s string) {
+	length := len(s)
+	left, right := 0, 0
+	for right < length {
+		//扩大窗口
+		right++
+		//缩小窗口
+		for {
+			left++
+		}
+	}
+}
+</code>
+</pre>
+</details>
+
 **应用**  
 LeetCode
 - 76.最小覆盖子串（困难）
@@ -87,6 +148,29 @@ LeetCode
 ## 二分搜索 ##
 **简介**  
 通过左右指针，不停缩小搜索区间  
+
+**模版**
+<details>
+<summary>代码</summary>
+<pre>
+<code>      
+func BinarySearch(nums []int, target int) int {
+	left, right := 0, len(nums)-1
+	for left <= right {
+		mid := left + (right-left)/2
+		if nums[mid] == target {
+			return mid
+		} else if nums[mid] < target {
+			left = mid + 1
+		} else if nums[mid] > target {
+			right = mid - 1
+		}
+	}
+	return -1
+}                   
+</code>
+</pre>
+</details>
 
 **应用**  
 LeetCode
