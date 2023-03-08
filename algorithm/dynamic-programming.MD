@@ -1,258 +1,58 @@
-# 动态规划 #
+**动态规划**
+- [定义](#定义)
+- [应用](#应用)
+  - [一维动态规划](#一维动态规划)
+  - [二维动态规划](#二维动态规划)
+  - [背包问题](#背包问题)
 
-## 定义 ##
+# 定义 #
 通过子问题，组合得到问题的解
 
-## 应用 ##
-### LEETCODE ###
-#### 70.爬楼梯 ####
-<details>
-<summary>代码</summary>
-<pre>
-<code>
-</code>
-</pre>
-</details>
+# 应用 #
+## 一维动态规划 ##
+**应用**  
+LeetCode
+- 70.爬楼梯
+- 322.零钱兑换
+- 300.最长递增子序列
+- 53.最大子序和
+- 354.俄罗斯套娃信封问题
+- 55.跳跃游戏
+- 45.跳跃游戏 II
+- 198.打家劫舍
+- 213.打家劫舍 II
+- 337.打家劫舍 III
 
-#### 198.打家劫舍 ####
-<details>
-<summary>代码</summary>
-<pre>
-<code>
-</code>
-</pre>
-</details>
+## 二维动态规划 ##
+**应用**  
+LeetCode
+- 64.最小路径和
+- 62.不同路径
+- 931.下降路径最小和
+- 72.编辑距离
+- 10.正则表达式匹配
+- 121.买卖股票的最佳时机
+- 122.买卖股票的最佳时机 II
+- 123.买卖股票的最佳时机 III
+- 188.买卖股票的最佳时机 IV
+- 309.最佳买卖股票时机含冷冻期
+- 714.买卖股票的最佳时机含手续费
+- 174.地下城游戏
+- 312.戳气球
+- 416.分割等和子集
+- 494.目标和
+- 514.自由之路
+- 518.零钱兑换 II
+- 1143.最长公共子序列
+- 583.两个字符串的删除操作
+- 712.两个字符串的最小 ASCII 删除和
+- 787.K 站中转内最便宜的航班
+- 887.鸡蛋掉落
 
-#### 413.等差数列划分 ####
-<details>
-<summary>代码</summary>
-<pre>
-<code>
-</code>
-</pre>
-</details>
 
-#### 64.最小路径和 ####
-<details>
-<summary>代码</summary>
-<pre>
-<code>
-</code>
-</pre>
-</details>
-
-#### 542.01矩阵 ####
-<details>
-<summary>代码</summary>
-<pre>
-<code>
-</code>
-</pre>
-</details>
-
-#### 221.最大正方形 ####
-<details>
-<summary>代码</summary>
-<pre>
-<code>
-</code>
-</pre>
-</details>
-
-#### 279.完全平方数 ####
-<details>
-<summary>代码</summary>
-<pre>
-<code>
-</code>
-</pre>
-</details>
-
-#### 91.解码方法 ####
-<details>
-<summary>代码</summary>
-<pre>
-<code>
-</code>
-</pre>
-</details>
-
-#### 139.单词拆分 ####
-<details>
-<summary>代码</summary>
-<pre>
-<code>
-</code>
-</pre>
-</details>
-
-#### 300.最长递增子序列 ####
-<details>
-<summary>代码</summary>
-<pre>
-<code>
-</code>
-</pre>
-</details>
-
-#### 1143.最长公共子序列 ####
-<details>
-<summary>代码</summary>
-<pre>
-<code>
-</code>
-</pre>
-</details>
-
-#### 416.分割等和子集 ####
-<details>
-<summary>代码</summary>
-<pre>
-<code>
-</code>
-</pre>
-</details>
-
-#### 474.一和零 ####
-<details>
-<summary>代码</summary>
-<pre>
-<code>
-</code>
-</pre>
-</details>
-
-#### 322.零钱兑换 ####
-<details>
-<summary>代码</summary>
-<pre>
-<code>
-</code>
-</pre>
-</details>
-
-#### 72.编辑距离 ####
-<details>
-<summary>代码</summary>
-<pre>
-<code>
-</code>
-</pre>
-</details>
-
-#### 650.只有两个键的键盘 ####
-<details>
-<summary>代码</summary>
-<pre>
-<code>
-</code>
-</pre>
-</details>
-
-#### 10.正则表达式匹配 ####
-<details>
-<summary>代码</summary>
-<pre>
-<code>
-</code>
-</pre>
-</details>
-
-#### 121.买卖股票的最佳时机 ####
-<details>
-<summary>代码</summary>
-<pre>
-<code>
-</code>
-</pre>
-</details>
-
-#### 188.买卖股票的最佳时机IV ####
-<details>
-<summary>代码</summary>
-<pre>
-<code>
-</code>
-</pre>
-</details>
-
-#### 309.最佳买卖股票时机含冷冻期 ####
-<details>
-<summary>代码</summary>
-<pre>
-<code>
-</code>
-</pre>
-</details>
-
-#### 213.打家劫舍 ####
-<details>
-<summary>代码</summary>
-<pre>
-<code>
-</code>
-</pre>
-</details>
-
-#### 53.最大子序和 ####
-<details>
-<summary>代码</summary>
-<pre>
-<code>
-</code>
-</pre>
-</details>
-
-#### 343.整数拆分 ####
-<details>
-<summary>代码</summary>
-<pre>
-<code>
-</code>
-</pre>
-</details>
-
-#### 583.两个字符串的删除操作 ####
-<details>
-<summary>代码</summary>
-<pre>
-<code>
-</code>
-</pre>
-</details>
-
-#### 646.最长数对链 ####
-<details>
-<summary>代码</summary>
-<pre>
-<code>
-</code>
-</pre>
-</details>
-
-#### 376.摆动序列 ####
-<details>
-<summary>代码</summary>
-<pre>
-<code>
-</code>
-</pre>
-</details>
-
-#### 494.目标和 ####
-<details>
-<summary>代码</summary>
-<pre>
-<code>
-</code>
-</pre>
-</details>
-
-#### 714.买卖股票的最佳时机含手续费 ####
-<details>
-<summary>代码</summary>
-<pre>
-<code>
-</code>
-</pre>
-</details>
+## 背包问题 ##
+**应用**  
+LeetCode
+- 518.零钱兑换 II
+- 494.目标和
+- 416.分割等和子集
