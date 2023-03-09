@@ -10,10 +10,12 @@
 
 # 内容 #
 ## 网络分层 ##
-**架构**  
+**分层架构**  
+
 ![](./images/layer.webp) 
 
-**结构**  
+**数据结构**  
+
 ![](./images/structure.webp)
 
 **应用层**  
@@ -44,8 +46,10 @@
 9.交换机进行转发  
 10.路由器进行路由
 
-**数据包**  
+**数据包结构**  
+
 ![](./images/send_receive.webp)
 
 ## Linux网络包收发过程 ##
+
 ![](./images/linux_send_receive.webp)
