@@ -82,7 +82,7 @@ Etag 的优先级更高
 **性能**  
 HTTP协议是基于TCP/IP，并且使用了「请求-应答」的通信模式  
 - 长连接 减少了TCP连接的重复建立和断开所造成的额外开销，减轻了服务器端的负载
-- 队头阻塞
+- 请求队头阻塞
 
 **优化**    
 - 尽量避免发送HTTP请求(缓存)
@@ -91,31 +91,27 @@ HTTP协议是基于TCP/IP，并且使用了「请求-应答」的通信模式
 
 
 ## HTTPS ##
-*特点*  
+**特点**  
 - 混合加密实现机密性，解决了窃听风险
 - 摘要算法实现完整性，解决了篡改风险
 - 将服务器公钥放入到数字证书，解决了冒充风险  
 
-*SSL/TLS通信流程*  
+**SSL/TLS通信流程**  
 - 客户端向服务器索要并验证公钥
 - 双方协商生成会话秘钥
 - 双方采用会话秘钥进行通信
 
-*SSL/TLS握手流程*  
-- 客户端发送ClientHello请求(SSL/TLS协议版本、随机数、密码套件列表)
-- 服务端发送ServerHello请求(SSL/TLS协议版本、随机数、密码套件列表、数字证书、HelloDone)
-- 客户端回应(随机数、加密算法改变通知、客户端握手结束通知)
-- 服务的回应(加密算法改变通知、服务端握手结束通知)
+**SSL/TLS握手流程**  
+- 客户端发送Client Hello(SSL/TLS协议版本&随机数&密码套件列表)
+- 服务端发送Server Hello(SSL/TLS协议版本&随机数&密码套件列表)、Certificate(CA证书)、Server HelloDone请求
+- 客户端发情Client Key Exchange(随机数)、Change Cipher Spec(加密算法改变通知)、Encrypted Handshake Message(摘要信息)
+- 服务端发送Change Cipher Spec(加密算法改变通知)、Encrypted Handshake Message(服务端握手结束通知)
 
-*ECDHE*
-通信双方通过随机私钥生成会话秘钥  
-
-*优化*
-- 硬件优化
-- 软件优化
-- 会话复用
-- 协议优化
-- 证书优化
+**ECDHE握手流程**  
+- 客户端发送Client Hello(SSL/TLS协议版本&随机数&密码套件列表)
+- 服务端发送Server Hello(SSL/TLS协议版本&随机数&密码套件列表)、Certificate(CA证书)、Server Key Exchange(服务端的椭圆曲线公钥)、Server HelloDone请求
+- 客户端发情Client Key Exchange(客户端的椭圆曲线公钥)、Change Cipher Spec(加密算法改变通知)、Encrypted Handshake Message(摘要信息)
+- 服务端发送Change Cipher Spec(加密算法改变通知)、Encrypted Handshake Message(服务端握手结束通知)
 
 ## HTTP2特性 ##
 **优化**  
@@ -129,10 +125,11 @@ HTTP协议是基于TCP/IP，并且使用了「请求-应答」的通信模式
 
 ## 安全问题 ##
 **XSS**  
+- 过滤
 - 转义
 
-**CSRF**
-- Referer
-- Token
+**CSRF**  
+- Referer校验
+- Token校验
 
   
