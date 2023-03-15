@@ -37,6 +37,7 @@
 ## 三次握手 ##
 **流程**  
 ![](./images/tpc_open_connection.webp)
+
 1.服务端(CLOSED状态)主动监听端口(LISTEN状态)  
 2.客户端(CLOSED状态)发送SYN报文(SYN_SENT状态)  
 3.服务端(Listend状态)发送SYN_ACK报文(SYN_RCVD状态)  
@@ -52,7 +53,7 @@
 - 第一次握手丢失  
   客户端超时重传SYN报文，达到最大重传次数，等待一段时间，客户端断开连接
 - 第二次握手丢失  
-  客户端超时重传SYN报文，达到最大重传次数，等待一段时间，客户端断开连接
+  客户端超时重传SYN报文，达到最大重传次数，等待一段时间，客户端断开连接  
   服务端超时重传SYN-ACK报文，达到最大重传次数，等待一段时间，服务端断开连接
 - 第三次握手丢失  
   服务端超时重传SYN-ACK报文，达到最大重传次数，等待一段时间，服务端断开连接
@@ -79,6 +80,7 @@
 ## 四次挥手 ##
 **流程**  
 ![](./images/tcp_close_connection.webp)
+
 1.客户端(ESTABLISHED状态)发送FIN报文(FIN_WAIT_1状态)  
 2.服务端(ESTABLISHED状态)发送ACK报文(CLOSED_WAIT状态)  
 3.客户端(FIN_WAIT_1状态)接收ACK报文(FIN_WAIT_2状态)  
