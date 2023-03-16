@@ -14,5 +14,8 @@
 - 输出设备
 
 ## 存储 ##
+**存储器的层次结构**  
 ![](./images/store.webp)
+
+**cpu cache**  
 ![](./images/cpu_cache.webp)
