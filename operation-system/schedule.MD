@@ -2,20 +2,21 @@
 - [内容](#内容)
   - [进程调度算法](#进程调度算法)
   - [内存页面置换算法](#内存页面置换算法)
+  - [磁盘调度算法](#磁盘调度算法)
 
 # 内容 #
 ## 进程调度算法 ##
 **先来先服务**  
-![](./images/schedule_process_fcfs.webp)
+![](./images/schedule/process_fcfs.webp)
 
 **最短作业优先**  
-![](./images/schedule_process_sjf.webp)  
+![](./images/schedule/process_sjf.webp)  
 
 **高响应比优先**  
-![](./images/schedule_process_hrrn.webp)
+![](./images/schedule/process_hrrn.webp)
 
 **时间片轮转**  
-![](./images/schedule_process_rr.webp)
+![](./images/schedule/process_rr.webp)
 
 **最高优先级**  
 *优先级分类*  
@@ -27,7 +28,7 @@
 - 抢占式 当就绪队列中出现优先级高的进程，当前进程挂起，调度优先级高的进程运行
 
 **多级反馈队列**  
-![](./images/schedule_process_mfq.webp)  
+![](./images/schedule/process_mfq.webp)  
 
 ## 内存页面置换算法 ##
 **最佳页面置换**  
@@ -44,7 +45,26 @@
 当发生缺页中断时，算法首先检查表针指向的页面  
 如果它的访问位位是 0 就淘汰该页面，并把新的页面插入这个位置，然后把表针前移一个位置  
 如果访问位是 1 就清除访问位，并把表针前移一个位置，重复这个过程直到找到了一个访问位为 0 的页面为止  
-![](./images/schedule_page_clock_1.webp)
+![](./images/schedule/page_clock.webp)
 
 **最不常用**  
 选择「访问次数」最少的那个页面，并将其淘汰
+
+## 磁盘调度算法 ##
+**先来先服务**  
+![](./images/schedule/disk_fcfs.webp)
+
+**最短寻道时间优先**  
+![](./images/schedule/disk_ssf.webp)
+
+**扫描算法**  
+![](./images/schedule/disk_scan.webp)
+
+**循环扫描算法**  
+![](./images/schedule/disk_cscan.webp)
+
+**LOOK**  
+![](./images/schedule/disk_look.webp)
+
+**C-LOOK**  
+![](./images/schedule/disk_clook.webp)
