@@ -18,11 +18,11 @@
 - 页表有一些标记属性的比特，比如控制一个页的读写权限，提供了更好的安全性
 
 **实现**  
-![](./images/virtual_memory.webp)
+![](./images/memory/virtual.webp)
 
 ### 内存分段 ###  
 **结构**  
-![](./images/memorty_segment.webp)
+![](./images/memorty/segment.webp)
 
 **组成**  
 - 段选择因子
@@ -34,7 +34,7 @@
 
 ### 内存分页 ###
 **结构**
-![](./images/memory_page.webp)
+![](./images/memory/page.webp)
 
 **组成**  
 - 页号
@@ -45,17 +45,17 @@
  
 **多级页表**  
 *二级分页*  
-![](./images/two_page_table.webp)
+![](./images/memory/two_page_table.webp)
 
 *四级分页*  
-![](./images/four_page_table.webp)
+![](./images/memory/four_page_table.webp)
 
 *TLB*  
 存放程序最常访问的页表项
 
 ### 段页式内存管理 ###
 **结构**  
-![](./images/memory_segment_page.webp)
+![](./images/memory/segment_page.webp)
 
 **地址变换**
 - 访问段表，得到页表起始地址
@@ -64,7 +64,7 @@
 
 ### Linux内存布局 ###
 **Intel处理器内存布局**  
-![](./images/memory_intel.webp)
+![](./images/memory/intel.webp)
 
 **Linux内存**  
 Linux系统中的每个段都是从0地址开始的整个4GB虚拟空间（32 位环境下），也就是所有的段的起始地址都是一样的

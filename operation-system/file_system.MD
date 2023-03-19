@@ -18,8 +18,7 @@
 - 目录项，也就是dentry  
   用来记录文件的名字、索引节点指针以及与其他目录项的层级关联关系
 
-**存储结构**  
-![](./images/file_system_base.webp)  
+![](./images/file_system/inode_dentry.webp)
 
 **磁盘存储区域划分**  
 - 超级块 用来存储文件系统的详细信息，比如块个数、块大小、空闲块等等
@@ -31,15 +30,15 @@
 - 索引节点区 当文件被访问时进入内存
 
 ## 虚拟文件系统 ##
-![](./images/file_system_virtual.webp)  
+![](./images/file_system/virtual.webp)  
 
-**分离**  
+**文件系统分类**  
 - 磁盘的文件系统
 - 内存的文件系统
 - 网络的文件系统
 
 ## 文件的使用 ##
-![](./images/file_system_use.webp)  
+![](./images/file_system/read_write.webp)  
 
 **文件描述符**  
 - 文件指针
@@ -49,7 +48,7 @@
 
 ## 文件的存储 ##
 **连续空间存放方式**  
-![](./images/file_system_sequence_store.webp)
+![](./images/file_system/sequence_store.webp)
 
 *缺陷*  
 - 磁盘空间碎片
@@ -69,17 +68,17 @@
 - 位图法
 
 ## 文件系统结构 ##
-![](./images/file_system_structure.webp)  
+![](./images/file_system/file_store.webp)  
 
 ## 目录的存储 ##
-![](./images/file_system_directory.webp)  
+![](./images/file_system/directory_store.webp)  
 
 ## 软连接和硬连接 ##
 **硬连接**  
-![](./images/file_system_hard_link.webp)  
+![](./images/file_system/hard_link.webp)  
 
 **软连接**  
-![](./images/file_system_symboal_link.webp)  
+![](./images/file_system/symboal_link.webp)  
 
 ## 文件IO ##
 **缓冲与非缓冲I/O**  
@@ -92,16 +91,16 @@
 
 **阻塞与非阻塞I/O**  
 *阻塞*  
-![](./images/file_system_io_block.webp)
+![](./images/file_system/io_block.webp)
 
 *非阻塞*  
-![](./images/file_system_io_no_block.webp)
+![](./images/file_system/io_no_block.webp)
 
 *多路复用*  
-![](./images/file_system_io_select.webp)
+![](./images/file_system/io_select.webp)
 
 *异步*  
-![](.images/file_system_io_aio.webp)
+![](.images/file_system/io_aio.webp)
 
 **同步与异步I/O**  
-![](./images/file_system_io.webp)  
+![](./images/file_system/io_sync.webp)  
