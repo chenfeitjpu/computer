@@ -4,6 +4,9 @@
   - [文件传输](#文件传输)
   - [大文件传输](#大文件传输)
   - [I/O多路复用](#io多路复用)
+  - [高性能网络模式](#高性能网络模式)
+    - [Reactor](#reactor)
+    - [Proactor](#proactor)
 
 # 内容 #
 ## IO ##
@@ -41,3 +44,20 @@
 
 **多路复用**  
 ![](./images/net_system/epoll.webp)
+
+## 高性能网络模式 ##
+### Reactor ###  
+Reactor 是非阻塞同步网络模式，感知的是就绪可读写事件
+
+**单Reactor单进程/单线程**  
+![](./images/net_system/single_reactor_single_process.webp)
+
+**单Reactor多线程/多进程**  
+![](./images/net_system/single_reactor_multi_process.webp)
+
+**多Reactor多线程/多进程**  
+![](./images/net_system/multi_reactor_multi_process.webp)
+
+### Proactor ###
+Proactor 是异步网络模式， 感知的是已完成的读写事件  
+![](./images/net_system/proactor.webp)
