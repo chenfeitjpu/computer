@@ -3,6 +3,7 @@
   - [IO](#io)
   - [文件传输](#文件传输)
   - [大文件传输](#大文件传输)
+  - [I/O多路复用](#io多路复用)
 
 # 内容 #
 ## IO ##
@@ -29,3 +30,14 @@
 ## 大文件传输 ##
 **异步IO+直接IO**  
 ![](./images/net_system/big_file.webp)
+
+
+## I/O多路复用 ##
+**多进程**  
+![](./images/net_system/multi_process.webp)
+
+**多线程**  
+![](./images/net_system/multi_thread.webp)
+
+**多路复用**  
+![](./images/net_system/epoll.webp)
