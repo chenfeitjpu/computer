@@ -64,5 +64,5 @@
 ### 流程控制 ###
 - if else if else
 - switch case fallthrough .(type)
-- for break continue
+- for range break continue
 - goto
