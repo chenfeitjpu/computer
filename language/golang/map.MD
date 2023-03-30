@@ -108,3 +108,17 @@ map元素个数 > 6.5 * 桶个数
 新增、修改或者删除时，每次最多只会搬迁 2 个 bucket
 
 ## sync.Map ##
+**结构**   
+```
+type Map struct {
+    mu Mutex
+    read atomic.Value // readOnly
+    dirty map[interface{}]*entry
+    misses int
+}
+```   
+sync.Map支持并发读写，采取了“空间换时间”的机制，冗余了两个数据结构，分别是read和dirty
+**使用场景**  
+1.sync.Map适用于读多、更新多、删多、写少的场景
+2.倘若写操作过多，sync.Map基本等价于互斥锁+map
+3.sync.Map可能存在性能抖动问题
