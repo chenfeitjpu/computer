@@ -14,18 +14,18 @@
 ### 变量 ###
 - var name [type] = value
 - name := value 只能声明局部变量
-- var (
-    name1 type1
-    name2 type2
-  ) 
+- var (  
+    name1 type1  
+    name2 type2  
+  )  
 
 ### 常量 ###
 常量数据类型只能是布尔型、数字型（整数型、浮点型和复数）和字符串型  
 - const name [type] = value
-- const (
-    name1 = value1
-    name2 = value2
-  )
+- const (  
+    name1 = value1  
+    name2 = value2  
+  )  
 - iota  
 
 ### 数据类型 ###
