@@ -23,8 +23,7 @@
 - 查找指定区间值
 
 **模版**
-<pre>
-<code>
+```
 type NumArray struct {
 	sumArray []int
 }
@@ -41,8 +40,7 @@ func Constructor(nums []int) *NumArray {
 func (this *NumArray) GetRange(start, end int) int {
 	return this.sumArray[end+1] - this.sumArray[start]
 }
-</code>
-</pre>
+```
 
 **应用**  
 LeetCode
