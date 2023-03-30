@@ -7,15 +7,16 @@
   - [扩容](#扩容)
     - [负载因子](#负载因子)
     - [扩容](#扩容-1)
+  - [sync.Map](#syncmap)
 
 # 内容 #
 ## 使用 ##
 **声明**  
-var name map[key_type]value_type
-name := make(map[key_type]value_type)
+var name map[key_type]value_type  
+name := make(map[key_type]value_type)  
 
 **删除**  
-delete(map, key)
+delete(map, key)  
 
 ## 结构 ##
 ![](./images/map/struct.png)
@@ -94,13 +95,16 @@ type mapextra struct {
 负载因子 = 哈希表存储的元素个数/桶个数  
 
 ### 扩容 ###  
-**超过负载**
+**超过负载**  
 map元素个数 > 6.5 * 桶个数  
 *双倍扩容*
 
 **溢出桶太多**  
 当桶总数 < 2 ^ 15 时，如果溢出桶总数 >= 桶总数，则认为溢出桶过多  
-当桶总数 >= 2 ^ 15 时，直接与 2 ^ 15 比较，当溢出桶总数 >= 2 ^ 15 时，即认为溢出桶太多了
+当桶总数 >= 2 ^ 15 时，直接与 2 ^ 15 比较，当溢出桶总数 >= 2 ^ 15 时，即认为溢出桶太多了  
 *等量扩容*
 
 **渐进式扩容**  
+新增、修改或者删除时，每次最多只会搬迁 2 个 bucket
+
+## sync.Map ##
