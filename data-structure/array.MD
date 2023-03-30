@@ -17,22 +17,20 @@
 # 应用 #
 ## 前缀和 ##
 **适用场景**  
-原始数组变，频繁查询某个区间的累加和  
+原始数组不变，频繁查询某个区间的累加和  
 - 求一维数组区间值
 - 求二维数组区间值
 - 查找指定区间值
 
 **模版**
-<details>
-<summary>代码</summary>
 <pre>
 <code>
 type NumArray struct {
 	sumArray []int
 }
 func Constructor(nums []int) *NumArray {
-	length := len(nums) + 1
-	sumArray := make([]int, 0, length)
+	length := len(nums)
+	sumArray := make([]int, length+1)
 	for i := 1; i <= length; i++ {
 		sumArray[i] = sumArray[i-1] + nums[i-1]
 	}
@@ -45,7 +43,6 @@ func (this *NumArray) GetRange(start, end int) int {
 }
 </code>
 </pre>
-</details>
 
 **应用**  
 LeetCode
