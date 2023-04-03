@@ -25,7 +25,7 @@
 **线程缓存mcache**  
 - mcache 是每个 P 独有的缓存，因此交互无锁
 - mcache 将每种 spanClass 等级的 mspan 各缓存了一个，总数为 2（nocan 维度） * 68（大小维度）= 136
-- mcache 中还有一个为对象分配器 tiny allocator，用于处理小于 16B 对象的内存分配
+- mcache 中还有一个对象分配器 tiny allocator，用于处理小于 16B 对象的内存分配
 
 **中心缓存mcentral**  
 - 每个 mcentral 对应一种 spanClass
