@@ -14,8 +14,9 @@ func funcName(parametername type1, parametername type2) (output1 type1, output2 
 
 ## 延迟函数 ##
 **实现原理**  
-- 先进后出(FILO)
-- 把defer函数在当前函数内展开并直接调用，这种方式被称为open coded defer
+- 多个defer语句，按照先进后出的方式执行
+- 延迟函数的参数在defer声明时就决定了
+- return赋值，执行defer，return返回
 
 ## 高阶函数 ##
 **数据类型**  
