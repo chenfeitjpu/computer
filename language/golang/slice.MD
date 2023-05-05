@@ -7,7 +7,6 @@
 
 # 内容 #
 ## 使用 ##
-
 **声明**  
 var name []type  
 name := make([]T, length, capacity)
