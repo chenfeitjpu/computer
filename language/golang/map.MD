@@ -13,7 +13,7 @@
 ## 使用 ##
 **声明**  
 var name map[key_type]value_type  
-name := make(map[key_type]value_type)  
+name := make(map[key_type]value_type, [cap])  
 
 **删除**  
 delete(map, key)  

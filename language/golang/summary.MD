@@ -1,6 +1,7 @@
 **GOLANG**
 - [内容](#内容)
   - [特点](#特点)
+  - [开发](#开发)
   - [语法](#语法)
     - [标识符](#标识符)
     - [变量](#变量)
@@ -20,6 +21,17 @@
 - 简单易学
   - 语法简单
   - 风格统一
+
+## 开发 ##
+**下载**
+
+**配置**
+export GOROOT=/usr/local/go  
+export PATH=$PATH:$GOROOT/bin
+
+**IDE**
+visualstudio  
+goland
 
 ## 语法 ##
 ### 标识符 ###
@@ -44,6 +56,7 @@ Functions:    make  len  cap  new  append  copy  close  delete
 
 ### 变量 ###
 - var name [type] = value
+- var name, name [type] = value, value
 - var (  
     name1 type1  
     name2 type2  
@@ -95,7 +108,7 @@ Functions:    make  len  cap  new  append  copy  close  delete
 
 ### 流程控制 ###
 - if else if else
-- switch case fallthrough .(type)
+- switch case fallthrough
 - for range 
 - break continue
 - goto
