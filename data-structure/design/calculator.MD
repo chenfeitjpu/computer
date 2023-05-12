@@ -149,3 +149,6 @@ func isDigit(char byte) bool {
 </details>
 
 # 应用 #
+*LeetCode*  
+- 224.基本计算器
+- 227.基本计算器 II
