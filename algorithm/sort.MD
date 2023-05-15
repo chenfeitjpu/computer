@@ -2,11 +2,7 @@
 - [定义](#定义)
 - [应用](#应用)
   - [常见算法](#常见算法)
-  - [leetcode](#leetcode)
-    - [215.数组中的第K个最大元素](#215数组中的第k个最大元素)
-    - [347.前K个高频元素](#347前k个高频元素)
-    - [451.根据字符出现频率排序](#451根据字符出现频率排序)
-    - [75.颜色分类](#75颜色分类)
+  - [应用](#应用-1)
 
 
 # 定义 #
@@ -18,22 +14,15 @@
 <summary>冒泡</summary>
 <pre>
 <code>
-/**
- * 两两比较
- */
-function bubble($nums) {
-    $len = count($nums);
-    if ($len <= 1) {
-        return $nums;
-    }
-    for ($i = $len - 1; $i > 0; $i--) {
-        for ($j = 0; $j < $i; $j++) {
-            if ($nums[$j] > $nums[$j + 1]) {
-                list($nums[$j], $nums[$j + 1]) = [$nums[$j + 1], $nums[$j]];
-            }
-        }
-    }
-    return $nums;
+func bubble(nums []int) []int {
+	for i := len(nums) - 1; i > 0; i-- {
+		for j := 0; j < i; j++ {
+			if nums[j] > nums[j+1] {
+				nums[j], nums[j+1] = nums[j+1], nums[j]
+			}
+		}
+	}
+	return nums
 }
 </code>
 </pre>
@@ -43,24 +32,17 @@ function bubble($nums) {
 <summary>选择</summary>
 <pre>
 <code>
-/**
- * 从待排序里选择一个
- */
-function select($nums) {
-    $len = count($nums);
-    if ($len <= 1) {
-        return $nums;
-    }
-    for ($i = $len - 1; $i > 0; $i--) {
-        $radix = 0;
-        for ($j = 1; $j <= $i; $j++) {
-            if ($nums[$j] > $nums[$radix]) {
-                $radix = $j;
-            }
-            list($nums[$radix], $nums[$i]) = [$nums[$i], $nums[$radix]];
-        }
-    }
-    return $nums;
+func select(nums []int) []int {
+	for i := len(nums) - 1; i > 0; i-- {
+		max := 0
+		for j := 1; j <= i; j++ {
+			if nums[j] > nums[max] {
+				max = j
+			}
+		}
+		nums[max], nums[i] = nums[i], nums[max]
+	}
+	return nums
 }
 </code>
 </pre>
@@ -70,25 +52,18 @@ function select($nums) {
 <summary>插入</summary>
 <pre>
 <code>
-/**
- * 向有序数组中插入一个
- */
-function insert($nums) {
-    $len = count($nums);
-    if ($len <= 1) {
-        return $nums;
-    }
-    for ($i = 1; $i < $len; $i++) {
-        $radix = $nums[$i];
-        for ($j = $i - 1; $j >= 0; $j--) {
-            if ($nums[$j] <= $radix) {
-                break;
-            }
-            $nums[$j + 1] = $nums[$j];
-        }
-        $nums[$j + 1] = $radix;
-    }
-    return $nums;
+func insert(nums []int) []int {
+	for i, length := 1, len(nums); i < length; i++ {
+		num, j := nums[i], i-1
+		for ; j >= 0; j-- {
+			if nums[j] < num {
+				break
+			}
+			nums[j+1] = nums[j]
+		}
+		nums[j+1] = num
+	}
+	return nums
 }
 </code>
 </pre>
@@ -98,37 +73,34 @@ function insert($nums) {
 <summary>快排</summary>
 <pre>
 <code>
-/**
- * 对集合进行拆分
- */
- function quick($nums) {
-    $len = count($nums);
-    if ($len <= 1) {
-        return $nums;
-    }
-    quickSort($nums, 0, $len - 1);
-    return $nums;
+func quick(nums []int) []int {
+	quickSort(nums, 0, len(nums)-1)
+	return nums
 }
-function quickSort(&$nums, $start, $end) {
-    if ($end <= $start) {
-        return;
-    }
-    $radix = $start;
-    list($left, $right) = [$start, $end];
-    while ($left < $right) {
-        while ($left < $right && $nums[$right] >= $nums[$radix]) {
-            $right--;
-        }
-        while ($left < $right && $nums[$left] <= $nums[$radix]) {
-            $left++;
-        }
-        if ($left < $right) {
-            list($nums[$left], $nums[$right]) = [$nums[$right], $nums[$left]];
-        }
-    }
-    list($nums[$radix], $nums[$right]) = [$nums[$right], $nums[$radix]];
-    quickSort($nums, $start, $right - 1);
-    quickSort($nums, $right + 1, $end);
+func quickSort(nums []int, start, end int) {
+	if start >= end {
+		return
+	}
+	partition := getPartition(nums, start, end)
+	quickSort(nums, start, partition-1)
+	quickSort(nums, partition+1, end)
+}
+func getPartition(nums []int, start, end int) int {
+	pivot, i, j := nums[start], start+1, end
+	for i <= j {
+		for i <= end && nums[i] <= pivot {
+			i++
+		}
+		for j > start && nums[j] > pivot {
+			j--
+		}
+		if i >= j {
+			break
+		}
+		nums[i], nums[j] = nums[j], nums[i]
+	}
+	nums[start], nums[j] = nums[j], nums[start]
+	return j
 }
 </code>
 </pre>
@@ -138,44 +110,45 @@ function quickSort(&$nums, $start, $end) {
 <summary>归并</summary>
 <pre>
 <code>
-/**
- * 合并两个有序集合
- */
-function merge($nums) {
-    $len = count($nums);
-    if ($len <= 1) {
-        return $nums;
-    }
-    mergeSort($nums, 0, $len - 1);
-    return $nums;
+func merge(nums []int) []int {
+	mergeSort(nums, 0, len(nums)-1)
+	return nums
 }
-function mergeSort(&$nums, $start, $end) {
-    if ($end <= $start) {
-        return;
-    }
-    $mid = $start + intval(($end - $start) / 2);
-    mergeSort($nums, $start, $mid);
-    mergeSort($nums, $mid + 1, $end);
-    mergeSortArray($nums, $start, $mid, $end);
+
+func mergeSort(nums []int, start, end int) {
+	if start >= end {
+		return
+	}
+	mid := start + (end-start)/2
+	mergeSort(nums, start, mid)
+	mergeSort(nums, mid+1, end)
+	mergeSortArray(nums, start, mid, end)
 }
-function mergeSortArray(&$nums, $start, $mid, $end) {
-    if ($end <= $start) {
-        return;
-    }
-    $tmp = [];
-    list($i, $j) = [$start, $mid + 1];
-    while ($i <= $mid && $j <= $end) {
-        $tmp[] = $nums[$i] <= $nums[$j] ? $nums[$i++] : $nums[$j++];
-    }
-    while($i <= $mid) {
-        $tmp[] = $nums[$i++];
-    }
-    while ($j <= $end) {
-        $tmp[] = $nums[$j++];
-    }
-    for ($k = $start; $k <= $end; $k++) {
-        $nums[$k] = $tmp[$k -$start];
-    }
+
+func mergeSortArray(nums []int, start, mid, end int) {
+	tmp := make([]int, end-start+1)
+	for i := start; i <= end; i++ {
+		tmp[i-start] = nums[i]
+	}
+	for p, i, j := start, start, mid+1; p <= end; p++ {
+		if i == mid+1 {
+			nums[p] = tmp[j-start]
+			j++
+			continue
+		}
+		if j == end+1 {
+			nums[p] = tmp[i-start]
+			i++
+			continue
+		}
+		if tmp[i-start] <= tmp[j-start] {
+			nums[p] = tmp[i-start]
+			i++
+		} else {
+			nums[p] = tmp[j-start]
+			j++
+		}
+	}
 }
 </code>
 </pre>
@@ -185,26 +158,38 @@ function mergeSortArray(&$nums, $start, $mid, $end) {
 <summary>计数</summary>
 <pre>
 <code>
-/**
- * 统计元素数量
- */
- function countSort($nums) {
-    $len = count($nums);
-    if ($len <= 1) {
-        return $nums;
-    }
-    list($min, $max) = [min($nums), max($nums)];
-    $list = array_fill(0, $max - $min + 1, 0);
-    foreach ($nums as $num) {
-        $list[$num - $min]++;
-    }
-    $i = 0;
-    foreach ($list as $key => $value) {
-        while ($value-- > 0) {
-            $nums[$i++] = $min + $key;
-        }
-    }
-    return $nums;
+func count(nums []int) []int {
+	min, max := getMinAndMax(nums)
+	countArr := make([][]int, max-min+1)
+	for _, num := range nums {
+		index := num - min
+		if len(countArr[index]) == 0 {
+			countArr[index] = []int{num}
+		} else {
+			countArr[index] = append(countArr[index], num)
+		}
+	}
+	i := 0
+	for _, arr := range countArr {
+		for _, num := range arr {
+			nums[i] = num
+			i++
+		}
+	}
+	return nums
+}
+
+func getMinAndMax(nums []int) (int, int) {
+	min, max := math.MaxInt, math.MinInt
+	for _, num := range nums {
+		if num < min {
+			min = num
+		}
+		if num > max {
+			max = num
+		}
+	}
+	return min, max
 }
 </code>
 </pre>
@@ -214,31 +199,40 @@ function mergeSortArray(&$nums, $start, $mid, $end) {
 <summary>基数</summary>
 <pre>
 <code>
-/**
- * 基数计数
- */
-function radix($nums) {
-    $len = count($nums);
-    if ($len <= 1) {
-        return $nums;
-    }
-    $d = strlen(max($nums));
-    $radix = 1;
-    for ($i = 0; $i < $d; $i++) {
-        $list = array_fill(0, 10, []);
-        foreach ($nums as $num) {
-            $list[($num / $radix) % 10][] = $num;
-        }
+func radix(nums []int) []int {
+	max := getMax(nums)
+	d := len(strconv.Itoa(max))
+	base := 1
+	for i := 0; i < d; i++ {
+		radixArr := make([][]int, 10)
+		for _, num := range nums {
+			index := (num / base) % 10
+			if len(radixArr[index]) == 0 {
+				radixArr[index] = []int{num}
+			} else {
+				radixArr[index] = append(radixArr[index], num)
+			}
+		}
+		base *= 10
+		j := 0
+		for _, arr := range radixArr {
+			for _, num := range arr {
+				nums[j] = num
+				j++
+			}
+		}
+	}
+	return nums
+}
 
-        $j = 0;
-        foreach ($list as $value) {
-            while ($value) {
-                $nums[$j++] = array_shift($value);
-            }
-        }
-        $radix *= 10;
-    }
-    return $nums;
+func getMax(nums []int) int {
+	max := math.MinInt
+	for _, num := range nums {
+		if num > max {
+			max = num
+		}
+	}
+	return max
 }
 </code>
 </pre>
@@ -248,256 +242,58 @@ function radix($nums) {
 <summary>桶</summary>
 <pre>
 <code>
-/**
- * 桶排序
- */
-function bucket($nums) {
-    $len = count($nums);
-    if ($len <= 1) {
-        return $nums;
-    }
-    list($cnt, $min, $max) = [3, min($nums), max($nums)];
-    $cap = ceil(($max - $min + 1) / $cnt);
-    $buckets = array_fill(0, $cnt, []);
-    foreach ($nums as $num) {
-        $index = intval(($num - $min) / $cap);
-        for ($i = count($buckets[$index]) - 1; $i >= 0; $i--) {
-            if ($buckets[$index][$i] <= $num) {
-                break;
-            }
-            $buckets[$index][$i + 1] =$buckets[$index][$i];
-        }
-        $buckets[$index][$i + 1] = $num;
-    }
-    $j = 0;
-    foreach ($buckets as $bucket) {
-        while ($bucket) {
-            $nums[$j++] = array_shift($bucket);
-        }
-    }
-    return $nums;
+func bucket(nums []int) []int {
+	min, max := getMinAndMax(nums)
+	var (
+		bucket  = 3
+		buckets = make([][]int, bucket)
+		radix   = int(math.Ceil(float64(max-min+1) / float64(bucket)))
+	)
+	for _, num := range nums {
+		index := (num - min) / radix
+		if len(buckets[index]) == 0 {
+			buckets[index] = []int{num}
+		} else {
+			buckets[index] = append(buckets[index], num)
+			i := len(buckets[index]) - 2
+			for ; i >= 0; i-- {
+				if buckets[index][i] < num {
+					break
+				}
+				buckets[index][i+1] = buckets[index][i]
+			}
+			buckets[index][i+1] = num
+		}
+	}
+	i := 0
+	for _, arr := range buckets {
+		for _, num := range arr {
+			nums[i] = num
+			i++
+		}
+	}
+	return nums
+}
+
+func getMinAndMax(nums []int) (int, int) {
+	min, max := math.MaxInt, math.MinInt
+	for _, num := range nums {
+		if num < min {
+			min = num
+		}
+		if num > max {
+			max = num
+		}
+	}
+	return min, max
 }
 </code>
 </pre>
 </details>
 
-## leetcode ##
-### 215.数组中的第K个最大元素 ###
-<details>
-<summary>代码</summary>
-<pre>
-<code>
-/**
- * 利用快速排序
- */
-function findKthLargest($nums, $k){
-    $len = count($nums);
-    if ($len < 1) {
-        return null;
-    }
-    list($left, $right) = [0, $len - 1];
-    while ($left <= $right) {
-        $mid = quick($nums, $left, $right);
-        var_dump($mid);exit;
-        if ($len - $k == $mid) {
-            return $nums[$mid];
-        } else if ($left - $k < $mid) {
-            $left = $mid + 1;
-        } else {
-            $right = $mid - 1;
-        }
-    }
-}
-function quick(&$nums, $start, $end) {
-    if ($start > $end) {
-        return;
-    }
-    list($left, $right) = [$start, $end];
-    while ($left < $right) {
-        while ($left < $right && $nums[$right] >= $nums[$start]) {
-            $right--;
-        }
-        while ($left < $right && $nums[$left] <= $nums[$start]) {
-            $left++;
-        }
-        if ($left < $right) {
-            list($nums[$left], $nums[$right]) = [$nums[$right], $nums[$left]];
-        }
-    }
-    list($nums[$start], $nums[$right]) = [$nums[$right], $nums[$start]];
-    return $right;
-}
-</code>
-</pre>
-</details>
-
-### 347.前K个高频元素 ###
-<details>
-<summary>代码</summary>
-<pre>
-<code>
-/**
- * 桶排序
- */
-function topKFrequent($nums, $k) {
-    $len = count($nums);
-    $map = [];
-    for ($i = 0; $i < $len; $i++) {
-        if (!isset($map[$nums[$i]])) {
-            $map[$nums[$i]] = 0;
-        }
-        $map[$nums[$i]]++;
-    }
-    list($min, $max) = [min($map), max($map)];
-    $list = array_fill($min, $max - $min + 1, []);
-    foreach ($map as $key => $value) {
-        $list[$value][] = $key;
-    }
-    $res = [];
-    for ($i = $max; $i >= $min; $i--) {
-        while (count($list[$i])) {
-            $res[] = array_pop($list[$i]);
-            if (count($res) == $k) {
-                break 2;
-            }
-        }
-    }
-    return $res;
-}
-</code>
-</pre>
-</details>
-
-### 451.根据字符出现频率排序 ###
-<details>
-<summary>代码</summary>
-<pre>
-<code>
-/**
- * 桶排序
- */
-function frequencySort($s) {
-    if (!$s) {
-        return $s;
-    }
-    $len = strlen($s);
-    $map = [];
-    for($i = 0; $i < $len; $i++) {
-        if (!isset($map[$s[$i]])) {
-            $map[$s[$i]] = 0;
-        }
-        $map[$s[$i]]++;
-    }
-    list($min, $max) = [min($map), max($map)];
-    $list = array_fill($min, $max - $min + 1, []);
-    foreach ($map as $key => $value) {
-        $list[$value][] = $key;
-    }
-    $res = '';
-    for ($i = $max; $i >= $min; $i--) {
-        while (count($list[$i])) {
-            $char = array_pop($list[$i]);
-            $cnt = $i;
-            while ($cnt > 0) {
-                $res .= $char;
-                $cnt--;
-            }
-        }
-    }
-    return $res;
-}
-</code>
-</pre>
-</details>
-
-### 75.颜色分类 ###
-<details>
-<summary>代码</summary>
-<pre>
-<code>
-/**
- * 计数排序
- */
-function sortColors(&$nums) {
-    $len = count($nums);
-    if ($len <= 1) {
-        return;
-    }
-    $map = array_fill(0, 3, 0);
-    for ($i = 0; $i < $len; $i++) {
-        $map[$nums[$i]]++;
-    }
-    $j = 0;
-    foreach ($map as $k => $v) {
-        while ($v > 0) {
-            $nums[$j++] = $k;
-            $v--;
-        }
-    }
-}
-</code>
-</pre>
-</details>
-<details>
-<summary>代码</summary>
-<pre>
-<code>
-/**
- * 选择排序
- */
-function sortColors(&$nums) {
-    $len = count($nums);
-    if ($len <= 1) {
-        return $nums;
-    }
-    list($l, $r, $i) = [0, $len - 1, 0];
-    while ($i <= $r) {
-        if ($nums[$i] == 2) {
-            list($nums[$r], $nums[$i]) = [$nums[$i], $nums[$r]];
-            $r--;
-            continue;
-        }
-        if ($nums[$i] == 0) {
-            list($nums[$l], $nums[$i]) = [$nums[$i], $nums[$l]];
-            $l++;
-        }
-        $i++;
-    }
-}
-</code>
-</pre>
-</details>
-<details>
-<summary>代码</summary>
-<pre>
-<code>
-/**
- * 插入排序
- */
-function sortColors(&$nums) {
-    $len = count($nums);
-    if ($len <= 1) {
-        return $nums;
-    }
-    list($red, $white, $blue) = [-1, -1, -1];
-    for ($i = 0; $i < $len; $i++) {
-        switch ($nums[$i]) {
-            case 0:
-                $nums[++$blue] = 2;
-                $nums[++$white] = 1;
-                $nums[++$red] = 0;
-                break;
-            case 1:
-                $nums[++$blue] = 2;
-                $nums[++$white] = 1;
-                break;
-            case 2:
-                $nums[++$blue] = 2;
-                break;
-
-        }
-    }
-}
-</code>
-</pre>
-</details>
+## 应用 ##
+**LeetCode*  
+- 215.数组中的第K个最大元素
+- 347.前K个高频元素
+- 451.根据字符出现频率排序 
+- 75.颜色分类
