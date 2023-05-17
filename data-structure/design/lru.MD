@@ -12,10 +12,10 @@
 <pre>
 <code>
 type LinkedListNode struct {
-    key   int
-    value int
-    prev  *LinkedListNode
-    next  *LinkedListNode
+	key   int
+	value int
+	prev  *LinkedListNode
+	next  *LinkedListNode
 }
 
 type DoubleLinkedList struct {
@@ -24,16 +24,16 @@ type DoubleLinkedList struct {
 }
 
 type HashLinkedList struct {
-    linkedList *DoubleLinkedList
-    data       map[int]*LinkedListNode
+	linkedList *DoubleLinkedList
+	data       map[int]*LinkedListNode
 }
 
 func ConstructorHashLinkedList() *HashLinkedList {
-    head, tail := &LinkedListNode{}, &LinkedListNode{}
-    head.next = tail
-    tail.prev = head
-    return &HashLinkedList{
-	    linkedList: &DoubleLinkedList{
+	head, tail := &LinkedListNode{}, &LinkedListNode{}
+	head.next = tail
+	tail.prev = head
+	return &HashLinkedList{
+		linkedList: &DoubleLinkedList{
 			head: head,
 			tail: tail,
 		},
