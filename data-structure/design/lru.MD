@@ -9,8 +9,7 @@
 # 实现 #
 <details>
 <summary>代码</summary>
-<pre>
-<code>
+
 type LinkedListNode struct {
 	key   int
 	value int
@@ -116,8 +115,7 @@ func (l *LRUCache) Put(key int, value int) {
 	}
 	l.hashLinkedList.PutHead(node)
 }
-</code>
-</pre>
+
 </details>
 
 # 应用 #
