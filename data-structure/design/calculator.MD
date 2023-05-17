@@ -9,8 +9,8 @@
 # 实现 # 
 <details>
 <summary>代码</summary>
-<pre>
-<code>
+
+```
 func calculate(s string) int {
 	s = strings.Replace(s, " ", "", -1)
 	optLevel := map[byte]int{
@@ -87,14 +87,13 @@ func cal(nums *[]int, opts *[]byte) {
 func isDigit(char byte) bool {
 	return '0' <= char && char <= '9'
 }
-</code>
-</pre>
+```
 </details>
 
 <details>
 <summary>代码</summary>
-<pre>
-<code>
+
+```
 func calculate(s string) int {
 	i := 0
 	return cal(s, &i)
@@ -144,11 +143,10 @@ func cal(s string, i *int) int {
 func isDigit(char byte) bool {
 	return '0' <= char && char <= '9'
 }
-</code>
-</pre>
+```
 </details>
 
 # 应用 #
-*LeetCode*  
+**LeetCode**  
 - 224.基本计算器
 - 227.基本计算器 II
