@@ -8,8 +8,8 @@
 # 实现 #
 <details>
 <summary>代码</summary>
-<pre>
-<code>
+
+```
 type intSmallHeap []int
 
 func (h intSmallHeap) Less(i, j int) bool {
@@ -102,10 +102,9 @@ func (m *MedianFinder) FindMedian() float64 {
 	}
 	return (float64(m.large.Top().(int)) + float64(m.small.Top().(int))) / 2
 }
-</code>
-</pre>
+```
 </details>
 
 # 应用 #
-*LeetCode*
+**LeetCode**
 - 295.数据流的中位数

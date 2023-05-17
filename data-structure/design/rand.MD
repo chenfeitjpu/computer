@@ -8,8 +8,8 @@
 # 实现 #
 <details>
 <summary>代码</summary>
-<pre>
-<code>
+
+```
 type RandomizedSet struct {
 	vi   map[int]int
 	nums []int
@@ -49,14 +49,13 @@ func (r *RandomizedSet) GetRandom() int {
 	index := rand.Intn(len(r.nums))
 	return r.nums[index]
 }
-</code>
-</prev>
+```
 </details>
 
 <details>
 <summary>代码</summary>
-<pre>
-<code>
+
+```
 type Solution struct {
 	n        int
 	blackMap map[int]int
@@ -99,11 +98,10 @@ func (s *Solution) Pick() int {
 	}
 	return index
 }
-</code>
-</pre>
+```
 </details>
 
 # 应用 #
-*LeetCode*  
+**LeetCode**  
 - 380.O(1)时间插入、删除和获取随机元素
 - 710.黑名单中的随机数
