@@ -7,7 +7,10 @@
 最近最少使用
 
 # 实现 #
-```
+<details>
+<summary>代码</summary>
+<pre>
+<code>
 type LinkedListNode struct {
     key   int
     value int
@@ -16,21 +19,21 @@ type LinkedListNode struct {
 }
 
 type DoubleLinkedList struct {
-    head *LinkedListNode
-    tail *LinkedListNode
+	head *LinkedListNode
+	tail *LinkedListNode
 }
 
 type HashLinkedList struct {
-	linkedList *DoubleLinkedList
+    linkedList *DoubleLinkedList
     data       map[int]*LinkedListNode
 }
 
 func ConstructorHashLinkedList() *HashLinkedList {
-	head, tail := &LinkedListNode{}, &LinkedListNode{}
-	head.next = tail
-	tail.prev = head
-	return &HashLinkedList{
-		linkedList: &DoubleLinkedList{
+    head, tail := &LinkedListNode{}, &LinkedListNode{}
+    head.next = tail
+    tail.prev = head
+    return &HashLinkedList{
+	    linkedList: &DoubleLinkedList{
 			head: head,
 			tail: tail,
 		},
@@ -113,8 +116,10 @@ func (l *LRUCache) Put(key int, value int) {
 	}
 	l.hashLinkedList.PutHead(node)
 }
-```
+</code>
+</pre>
+</details>
 
 # 应用 #
-**leetcode**  
+**LeetCode**  
 - 146.LRU缓存 
