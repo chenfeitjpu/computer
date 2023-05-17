@@ -9,8 +9,8 @@
 # 实现 #
 <details>
 <summary>代码</summary>
-<pre>
-<code>
+
+```
 type LinkedListNode struct {
 	key   int
 	value int
@@ -154,10 +154,9 @@ func (l *LFUCache) DeleteLast() {
 	delete(l.kf, tail.key)
 	hashLinkedList.Delete(tail)
 }
-</code>
-</pre>
+```
 </details>
 
 # 应用 #
-*LeetCode*
+**LeetCode** 
 - 460.LFU缓存
