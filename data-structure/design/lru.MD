@@ -7,10 +7,7 @@
 最近最少使用
 
 # 实现 #
-<details>
-<summary>代码</summary>
-<pre>
-<code>
+```
 type LinkedListNode struct {
     key   int
     value int
@@ -25,7 +22,7 @@ type DoubleLinkedList struct {
 
 type HashLinkedList struct {
 	linkedList *DoubleLinkedList
-	data       map[int]*LinkedListNode
+    data       map[int]*LinkedListNode
 }
 
 func ConstructorHashLinkedList() *HashLinkedList {
@@ -116,10 +113,8 @@ func (l *LRUCache) Put(key int, value int) {
 	}
 	l.hashLinkedList.PutHead(node)
 }
-</code>
-</pre>
-</details>
+```
 
 # 应用 #
-*LEETCODE*
+**leetcode**  
 - 146.LRU缓存 
