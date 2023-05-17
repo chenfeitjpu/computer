@@ -12,15 +12,15 @@
 <pre>
 <code>
 type LinkedListNode struct {
-	key   int
-	value int
-	prev  *LinkedListNode
-	next  *LinkedListNode
+    key   int
+    value int
+    prev  *LinkedListNode
+    next  *LinkedListNode
 }
 
 type DoubleLinkedList struct {
-	head *LinkedListNode
-	tail *LinkedListNode
+    head *LinkedListNode
+    tail *LinkedListNode
 }
 
 type HashLinkedList struct {
