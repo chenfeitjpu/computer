@@ -1,24 +1,37 @@
 **集合**
 - [内容](#内容)
   - [使用](#使用)
+    - [基本操作](#基本操作)
+    - [特性](#特性)
   - [结构](#结构)
-  - [特性](#特性)
-  - [查找](#查找)
-  - [扩容](#扩容)
-    - [负载因子](#负载因子)
-    - [扩容](#扩容-1)
+    - [存储](#存储)
+    - [查找](#查找)
+    - [扩容](#扩容)
   - [sync.Map](#syncmap)
 
 # 内容 #
 ## 使用 ##
+### 基本操作 ###
 **声明**  
-var name map[key_type]value_type  
+var name map[key_type]value_type = map[key_type]value_type{} 
 name := make(map[key_type]value_type, [cap])  
 
 **删除**  
 delete(map, key)  
 
+### 特性 ###
+**无序**  
+- 每次遍历，都会从一个随机值序号的bucket，再从其中随机的cell开始遍历
+- map在扩容后，会发生key的搬迁
+
+**非线程安全**  
+
+**线程安全**
+- map + sync.RWMutex
+- sync.Map
+
 ## 结构 ##
+### 存储 ###
 ![](./images/map/struct.png)
 
 ```
@@ -71,38 +84,27 @@ type mapextra struct {
     overflow    *[]*bmap
     // overflow 包含的是 hmap.buckets 的 overflow 的 buckets
     oldoverflow *[]*bma
-   // oldoverflow 包含扩容时 hmap.oldbuckets 的 overflow 的 bucket
+    // oldoverflow 包含扩容时 hmap.oldbuckets 的 overflow 的 bucket
     nextOverflow *bmap 
-     // 指向空闲的 overflow bucket 的指针
+    // 指向空闲的 overflow bucket 的指针
 }
 ```
-## 特性 ##
-**无序**  
-- 每次遍历，都会从一个随机值序号的bucket，再从其中随机的cell开始遍历
-- map在扩容后，会发生key的搬迁
 
-**非线程安全**  
-
-**线程安全**
-- map + sync.RWMutex
-- sync.Map
-
-## 查找 ##
+### 查找 ###
 ![](./images/map/get.png)
 
-## 扩容 ##
-### 负载因子 ###  
+### 扩容 ###
+**负载因子**  
 负载因子 = 哈希表存储的元素个数/桶个数  
 
-### 扩容 ###  
 **超过负载**  
 map元素个数 > 6.5 * 桶个数  
-*双倍扩容*
+双倍扩容  
 
 **溢出桶太多**  
 当桶总数 < 2 ^ 15 时，如果溢出桶总数 >= 桶总数，则认为溢出桶过多  
 当桶总数 >= 2 ^ 15 时，直接与 2 ^ 15 比较，当溢出桶总数 >= 2 ^ 15 时，即认为溢出桶太多了  
-*等量扩容*
+等量扩容  
 
 **渐进式扩容**  
 新增、修改或者删除时，每次最多只会搬迁 2 个 bucket

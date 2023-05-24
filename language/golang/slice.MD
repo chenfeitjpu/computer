@@ -8,8 +8,12 @@
 # 内容 #
 ## 使用 ##
 **声明**  
-var name []type  
+var name []type = []type{}
 name := make([]T, length, capacity)
+
+**切片表达式**
+a[low : high : max]  
+0 <= low <= high <= max <= cap(a)
 
 **添加**
 - append
