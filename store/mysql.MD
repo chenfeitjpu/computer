@@ -239,7 +239,8 @@
 - `comment` 注释
 - `primary key` 主键
 - `unique [key]` 唯一键
-- `constraint [外键名称] foreign key (列1, 列2, ...) references 父表名 (父列1, 父列2, ...)` 外键
+- `foreign key (列1, 列2, ...) references 父表名 (父列1, 父列2, ...)` 外键
+- `constraint [约束名] 条件`
 
 ### DML ###
   - `insert into 表名 values` 插入数据
@@ -248,7 +249,11 @@
   - 
 
 ### DQL ###
-  - `select [distinct] [column] from tablename [where] [group by having] [order by] [limit offset length]` 查询数据
+- `select 列名 [as] [别名][, 列名 [as] [别名]] from 表名` 查询单个｜多个列
+- `select * from 表名` 查询所有列
+- `select distinct 列名[, 列名] from 表名` 去除单列|多列的重复结果 
+- `limit [开始行,] 限制条数` 限制查询结果条数
+- `order by 列名 asc|desc[, 列名 asc|desc]` 按照单列|多列的值进行排序，默认升序
   
 ### DCL ###
   - `grant 权限 on 库名.表名 to 用户@主机 identified by 密码` 授权
@@ -277,56 +282,57 @@
     - `union`
 
 ### 运算符 ###
-  - *算术*  
-    `+, -, *, /, %`
-  - *比较*  
-    `\>, \>=, \<, \<=, =, !=, between and`
-  - *逻辑*  
-    `and, or`
-  - *匹配*  
-    `in, not in, is null, is not null`
-  - *通配*  
-    `_, %`
+**算术**  
++, -, *, /, %
+
+**比较**    
+  `\>, \>=, \<, \<=, =, !=, between and, in, not in, is null, is not null, like, not like`
+
+**逻辑**  
+  `and, or, xor`
+
+**通配**  
+`_, %`
 
 ### 函数 ###
-  - **文本**
-    - `left` 从左边取指定长度的子串
-    - `right` 从右边取指定长度的子串
-    - `length` 获取字符串长度
-    - `upper` 大写格式
-    - `lower` 小写格式
-    - `ltrim` 去掉字符串左边空格
-    - `rtrim` 去掉字符串右边空格
-    - `substring` 字符串截取
-    - `concat` 字符串拼接
+**文本**
+  - `left` 从左边取指定长度的子串
+  - `right` 从右边取指定长度的子串
+  - `length` 获取字符串长度
+  - `upper` 大写格式
+  - `lower` 小写格式
+  - `ltrim` 去掉字符串左边空格
+  - `rtrim` 去掉字符串右边空格
+  - `substring` 字符串截取
+  - `concat` 字符串拼接
+ 
+- **时间**
+  - `now` 获取当前日期和时间
+  - `curdate` 获取当前日期
+  - `curtime` 获取当前时间
+  - `date(datetime)` 提取日期
+  - `date_add(datetime, interval value type)` 添加指定的时间间隔
+  - `date_sub(datetime, interval value type)` 减去指定的时间间隔
+  - `datediff(date, date)` 返回两个日期之间的天数
+  - `date_format(datetime, format)` 格式化显示日期和时间
    
-  - **时间**
-    - `now` 获取当前日期和时间
-    - `curdate` 获取当前日期
-    - `curtime` 获取当前时间
-    - `date(datetime)` 提取日期
-    - `date_add(datetime, interval value type)` 添加指定的时间间隔
-    - `date_sub(datetime, interval value type)` 减去指定的时间间隔
-    - `datediff(date, date)` 返回两个日期之间的天数
-    - `date_format(datetime, format)` 格式化显示日期和时间
-     
-  - **数值**
-    - `rand` 随机数
-    - `mod` 取余
-    - `abs` 绝对值
-    - `pi` 圆周率
-    - `exp` e的指定次方
-    - `sqrt` 平方根
-    - `sin` 正弦
-    - `cos` 余弦
-    - `tan` 正切
-     
-  - **聚集**
-    - `count` 总数
-    - `max` 最大值
-    - `min` 最小值
-    - `sum` 求和
-    - `avg` 平均值
+- **数值**
+  - `rand` 随机数
+  - `mod` 取余
+  - `abs` 绝对值
+  - `pi` 圆周率
+  - `exp` e的指定次方
+  - `sqrt` 平方根
+  - `sin` 正弦
+  - `cos` 余弦
+  - `tan` 正切
+   
+- **聚集**
+  - `count` 总数
+  - `max` 最大值
+  - `min` 最小值
+  - `sum` 求和
+  - `avg` 平均值
 
 ### 视图 ###
   - `show tables` 查看所有视图
