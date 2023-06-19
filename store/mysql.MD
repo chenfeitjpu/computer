@@ -285,14 +285,14 @@
 **算术**  
 +, -, *, /, %
 
-**比较**    
-  `\>, \>=, \<, \<=, =, !=, between and, in, not in, is null, is not null, like, not like`
+**比较**  
+\>, \>=, \<, \<=, =, !=, between and, in, not in, is null, is not null, like, not like
 
 **逻辑**  
-  `and, or, xor`
+and, or, xor
 
 **通配**  
-`_, %`
+_, %
 
 ### 函数 ###
 **文本**
