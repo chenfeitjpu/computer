@@ -283,56 +283,56 @@
 
 ### 运算符 ###
 **算术**  
-+, -, *, /, %
+`+, -, *, /, %`
 
 **比较**  
-\>, \>=, \<, \<=, =, !=, between and, in, not in, is null, is not null, like, not like
+`\>, \>=, \<, \<=, =, !=, between and, in, not in, is null, is not null, like, not like`
 
 **逻辑**  
-and, or, xor
+`and, or, xor`
 
 **通配**  
-_, %
+`_, %`
 
 ### 函数 ###
-**文本**
-  - `left` 从左边取指定长度的子串
-  - `right` 从右边取指定长度的子串
-  - `length` 获取字符串长度
-  - `upper` 大写格式
-  - `lower` 小写格式
-  - `ltrim` 去掉字符串左边空格
-  - `rtrim` 去掉字符串右边空格
-  - `substring` 字符串截取
-  - `concat` 字符串拼接
+**文本**  
+- `left` 从左边取指定长度的子串
+- `right` 从右边取指定长度的子串
+- `length` 获取字符串长度
+- `upper` 大写格式
+- `lower` 小写格式
+- `ltrim` 去掉字符串左边空格
+- `rtrim` 去掉字符串右边空格
+- `substring` 字符串截取
+- `concat` 字符串拼接
  
-- **时间**
-  - `now` 获取当前日期和时间
-  - `curdate` 获取当前日期
-  - `curtime` 获取当前时间
-  - `date(datetime)` 提取日期
-  - `date_add(datetime, interval value type)` 添加指定的时间间隔
-  - `date_sub(datetime, interval value type)` 减去指定的时间间隔
-  - `datediff(date, date)` 返回两个日期之间的天数
-  - `date_format(datetime, format)` 格式化显示日期和时间
+**时间**  
+- `now` 获取当前日期和时间
+- `curdate` 获取当前日期
+- `curtime` 获取当前时间
+- `date(datetime)` 提取日期
+- `date_add(datetime, interval value type)` 添加指定的时间间隔
+- `date_sub(datetime, interval value type)` 减去指定的时间间隔
+- `datediff(date, date)` 返回两个日期之间的天数
+- `date_format(datetime, format)` 格式化显示日期和时间
    
-- **数值**
-  - `rand` 随机数
-  - `mod` 取余
-  - `abs` 绝对值
-  - `pi` 圆周率
-  - `exp` e的指定次方
-  - `sqrt` 平方根
-  - `sin` 正弦
-  - `cos` 余弦
-  - `tan` 正切
-   
-- **聚集**
-  - `count` 总数
-  - `max` 最大值
-  - `min` 最小值
-  - `sum` 求和
-  - `avg` 平均值
+**数值**  
+- `rand` 随机数
+- `mod` 取余
+- `abs` 绝对值
+- `pi` 圆周率
+- `exp` e的指定次方
+- `sqrt` 平方根
+- `sin` 正弦
+- `cos` 余弦
+- `tan` 正切
+ 
+**聚集**  
+- `count` 总数
+- `max` 最大值
+- `min` 最小值
+- `sum` 求和
+- `avg` 平均值
 
 ### 视图 ###
   - `show tables` 查看所有视图
