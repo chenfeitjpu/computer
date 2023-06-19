@@ -213,22 +213,33 @@
 - `use 库名` 选择库
   
 **table**  
-- `show tables` 查看所有表
-- `show create table 表名` 查看表定义
-- `desc 表名` 查看表描述
-- `create table 表名` 创建表
-- `alter table 表名 [add column|modify column|alter column|change column|drop column|rename to]` 修改表
-- `drop table 表名` 删除表
+- `show tables [from 库名]` 查看所有表
+- `show create table [库名.]表名` 查看表定义
+- `[describe|desc|explain|show columns from|show fields form] 表名` 查看表描述
+- `create table [if not exists] 表名` 创建表
+- `alter table 旧表名 rename to 新表名` 修改表名
+- `rename table 旧表名 to 新表名` 修改表名
+- `drop table [if exists ]表名` 删除表
+- `alter table 表名 add column 列名 数据类型 [列的属性] [first|after 列表]` 增加列
+- `alter table 表名 drop column 列名` 删除列
+- `alter table 表名 modify 列名 新数据类型 [新属性] [first|after]` 修改列
+- `alter table 表名 change 旧列名 新列名 新数据类型 [新属性]` 修改列
 
 **column**  
 - `default` 默认值
 - `not null` 非空
 - `auto_increament` 自增
+  - 一个表中最多有一个具有AUTO_INCREMENT属性的列
+  - 拥有AUTO_INCREMENT属性的列就不能再通过指定DEFAULT属性来指定默认值
+  - 具有AUTO_INCREMENT属性的列必须建立索引  
 - `zerofill` 零填充
-- `constraint` 约束
+  - 该列必须是整数类型的
+  - 该列必须有unsigned zerofill的属性
+  - 该列的实际值的位数必须小于显示宽度  
+- `comment` 注释
 - `primary key` 主键
-- `unique key` 唯一键
-- `foreign key` 外键
+- `unique [key]` 唯一键
+- `constraint [外键名称] foreign key (列1, 列2, ...) references 父表名 (父列1, 父列2, ...)` 外键
 
 ### DML ###
   - `insert into 表名 values` 插入数据
