@@ -206,30 +206,30 @@
 
 ## SQL ##
 ### DDL ###
-  - **database**
-    - `show databases` 查看所有库
-    - `create database 库名` 创建库
-    - `drop database 库名` 删除库
-    - `use 库名` 选择库
+**database**  
+- `show databases` 查看所有库
+- `create database [if not exists] 库名` 创建库
+- `drop database [if exists] 库名` 删除库
+- `use 库名` 选择库
   
-  - **table**
-    - `show tables` 查看所有表
-    - `show create table 表名` 查看表定义
-    - `desc 表名` 查看表描述
-    - `create table 表名` 创建表
-    - `alter table 表名 [add column|modify column|alter column|change column|drop column|rename to]` 修改表
-    - `drop table 表名` 删除表
-  
-  - **column**
-    - `default` 默认值
-    - `not null` 非空
-    - `auto_increament` 自增
-    - `zerofill` 零填充
-    - `constraint` 约束
-    - `primary key` 主键
-    - `unique key` 唯一键
-    - `foreign key` 外键
-  
+**table**  
+- `show tables` 查看所有表
+- `show create table 表名` 查看表定义
+- `desc 表名` 查看表描述
+- `create table 表名` 创建表
+- `alter table 表名 [add column|modify column|alter column|change column|drop column|rename to]` 修改表
+- `drop table 表名` 删除表
+
+**column**  
+- `default` 默认值
+- `not null` 非空
+- `auto_increament` 自增
+- `zerofill` 零填充
+- `constraint` 约束
+- `primary key` 主键
+- `unique key` 唯一键
+- `foreign key` 外键
+
 ### DML ###
   - `insert into 表名 values` 插入数据
   - `update 表名 set` 修改数据 
