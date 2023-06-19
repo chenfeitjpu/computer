@@ -261,25 +261,26 @@
 
 ## 查询 ##
 ### 分类 ###
-  - *简单查询*
-    - `where`
-    - `order by asc, desc`
-    - `limit offset length`
-    - `distinct`
+**简单查询**  
   
-  - *分组查询*
-    - `group by having`
+**分组查询**  
+`group by 列名 [, 列名] having`
   
-  - *子查询*
-  
-  - *连接查询*
-    - `inner join on`
-    - `left join on`
-    - `right join on`
-     
-  - *组合查询*
-    - `union all`
-    - `union`
+**子查询**  
+- 标量子查询
+- 列子查询
+- 行子查询
+- 表子查询
+- exists和not exists子查询
+
+**连接查询**  
+- `inner join on` 内连接
+- `left join on` 左外连接
+- `right join on` 右外连接
+ 
+**组合查询**
+- `union all` 保留重复记录
+- `union` 去除重复记录
 
 ### 运算符 ###
 **算术**  
