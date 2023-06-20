@@ -34,12 +34,7 @@
   - [存储程序](#存储程序)
     - [语法](#语法-1)
     - [存储函数](#存储函数)
-    - [存储过程](#存储过程)
-    - [触发器](#触发器)
     - [事件](#事件)
-  - [存储结构](#存储结构)
-    - [行结构](#行结构)
-      - [基本操作](#基本操作)
       - [InnoDB行结构](#innodb行结构)
       - [行溢出](#行溢出)
     - [页结构](#页结构)
@@ -51,7 +46,7 @@
       - [注意事项](#注意事项)
       - [InnoDB索引结构](#innodb索引结构)
     - [数据目录](#数据目录)
-      - [基本操作](#基本操作-1)
+      - [基本操作](#基本操作)
       - [结构](#结构)
     - [InnoDB表空间](#innodb表空间)
     - [InnoDB的Buffer Pool###](#innodb的buffer-pool)
@@ -1027,54 +1022,55 @@ level: {
   
 ## 存储程序 ##
 ### 语法 ###
-  - *变量*
-    - `declare name 类型 default value` 定义局部变量
-    - `set name=value` 变量赋值
-    - `into name, name` 多个变量赋值
-    - `delimiter` 结束分隔符
+**变量**  
+- `declare 变量名 数据类型 [default value]` 定义局部变量
+- `set name=value` 变量赋值
+- `into name, name` 多个变量赋值
+- `delimiter` 结束分隔符
   
-  - *选择语句*
-    ```
-    if then  
-    elseif then  
-    else  
-    end if;
-    ```
+**选择语句**  
+```
+if 表达式 then  
+elseif 表达式 then  
+else  
+end if;
+```
 
-  - *循环语句*
-    ```
-    while do  
-    end while;
-    ```
-    ```
-    repeat  
-    until end repeat;
-    ```
-    ```
-    loop  
-    end loop;
-    ```
-  - *游标*
-    - `declare 游标名 cursor for select` 创建游标 
-    - `declare continue handler for not found` 事件响应
-    - `open 游标名` 打开游标  
-    - `fetch 游标名 into` 移动游标
-    - `close 游标名` 关闭游标
+**循环语句**  
+```
+while 表达式 do  
+end while;
+```
+```
+repeat  
+until 表达式 end repeat;
+```
+```
+loop  
+end loop;
+```
+**游标**  
+- `declare 游标名 cursor for select` 创建游标 
+- `declare continue handler for not found` 事件响应
+- `open 游标名` 打开游标  
+- `fetch 游标名 into` 移动游标
+- `close 游标名` 关闭游标
   
 ### 存储函数 ###
-  - `show function status like` 查看所有函数
-  - `show create function 函数名` 查看函数定义
-  - ```
-    create function 函数名(参数名 数据类型, 参数名 数据类型)  
-    returns 返回值类型  
-    begin  
-        函数体内容  
-    end;
-    ```
-  - `drop function 函数名` 删除函数
+- `show function status [like 函数名]` 查看所有函数
+- `show create function 函数名` 查看函数定义
+- ```
+  create function 函数名(参数名 数据类型, 参数名 数据类型)  
+  returns 返回值类型  
+  begin  
+      函数体内容  
+      return
+  end;
+  ```
+- `drop function 函数名` 删除函数
 
 ### 存储过程 ###
-  - `show procedure status like` 查看所有存储过程
+  - `show procedure status [like 存储过程名]` 查看所有存储过程
   - `show create procedure 存储过程名` 查看存储过程定义
   - ```
     create procedure 存储过程名([in|out|inout]参数名 数据类型)  
@@ -1084,33 +1080,33 @@ level: {
   - `drop procedure 存储过程名` 删除存储过程
 
 ### 触发器 ###
-  - `show triggers` 查看所有触发器
-  - `show create trigger 触发器名` 查看触发器定义
-  - ```
-    create trigger 触发器名  
-    {before|after} on {insert|update|delete} on 表名  
-    for each row  
-    begin  
-      {old|new}  
-    end
-    ``` 
- - `drop trigger 触发器名` 删除触发器
+- `show triggers` 查看所有触发器
+- `show create trigger 触发器名` 查看触发器定义
+- ```
+  create trigger 触发器名  
+  {before|after} on {insert|update|delete} on 表名  
+  for each row  
+  begin  
+    {old|new}  
+  end
+  ``` 
+- `drop trigger 触发器名` 删除触发器
   
 ### 事件 ###
-  - `show events` 查看所有事件
-  - `show create event 事件名` 查看事件定义
-  - ```
-    create event 事件名  
-    on schedual  
-    {  
-      at 某个确定的时间点  
-      every 期望的时间间隔 [STARTS datetime][END datetime]  
-    }  
-    do  
-    begin  
-    end 
-    ```
-  - `drop event 事件名` 删除事件
+- `show events` 查看所有事件
+- `show create event 事件名` 查看事件定义
+- ```
+  create event 事件名  
+  on schedual  
+  {  
+    at 某个确定的时间点  
+    every 期望的时间间隔 [STARTS datetime][END datetime]  
+  }  
+  do  
+  begin  
+  end 
+  ```
+- `drop event 事件名` 删除事件
 
 ## 存储结构 ##
 ### 行结构 ###
