@@ -220,10 +220,10 @@
 - `alter table 旧表名 rename to 新表名` 修改表名
 - `rename table 旧表名 to 新表名` 修改表名
 - `drop table [if exists ]表名` 删除表
-- `alter table 表名 add column 列名 数据类型 [列的属性] [first|after 列表]` 增加列
-- `alter table 表名 drop column 列名` 删除列
-- `alter table 表名 modify 列名 新数据类型 [新属性] [first|after]` 修改列
-- `alter table 表名 change 旧列名 新列名 新数据类型 [新属性]` 修改列
+- `alter table 表名 add [column] 列名 数据类型 [列的属性] [first|after 列表]` 增加列
+- `alter table 表名 drop [column] 列名` 删除列
+- `alter table 表名 modify [column] 列名 新数据类型 [新属性] [first|after]` 修改列
+- `alter table 表名 change [column] 列名 新列名 新数据类型 [新属性]` 修改列
 
 **column**  
 - `default` 默认值
@@ -243,10 +243,12 @@
 - `constraint [约束名] 条件`
 
 ### DML ###
-  - `insert into 表名 values` 插入数据
-  - `update 表名 set` 修改数据 
-  - `delete from 表名` 删除数据
-  - 
+- `insert into 表名 [(列名, 列名)] values (值, 值) [,(值, 值)]` 插入单条|多条数据
+- `insert into 表名 select` 插入结果集
+- `insert ignore into` 插入忽略错误
+- `insert into ... on duplicate key update 列名 = 值|values(列名)` 插入重复值
+- `delete from 表名 [where 表达式]` 删除数据
+- `update 表名 set 列名=值 [where 表达式]` 更新数据 
 
 ### DQL ###
 - `select 列名 [as] [别名][, 列名 [as] [别名]] from 表名` 查询单个｜多个列
