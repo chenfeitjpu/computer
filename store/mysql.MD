@@ -1036,6 +1036,19 @@ else
 end if;
 ```
 
+```
+case 变量
+when 值 then
+else
+end
+```
+
+```
+case
+when 布尔表达式 then
+else
+end
+```
 **循环语句**  
 ```
 while 表达式 do  
