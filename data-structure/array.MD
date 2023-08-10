@@ -6,7 +6,6 @@
   - [差分数组](#差分数组)
   - [双指针](#双指针)
   - [滑动窗口](#滑动窗口)
-  - [二分搜索](#二分搜索)
 
 # 定义 #
 顺序存储元素
@@ -139,36 +138,3 @@ LeetCode
 - 567.字符串的排列
 - 438.找到字符串中所有字母异位词
 - 3.无重复字符的最长子串
-  
-## 二分搜索 ##
-**简介**  
-通过左右指针，不停缩小搜索区间  
-
-**模版**
-<details>
-<summary>代码</summary>
-<pre>
-<code>      
-func BinarySearch(nums []int, target int) int {
-	left, right := 0, len(nums)-1
-	for left <= right {
-		mid := left + (right-left)/2
-		if nums[mid] == target {
-			return mid
-		} else if nums[mid] < target {
-			left = mid + 1
-		} else if nums[mid] > target {
-			right = mid - 1
-		}
-	}
-	return -1
-}                   
-</code>
-</pre>
-</details>
-
-**应用**  
-LeetCode
-- 875.爱吃香蕉的珂珂
-- 1011.在D天内送达包裹的能力
-- 410.分割数组的最大值
