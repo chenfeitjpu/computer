@@ -15,14 +15,17 @@
 
 # 应用 #
 ## 前缀和 ##
-**适用场景**  
+**定义**  
 原始数组不变，频繁查询某个区间的累加和  
 - 求一维数组区间值
 - 求二维数组区间值
 - 查找指定区间值
 
 **模版**
-```
+<details>
+<summary>代码</summary>
+<pre>
+<code>
 type NumArray struct {
 	sumArray []int
 }
@@ -39,16 +42,18 @@ func Constructor(nums []int) *NumArray {
 func (this *NumArray) GetRange(start, end int) int {
 	return this.sumArray[end+1] - this.sumArray[start]
 }
-```
+</code>
+</pre>
+</details>
 
 **应用**  
-LeetCode
+*LeetCode*  
 - 303.区域和检索 - 数组不可变
 - 304.二维区域和检索 - 矩阵不可变
 - 560.和为K的子数组
     
 ## 差分数组 ##
-**适用场景**  
+**定义**  
 频繁对原始数组的某个区间的元素进行增减
 
 **模版**
@@ -90,25 +95,25 @@ func (this *Difference) GetResult() []int {
 </details>
 
 **应用**  
-LeetCode
+*LeetCode*  
 - 370.区间加法
 - 1109.航班预订统计
 - 1094.拼车
 
 ## 双指针 ##
-**简介**  
+**定义**  
 - 左右指针 两个指针相向而行或者相背而行
 - 快慢指针 两个指针同向而行，一快一慢
 
 **应用**  
-LeetCode
+*LeetCode*  
 - 26.删除有序数组中的重复项
 - 27.移除元素
 - 283.移动零
 - 167.两数之和 II - 输入有序数组
 
 ## 滑动窗口 ##
-**简介**    
+**定义**    
 通过快慢指针，不停滑动搜索区间
 
 **模版**
@@ -133,7 +138,7 @@ func SlideWindow(s string) {
 </details>
 
 **应用**  
-LeetCode
+*LeetCode*  
 - 76.最小覆盖子串
 - 567.字符串的排列
 - 438.找到字符串中所有字母异位词
