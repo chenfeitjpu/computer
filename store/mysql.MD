@@ -55,8 +55,17 @@
     - [并发](#并发)
   - [存储程序](#存储程序)
     - [语法](#语法-1)
+      - [变量](#变量-1)
+      - [选择语句](#选择语句)
+      - [循环语句](#循环语句)
+      - [游标](#游标)
     - [存储函数](#存储函数)
+    - [存储过程](#存储过程)
+    - [触发器](#触发器)
     - [事件](#事件)
+  - [存储结构](#存储结构)
+    - [行结构](#行结构)
+      - [基本操作](#基本操作)
       - [InnoDB行结构](#innodb行结构)
       - [行溢出](#行溢出)
     - [页结构](#页结构)
@@ -68,10 +77,10 @@
       - [注意事项](#注意事项)
       - [InnoDB索引结构](#innodb索引结构)
     - [数据目录](#数据目录)
-      - [基本操作](#基本操作)
+      - [基本操作](#基本操作-1)
       - [结构](#结构)
     - [InnoDB表空间](#innodb表空间)
-    - [InnoDB的Buffer Pool###](#innodb的buffer-pool)
+    - [InnoDB的Buffer Pool](#innodb的buffer-pool)
   - [日志](#日志)
     - [redo日志](#redo日志)
     - [undo日志](#undo日志)
@@ -1054,18 +1063,18 @@ level: {
   
 ## 存储程序 ##
 ### 语法 ###
-**变量**  
+#### 变量 ####  
 - `declare 变量名 数据类型 [default value]` 定义局部变量
 - `set name=value` 变量赋值
 - `into name, name` 多个变量赋值
 - `delimiter` 结束分隔符
   
-**选择语句**  
+#### 选择语句 ####  
 ```
 if 表达式 then  
 elseif 表达式 then  
 else  
-end if;
+end if
 ```
 
 ```
@@ -1081,53 +1090,59 @@ when 布尔表达式 then
 else
 end
 ```
-**循环语句**  
+#### 循环语句 ####  
 ```
 while 表达式 do  
-end while;
+end while
 ```
+
 ```
 repeat  
-until 表达式 end repeat;
+until 表达式 end repeat
 ```
+
 ```
 loop  
-end loop;
+end loop
 ```
-**游标**  
+
+#### 游标 ####  
 - `declare 游标名 cursor for select` 创建游标 
 - `declare continue handler for not found` 事件响应
 - `open 游标名` 打开游标  
 - `fetch 游标名 into` 移动游标
 - `close 游标名` 关闭游标
   
-### 存储函数 ###
+### 存储函数 ###  
 - `show function status [like 函数名]` 查看所有函数
 - `show create function 函数名` 查看函数定义
-- ```
+-  
+  ```
   create function 函数名(参数名 数据类型, 参数名 数据类型)  
   returns 返回值类型  
   begin  
       函数体内容  
       return
-  end;
+  end
   ```
 - `drop function 函数名` 删除函数
 
 ### 存储过程 ###
-  - `show procedure status [like 存储过程名]` 查看所有存储过程
-  - `show create procedure 存储过程名` 查看存储过程定义
-  - ```
-    create procedure 存储过程名([in|out|inout]参数名 数据类型)  
-    begin  
-    end
-    ```
-  - `drop procedure 存储过程名` 删除存储过程
+- `show procedure status [like 存储过程名]` 查看所有存储过程
+- `show create procedure 存储过程名` 查看存储过程定义
+- 
+  ```
+  create procedure 存储过程名([in|out|inout]参数名 数据类型)  
+  begin  
+  end
+  ```
+- `drop procedure 存储过程名` 删除存储过程
 
 ### 触发器 ###
 - `show triggers` 查看所有触发器
 - `show create trigger 触发器名` 查看触发器定义
-- ```
+- 
+  ```
   create trigger 触发器名  
   {before|after} on {insert|update|delete} on 表名  
   for each row  
@@ -1140,7 +1155,8 @@ end loop;
 ### 事件 ###
 - `show events` 查看所有事件
 - `show create event 事件名` 查看事件定义
-- ```
+- 
+  ```
   create event 事件名  
   on schedual  
   {  
@@ -1154,8 +1170,8 @@ end loop;
 - `drop event 事件名` 删除事件
 
 ## 存储结构 ##
-### 行结构 ###
-#### 基本操作 ####
+### 行结构 ###  
+#### 基本操作 ####  
 + 查看  
   `SHOW TABLE STATUS LIKE 表名\G`
 + 设置  
@@ -1165,7 +1181,7 @@ end loop;
   ALTER TABLE 表名 ROW_FORMAT=行格式名称
   ```
 
-#### InnoDB行结构 ####
+#### InnoDB行结构 ####  
 **Compact**
 <table>
     <tr><td colspan="3">记录的额外信息</td><td>记录的真实数据</td></tr>
@@ -1406,7 +1422,7 @@ end loop;
     - 通过目录项记录页确定用户记录所在的页
     - 在用户记录的页中定位到具体的记录
     - 根据主键值去聚簇索引中再查找一遍完整的用户记录
-  **
+
 ### 数据目录 ###
 #### 基本操作 ####
  + 查看    
@@ -1432,7 +1448,7 @@ end loop;
 ### InnoDB表空间 ###
 ![avatar](./images/mysql/innodb-table-space.awebp)
 
-### InnoDB的Buffer Pool###
+### InnoDB的Buffer Pool ###
 ***定义***  
 InnoDB为了缓存磁盘中的页，在MySQL服务器启动的时候就向操作系统申请了一片连续的内存，他们给这片内存起了个名，叫做Buffer Pool  
 
