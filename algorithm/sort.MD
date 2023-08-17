@@ -155,6 +155,44 @@ func mergeSortArray(nums []int, start, mid, end int) {
 </details>
 
 <details>
+<summary>堆排序</summary>
+<pre>
+<code>
+func heapSort(nums []int) []int {
+	length := len(nums)
+	initHeap(nums, length-1)
+	for i := length - 1; i >= 1; {
+		nums[0], nums[i] = nums[i], nums[0]
+		i--
+		buildHeap(nums, 0, i)
+	}
+	return nums
+}
+
+func initHeap(nums []int, end int) {
+	for i := end / 2; i >= 0; i-- {
+		buildHeap(nums, i, end)
+	}
+}
+
+func buildHeap(nums []int, i, end int) {
+	l, r, large := 2*i+1, 2*i+2, i
+	if l <= end && nums[l] > nums[large] {
+		large = l
+	}
+	if r <= end && nums[r] > nums[large] {
+		large = r
+	}
+	if large != i {
+		nums[i], nums[large] = nums[large], nums[i]
+		buildHeap(nums, large, end)
+	}
+}
+</code>
+</pre>
+</details>
+
+<details>
 <summary>计数</summary>
 <pre>
 <code>
