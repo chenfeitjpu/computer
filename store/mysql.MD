@@ -136,58 +136,52 @@
 | _bin | binary | 以二进制方式比较 |
 
   
-**级别**
-  + 服务器级别  
-    *查看*  
-    `show variables like 'character_set_server'`  
-    `show variables like 'collation_server'`
+**设置**
+- 服务器级别 
+```
+show variables like 'character_set_server'
+show variables like 'collation_server'
 
-    *设置*  
-    `set character_set_server='utf8mb4'`  
-    `set collation_server='utf8mb4_0900_ai_ci'`
+set character_set_server='utf8mb4'
+set collation_server='utf8mb4_0900_ai_ci'
+```
 
-  + 数据库级别  
-    *查看*  
-    `show create database 数据库名`
-    
-    *设置*  
-    ```
-    create database 数据库名
-    [[default] character set 字符集名称]
-    [[default] collate 比较规则名称]
+- 数据库级别  
+```
+show create database 数据库名
+  
+create database 数据库名
+[[default] character set 字符集名称]
+[[default] collate 比较规则名称]
 
-    alter database 数据库名
-    [[default] character set 字符集名称]
-    [[default] collate 比较规则名称]
-    ```
+alter database 数据库名
+[[default] character set 字符集名称]
+[[default] collate 比较规则名称]
+```
 
-  - 表级别  
-    *查看*  
-    `show create table 表名`
+- 表级别  
+```
+show create table 表名
 
-    *设置*  
-    ```
-    create table 表名 (列的信息)
-    [[default] character set 字符集名称]
-    [collate 比较规则名称]]
+create table 表名 (列的信息)
+[[default] character set 字符集名称]
+[collate 比较规则名称]
 
-    alter table 表名
-    [[default] character set 字符集名称]
-    [collate 比较规则名称]
-    ```
-    
-  - 列级别  
-    *查看*  
-    `show create table 表名`
+alter table 表名
+[[default] character set 字符集名称]
+[collate 比较规则名称]
+```
+  
+- 列级别  
+```
+show create table 表名
 
-    *设置*
-    ```
-    CREATE TABLE 表名(
-        列名 字符串类型 [CHARACTER SET 字符集名称] [COLLATE 比较规则名称]
-    )
+CREATE TABLE 表名(
+    列名 字符串类型 [CHARACTER SET 字符集名称] [COLLATE 比较规则名称]
+)
 
-    ALTER TABLE 表名 MODIFY 列名 字符串类型 [CHARACTER SET 字符集名称] [COLLATE 比较规则名称]
-    ```
+ALTER TABLE 表名 MODIFY 列名 字符串类型 [CHARACTER SET 字符集名称] [COLLATE 比较规则名称]
+```
     
 **转换过程** 
 > + 客户端使用操作系统的字符集编码请求字符串，向服务器发送的是经过编码的一个字节串  
