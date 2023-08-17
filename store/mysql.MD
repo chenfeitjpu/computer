@@ -114,15 +114,27 @@
 - `show engines` 查看存储引擎
 
 ### 系统变量 ###
-- `show variables [LIKE 匹配的模式]` 查看系统变量
+- `show [global|session] variables [LIKE 匹配的模式]` 查看系统变量
+- `set [global|session] 变量名=值` 设置系统变量
+- `set [@@global|session.] 变量名=值` 设置系统变量
   
 ### 系统状态 ###
-- `show status [LIKE 匹配的模式]` 查看系统状态
+- `show [global|session] status [LIKE 匹配的模式]` 查看系统状态
   
 ### 字符集 ###
 **查看**  
-  + `show (character set | charset)` 查看字符集
-  + `show collation` 查看比较规则
+- `show (character set | charset)` 查看字符集
+- `show collation` 查看比较规则
+
+**后缀**  
+| 后缀 | 英文释义 | 描述 |
+| :--: | :--: | :--: |
+| _ai | accent insensitive | 不区分重音 |
+| _as | accent sensitive | 区分重音 |
+| _ci | case insensitive | 不区分大小写 |
+| _cs | case sensitive | 区分大小写 |
+| _bin | binary | 以二进制方式比较 |
+
   
 **级别**
   + 服务器级别  
