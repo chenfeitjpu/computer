@@ -1510,13 +1510,13 @@ ALTER TABLE 表名 DROP [INDEX|KEY] 索引名
 
 **数据表在文件系统中的表示**  
 ```
-定义  表名.frm  
+定义  
+表名.frm  
 
 数据  
 innodb  
 系统表空间 ibdata1  
 独立表空间 表名.ibd
-
 myisam  
 数据 表名.MYD 
 索引 表名.MYI
