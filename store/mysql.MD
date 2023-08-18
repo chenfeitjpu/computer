@@ -395,27 +395,26 @@ ALTER TABLE 表名 MODIFY 列名 字符串类型 [CHARACTER SET 字符集名称]
 ### 优化 ###
 #### 访问方式 ####
 **单表访问**  
-方法
-  - const
-  - ref
-  - ref_or_null
-  - range
-  - index
-  - all
+```
+访问方法  
+- const 主键或者唯一二级索引列通过等值来定位一条记录  
+- ref 二级索引列进行等值或者null比较后可能匹配到多条连续的记录  
+- ref_or_null 二级索引列的值等于某个常数(包括空)的记录  
+- range 范围匹配
+- index 扫描整个索引  
+- all 全表扫描  
   
-索引合并
-  - Intersection合并
-  - Union合并
-  - Sort-Union合并
-  
-**连接查询**  
-分类
-  - 内连接
-  - 外连接
+索引合并  
+- Intersection合并  
+- Union合并  
+- Sort-Union合并  
+```
 
-原理
-  - 嵌套循环查询(Nested Loop Join)  
-  - 基于块的嵌套循环查询(Block Nested Loop Join)
+**连接查询**  
+```
+- 嵌套循环查询(Nested Loop Join)  
+- 基于块的嵌套循环查询(Block Nested Loop Join)
+```
 
 #### 基于成本优化 ####
 **成本计算**
