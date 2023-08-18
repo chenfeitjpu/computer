@@ -1593,7 +1593,7 @@ myisam
 ![avatar](./images/mysql/table_space_page_xdes.webp)
 
 #### 总览 ####
-![avatar](./images/mysql/table_space_per.webp)
+![avatar](./images/mysql/table_space.webp)
 
 ### InnoDB的Buffer Pool ###
 ***定义***  
