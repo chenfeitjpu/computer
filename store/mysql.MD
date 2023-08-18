@@ -394,7 +394,7 @@ ALTER TABLE 表名 MODIFY 列名 字符串类型 [CHARACTER SET 字符集名称]
 
 ### 优化 ###
 #### 访问方式 ####
-**单表访问**  
+**单表查询**  
 ```
 访问方法  
 - const 主键或者唯一二级索引列通过等值来定位一条记录  
@@ -413,112 +413,123 @@ ALTER TABLE 表名 MODIFY 列名 字符串类型 [CHARACTER SET 字符集名称]
 **连接查询**  
 ```
 - 嵌套循环查询(Nested Loop Join)  
-- 基于块的嵌套循环查询(Block Nested Loop Join)
+- 基于块的嵌套循环查询(Block Nested Loop Join)  
 ```
 
 #### 基于成本优化 ####
-**成本计算**
-  - IO成本
-  - CPU成本 
+**成本计算**  
+```
+- IO成本  从磁盘到内存这个加载的过程损耗的时间
+- CPU成本  检测记录是否满足对应的搜索条件、对结果集进行排序等这些操作损耗的时间
+```
 
 **单表查询成本**  
-1. 根据搜索条件，找出所有可能使用的索引
-2. 计算全表扫描的代价
-3. 计算使用不同索引执行查询的代价
-4. 对比各种执行方案的代价，找出成本最低的那一个
+```
+- 根据搜索条件，找出所有可能使用的索引  
+- 计算全表扫描的代价  
+  - 聚簇索引占用的页面数  Data_length / innodb_page_size
+  - 该表中的记录数  Rows
+- 计算使用不同索引执行查询的代价 
+  - 二级索引占用页面数 一个区间就是一个页面
+  - 二级索引记录数 区间最左记录和区间最右记录相隔不大于10个页面，那就可以精确统计。否则只沿着区间最左记录向右读10个页面，计算平均每个页面中包含多少记录，然后用这个平均值乘以区间最左记录和区间最右记录之间的页面数量就可以了
+  - 回表一条记录算一个页面
+- 对比各种执行方案的代价，找出成本最低的那一个  
 
 区间记录计算
-  - index dive
-  - 索引统计
-   
-**连接查询成本**
-1. 单次查询驱动表的成本  
-2. 多次查询被驱动表的成本
+- index dive 直接访问索引对应的B+树来计算某个范围区间对应的索引记录条数
+- 索引统计 单点区间超过eq_range_index_dive_limit时使用
+```
 
-condition filtering(扇出值)
-
-**调节成本常数**
-  - server层(mysql.server_cos)
-  - 存储引擎层(mysql.engine_cost)
+**连接查询成本**  
+```
+连接查询总成本 = 单次访问驱动表的成本 + 驱动表扇出数 x 单次访问被驱动表的成本
+```
 
 **InnoDB统计数据收集**  
+```
 存储方式  
-  - 永久性的统计数据
-  - 非永久性的统计数据 
+- 永久性的统计数据  
+- 非永久性的统计数据   
   
-可通过innodb_stats_persistent变量设置系统的存储方式  
-可通过STATS_PERSISTENT属性指明表的存储方式
+设置
+- 通过系统变量`innodb_stats_persistent`设置  
+- create table 表名 Engine=InnoDB, STATS_PERSISTENT = (1|0)
+  alter table 表名 Engine=InnoDB, STATS_PERSISTENT = (1|0)
 
-存储位置
-  - innodb_table_stats
-    | 字段名 |	描述 |
-    | :---: | :---: |
-    | database_name | 数据库名 |
-    | table_name | 表名 |
-    | last_update | 本条记录最后更新时间 |
-    | n_rows | 表中记录的条数 |
-    | clustered_index_size | 表的聚簇索引占用的页面数量 |
-    | sum_of_other_index_sizes | 表的其他索引占用的页面数量 | 
+存储位置  
+- innodb_table_stats
+| 字段名 |	描述 |
+| :---: | :---: |
+| database_name | 数据库名 |
+| table_name | 表名 |
+| last_update | 本条记录最后更新时间 |
+| n_rows | 表中记录的条数 |
+| clustered_index_size | 表的聚簇索引占用的页面数量 |
+| sum_of_other_index_sizes | 表的其他索引占用的页面数量 | 
 
-  - innodb_index_stats
-    | 字段名 | 描述 |
-    | :---: | :---: |
-    | database_name | 数据库名 |
-    | table_name | 表名 |
-    | index_name | 索引名 |
-    | last_update | 本条记录最后更新时间 |
-    | stat_name | 统计项的名称 | 
-    | stat_value | 对应的统计项的值 |
-    | sample_size | 为生成统计数据而采样的页面数量 |
-    | stat_description| 对应的统计项的描述 |
+- innodb_index_stats
+| 字段名 | 描述 |
+| :---: | :---: |
+| database_name | 数据库名 |
+| table_name | 表名 |
+| index_name | 索引名 |
+| last_update | 本条记录最后更新时间 |
+| stat_name | 统计项的名称 | 
+| stat_value | 对应的统计项的值 |
+| sample_size | 为生成统计数据而采样的页面数量 |
+| stat_description| 对应的统计项的描述 |
 
 更新  
-  - 定期更新
-    `innodb_stats_auto_recalc`
-
-  - 手动更新
-    `ANALYZE TABLE`
+- 定期更新 通过系统变量`innodb_stats_auto_recalc`设置
+- 手动更新 通过命令`ANALYZE TABLE`更新
 
 NULL值处理  
-*innodb_stats_method*  
-  - nulls_equal
-  - nulls_unequal
-  - nulls_ignored    
+通过系统变量`innodb_stats_method`设置
+- nulls_equal 认为所有NULL值都是相等的  
+- nulls_unequal 认为所有NULL值都是不相等的  
+- nulls_ignored  直接把NULL值忽略掉    
+```
 
 #### 基于规则优化 ####
-**条件化简**
-  - 移除不必要的括号
-  - 常量传递
-  - 等值传递
-  - 移除没用的条件
-  - 表达式计算
-  - HAVING子句和WHERE子句的合并
-  - 常量表检测
-  - 外连接消除
-   
-**子查询优化**
+**条件化简**  
+```
+- 移除不必要的括号
+- 常量传递
+- 等值传递
+- 移除没用的条件
+- 表达式计算
+- HAVING子句和WHERE子句的合并
+- 常量表检测
+- 外连接消除
+``` 
+
+**子查询优化**  
+```
 标量子查询、行子查询
-  - 不相关查询  
-    - 单独执行子查询  
-    - 再执行外层查询
-  - 相关查询  
-    - 先从外层查询中获取一条记录  
-    - 执行子查询  
-    - 检测外层查询  
+- 不相关查询  
+  - 单独执行子查询  
+  - 再执行外层查询
+- 相关查询  
+  - 先从外层查询中获取一条记录  
+  - 执行子查询  
+  - 检测外层查询  
 
 IN子查询优化  
-  - 将子查询转换为semi-join
-    - Table pullout（子查询中的表上拉） 
-    - DuplicateWeedout execution strategy（重复值消除）
-    - LooseScan execution strategy（松散扫描）
-    - Semi-join Materialization execution strategy（物化连接）
-    - FirstMatch execution strategy（首次匹配）
-  - 将子查询物化之后再执行查询
-  - 执行IN to EXISTS转换  
+半连接
+对于s1表的某条记录来说，我们只关心在s2表中是否存在与之匹配的记录，而不关心具体有多少条记录与之匹配，最终的结果集中只保留s1表的记录  
 
-表子查询优化
-  - 把派生表物化
-  - 将派生表和外层的表合并
+- 将子查询转换为semi-join
+  - Table pullout（子查询中的表上拉） 
+  - DuplicateWeedout execution strategy（重复值消除）
+  - LooseScan execution strategy（松散扫描）
+  - FirstMatch execution strategy（首次匹配）
+- 将子查询物化之后再执行查询
+- 执行in to exists转换  
+
+表子查询优化  
+- 把派生表物化  
+- 将派生表和外层的表合并  
+```
 
 ### 执行计划 ###
 #### Explain ####
