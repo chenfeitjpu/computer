@@ -83,6 +83,9 @@
     - [InnoDB表空间](#innodb表空间)
       - [区](#区)
       - [段](#段)
+      - [独立表空间](#独立表空间)
+      - [系统表空间](#系统表空间)
+      - [总览](#总览)
     - [InnoDB的Buffer Pool](#innodb的buffer-pool)
   - [日志](#日志)
     - [redo日志](#redo日志)
@@ -1526,13 +1529,13 @@ myisam
 
 ### InnoDB表空间 ###
 #### 区 ####
-**概念**  
+*概念*  
 ```
 - 表空间被划分为许多连续的区，每个区默认由64个页组成  
 - 每256个区划分为一组，每个组的最开始的几个页面类型是固定的就好了  
 ```
 
-**分类**
+*分类*
 ```
 | 状态名 | 含义 |
 | :--: | :-- : |
@@ -1542,7 +1545,7 @@ myisam
 | FSEG | 附属于某个段的区 |
 ```
 
-**结构**  
+*结构*  
 ![avatar](./images/mysql/extent_xdes_entry.webp)
 ```
 - Segment ID(8字节) 该区所在的段  
@@ -1552,11 +1555,36 @@ myisam
 ```
 
 #### 段 ####
+*概念*  
 ```
 某些零散的页面以及一些完整的区的集合  
 ```
 
-![avatar](./images/mysql/innodb-table-space.awebp)
+*分配策略*  
+```
+- 在刚开始向表中插入数据的时候，段是从某个碎片区以单个页面为单位来分配存储空间的  
+- 当某个段已经占用了32个碎片区页面之后，就会以完整的区为单位来分配存储空间  
+```
+
+*结构*  
+![avatar](./images/mysql/segment_inode_entry.webp)
+```
+- Segment ID 段号  
+- NOT_FULL_N_USED NOT_FULL链表中已经使用了多少个页面
+- List Base Node 分别为段的FREE链表、NOT_FULL链表、FULL链表定义了List Base Node
+- Magic Number 这个值是用来标记这个INODE Entry是否已经被初始化了（初始化的意思就是把各个字段的值都填进去了）。如果这个数字是值的97937874，表明该INODE Entry已经初始化，否则没有被初始化。（不用纠结这个值有啥特殊含义，人家规定的）
+- Fragment Array Entry 每个Fragment Array Entry结构都对应着一个零散的页面，这个结构一共4个字节，表示一个零散页面的页号
+```  
+
+#### 独立表空间 ####
+![avatar](./images/mysql/table_space_per.webp)
+
+
+####  系统表空间 ####
+![avatar](./images/mysql/table_space_system.webp)
+
+#### 总览 ####
+![avatar](./images/mysql/table_space_per.webp)
 
 ### InnoDB的Buffer Pool ###
 ***定义***  
