@@ -1576,12 +1576,21 @@ myisam
 - Fragment Array Entry 每个Fragment Array Entry结构都对应着一个零散的页面，这个结构一共4个字节，表示一个零散页面的页号
 ```  
 
+
 #### 独立表空间 ####
 ![avatar](./images/mysql/table_space_per.webp)
 
+**FSP_HDR**  
+![avatar](./images/mysql/table_space_page_fsp_hdr.webp)
 
-####  系统表空间 ####
+**INODE**  
+![avatar](./images/msyql/../mysql/table_space_page_inode.webp)
+
+#### 系统表空间 ####
 ![avatar](./images/mysql/table_space_system.webp)
+
+**XDES**  
+![avatar](./images/mysql/table_space_page_xdes.webp)
 
 #### 总览 ####
 ![avatar](./images/mysql/table_space_per.webp)
