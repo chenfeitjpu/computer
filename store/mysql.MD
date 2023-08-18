@@ -1497,25 +1497,30 @@ ALTER TABLE 表名 DROP [INDEX|KEY] 索引名
 
 ### 数据目录 ###
 #### 基本操作 ####
- + 查看    
-   `SHOW VARIABLES LIKE 'datadir'`
+```    
+`show variables like 'datadir'` 查看数据目录
+```
 
 #### 结构 ####
-+ 数据库在文件系统中的表示  
-  *同名文件夹*
+**数据库在文件系统中的表示**  
+```  
+- 在数据目录下创建一个和数据库名同名的子目录  
+- 在该与数据库名同名的子目录下创建一个名为db.opt的文件，这个文件中包含了该数据库的各种属性  
+```
 
-+ 数据表在文件系统中的表示
-  - 定义  
-    *表名.frm*
+**数据表在文件系统中的表示**  
+```
+定义  表名.frm  
 
-  - 数据  
-    **innodb**  
-    *系统表空间 ibdata1*  
-    *独立表空间 表名.ibd*
+数据  
+innodb  
+系统表空间 ibdata1  
+独立表空间 表名.ibd
 
-    **myisam**  
-    *数据 表名.MYD*  
-    *索引 表名.MYI*
+myisam  
+数据 表名.MYD 
+索引 表名.MYI
+```
 
 ### InnoDB表空间 ###
 ![avatar](./images/mysql/innodb-table-space.awebp)
