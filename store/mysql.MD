@@ -30,12 +30,9 @@
       - [explain](#explain)
       - [optimizer trace](#optimizer-trace)
   - [事务](#事务)
-    - [特性](#特性)
-    - [状态](#状态)
-    - [语法](#语法)
     - [并发](#并发)
   - [存储程序](#存储程序)
-    - [语法](#语法-1)
+    - [语法](#语法)
     - [游标](#游标)
     - [存储函数](#存储函数)
     - [存储过程](#存储过程)
@@ -910,44 +907,42 @@ INSUFFICIENT_PRIVILEGES: 1
 </details>
 
 ## 事务 ##
-### 特性 ###
+![avatar](./images/mysql/transaction-state.awebp)
+
+```
+特性  
 - 原子性（Atomicity）
 - 隔离性（Isolation）
 - 一致性（Consistency）
 - 持久性（Durability）
 
-### 状态 ###
+状态  
 - 活动的（active
 - 部分提交的（partially committed）
 - 失败的（failed）
 - 中止的（aborted）
 - 提交的（committed）
 
-![avatar](./images/mysql/transaction-state.awebp)
-
-### 语法 ###
-**开启事务**  
+开启事务    
 - `BEGIN [WORK]`  
 - `START TRANSACTION [READ ONLY | READ WRITE | WITH CONSISTENT SNAPSHOT]`  
 
-**提交事务**
+提交事务  
 `COMMIT [WORK]`
 
-**手动中止事务**
+手动中止事务  
 `ROLLBACK [WORK]`
 
-**自动提交**  
+自动提交    
 `autocommit`
 
-**隐式提交**  
+隐式提交  
  
-**保存点**
-- 定义  
-  `SAVEPOINT 保存点名称`
-- 回滚  
-  `ROLLBACK [WORK] TO [SAVEPOINT] 保存点名称`
-- 删除  
-  `RELEASE SAVEPOINT 保存点名称`
+保存点
+- `SAVEPOINT 保存点名称`  定义
+- `ROLLBACK [WORK] TO [SAVEPOINT] 保存点名称` 回滚
+- `RELEASE SAVEPOINT 保存点名称` 删除 
+```
 
 ### 并发 ###
 ***问题***
