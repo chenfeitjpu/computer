@@ -36,10 +36,7 @@
     - [并发](#并发)
   - [存储程序](#存储程序)
     - [语法](#语法-1)
-      - [变量](#变量)
-      - [选择语句](#选择语句)
-      - [循环语句](#循环语句)
-      - [游标](#游标)
+    - [游标](#游标)
     - [存储函数](#存储函数)
     - [存储过程](#存储过程)
     - [触发器](#触发器)
@@ -631,7 +628,7 @@ Extra  额外信息
 ```
 
 <details>
-<summary>详解</summary>
+<summary>示例</summary>
 <pre>
 <code>
 
@@ -1019,101 +1016,89 @@ level: {
   
 ## 存储程序 ##
 ### 语法 ###
-#### 变量 ####  
+```  
 - `declare 变量名 数据类型 [default value]` 定义局部变量
 - `set name=value` 变量赋值
 - `into name, name` 多个变量赋值
 - `delimiter` 结束分隔符
-  
-#### 选择语句 ####  
-```
+
 if 表达式 then  
 elseif 表达式 then  
 else  
 end if
-```
 
-```
 case 变量
 when 值 then
 else
 end
-```
 
-```
+
 case
 when 布尔表达式 then
 else
 end
-```
-#### 循环语句 ####  
-```
+
+
 while 表达式 do  
 end while
-```
 
-```
 repeat  
 until 表达式 end repeat
-```
 
-```
 loop  
 end loop
 ```
 
-#### 游标 ####  
+### 游标 ###
+```  
 - `declare 游标名 cursor for select` 创建游标 
 - `declare continue handler for not found` 事件响应
 - `open 游标名` 打开游标  
 - `fetch 游标名 into` 移动游标
 - `close 游标名` 关闭游标
-  
-### 存储函数 ###  
+```
+
+### 存储函数 ### 
+``` 
 - `show function status [like 函数名]` 查看所有函数
 - `show create function 函数名` 查看函数定义
--  
-  ```
-  create function 函数名(参数名 数据类型, 参数名 数据类型)  
+- `create function 函数名(参数名 数据类型, 参数名 数据类型)  
   returns 返回值类型  
   begin  
       函数体内容  
       return
-  end
-  ```
+  end`
 - `drop function 函数名` 删除函数
+```
 
 ### 存储过程 ###
+```
 - `show procedure status [like 存储过程名]` 查看所有存储过程
 - `show create procedure 存储过程名` 查看存储过程定义
-- 
-  ```
-  create procedure 存储过程名([in|out|inout]参数名 数据类型)  
+- `create procedure 存储过程名([in|out|inout]参数名 数据类型)  
   begin  
-  end
-  ```
+  end`
 - `drop procedure 存储过程名` 删除存储过程
+```
 
 ### 触发器 ###
+```
 - `show triggers` 查看所有触发器
 - `show create trigger 触发器名` 查看触发器定义
-- 
-  ```
-  create trigger 触发器名  
+- `create trigger 触发器名  
   {before|after} on {insert|update|delete} on 表名  
   for each row  
   begin  
     {old|new}  
-  end
-  ``` 
+  end` 
 - `drop trigger 触发器名` 删除触发器
-  
+```
+
 ### 事件 ###
+```
 - `show events` 查看所有事件
 - `show create event 事件名` 查看事件定义
-- 
-  ```
-  create event 事件名  
+- `create event 事件名  
   on schedual  
   {  
     at 某个确定的时间点  
@@ -1121,9 +1106,9 @@ end loop
   }  
   do  
   begin  
-  end 
-  ```
+  end `
 - `drop event 事件名` 删除事件
+```
 
 ## 存储结构 ##
 ### 行结构 ###  
