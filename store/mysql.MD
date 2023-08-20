@@ -23,10 +23,11 @@
     - [函数](#函数)
     - [优化](#优化)
       - [访问方式](#访问方式)
-      - [基于成本优化](#基于成本优化)
+      - [成本优化](#成本优化)
+      - [InnoDB统计数据收集](#innodb统计数据收集)
       - [基于规则优化](#基于规则优化)
     - [执行计划](#执行计划)
-      - [Explain](#explain)
+      - [explain](#explain)
       - [optimizer trace](#optimizer-trace)
   - [事务](#事务)
     - [特性](#特性)
@@ -395,7 +396,7 @@ UNSIGNED
 
 ### 优化 ###
 #### 访问方式 ####
-**单表查询**  
+*单表查询*  
 ```
 访问方法  
 - const 主键或者唯一二级索引列通过等值来定位一条记录  
@@ -411,20 +412,20 @@ UNSIGNED
 - Sort-Union合并  
 ```
 
-**连接查询**  
+*连接查询*  
 ```
 - 嵌套循环查询(Nested Loop Join)  
 - 基于块的嵌套循环查询(Block Nested Loop Join)  
 ```
 
-#### 基于成本优化 ####
-**成本计算**  
+#### 成本优化 ####
+*成本计算*  
 ```
 - IO成本  从磁盘到内存这个加载的过程损耗的时间
 - CPU成本  检测记录是否满足对应的搜索条件、对结果集进行排序等这些操作损耗的时间
 ```
 
-**单表查询成本**  
+*单表查询成本*  
 ```
 - 根据搜索条件，找出所有可能使用的索引  
 - 计算全表扫描的代价  
@@ -441,12 +442,12 @@ UNSIGNED
 - 索引统计 单点区间超过eq_range_index_dive_limit时使用
 ```
 
-**连接查询成本**  
+*连接查询成本*  
 ```
 连接查询总成本 = 单次访问驱动表的成本 + 驱动表扇出数 x 单次访问被驱动表的成本
 ```
 
-**InnoDB统计数据收集**  
+#### InnoDB统计数据收集 ####
 ```
 存储方式  
 - 永久性的统计数据  
@@ -457,8 +458,18 @@ UNSIGNED
 - create table 表名 Engine=InnoDB, STATS_PERSISTENT = (1|0)
   alter table 表名 Engine=InnoDB, STATS_PERSISTENT = (1|0)
 
-存储位置  
-- innodb_table_stats
+更新  
+- 定期更新 通过系统变量`innodb_stats_auto_recalc`设置
+- 手动更新 通过命令`ANALYZE TABLE`更新
+
+NULL值处理  
+通过系统变量`innodb_stats_method`设置
+- nulls_equal 认为所有NULL值都是相等的  
+- nulls_unequal 认为所有NULL值都是不相等的  
+- nulls_ignored  直接把NULL值忽略掉    
+```  
+
+*innodb_table_stats*
 | 字段名 |	描述 |
 | :---: | :---: |
 | database_name | 数据库名 |
@@ -468,7 +479,7 @@ UNSIGNED
 | clustered_index_size | 表的聚簇索引占用的页面数量 |
 | sum_of_other_index_sizes | 表的其他索引占用的页面数量 | 
 
-- innodb_index_stats
+*innodb_index_stats*  
 | 字段名 | 描述 |
 | :---: | :---: |
 | database_name | 数据库名 |
@@ -480,19 +491,8 @@ UNSIGNED
 | sample_size | 为生成统计数据而采样的页面数量 |
 | stat_description| 对应的统计项的描述 |
 
-更新  
-- 定期更新 通过系统变量`innodb_stats_auto_recalc`设置
-- 手动更新 通过命令`ANALYZE TABLE`更新
-
-NULL值处理  
-通过系统变量`innodb_stats_method`设置
-- nulls_equal 认为所有NULL值都是相等的  
-- nulls_unequal 认为所有NULL值都是不相等的  
-- nulls_ignored  直接把NULL值忽略掉    
-```
-
 #### 基于规则优化 ####
-**条件化简**  
+*条件化简*  
 ```
 - 移除不必要的括号
 - 常量传递
@@ -504,7 +504,7 @@ NULL值处理
 - 外连接消除
 ``` 
 
-**子查询优化**  
+*子查询优化*  
 ```
 标量子查询、行子查询
 - 不相关查询  
@@ -533,7 +533,7 @@ IN子查询优化
 ```
 
 ### 执行计划 ###
-#### Explain ####
+#### explain ####
 | 列名 | 描述 |
 | :---: | :---: |
 | id | 在一个大的查询语句中每个SELECT关键字都对应一个唯一的id |
@@ -549,13 +549,10 @@ IN子查询优化
 | filtered | 某个表经过搜索条件过滤后剩余记录条数的百分比 |
 | Extra | 一些额外的信息 |
 
-**id**  
 ```
-查询语句中每出现一个SELECT关键字，就会为它分配一个唯一的id值
-```
+id 查询语句中每出现一个SELECT关键字，就会为它分配一个唯一的id值
 
-**select_type** 
-``` 
+select_type  查询方式
 - SIMPLE  查询语句中不包含UNION或者子查询的查询都算作是SIMPLE类型  
 - PRIMARY  对于包含UNION、UNION ALL或者子查询的大查询来说，它是由几个小查询组成的，其中最左边的那个查询的select_type值就是PRIMARY  
 - UNION  对于包含UNION或者UNION ALL的大查询来说，它是由几个小查询组成的，其中除了最左边的那个小查询以外，其余的小查询的select_type值就是UNION  
@@ -565,10 +562,8 @@ IN子查询优化
 - DEPENDENT UNION 子查询都依赖于外层查询的话  
 - DERIVED 采用物化的方式执行的包含派生表的查询  
 - MATERIALIZED 将子查询物化之后与外层查询进行连接查询  
-```
 
-**type**     
-```
+type  表的访问方式
 - system  当表中只有一条记录并且该表使用的存储引擎的统计数据是精确的，比如MyISAM、Memory  
 - const  根据主键或者唯一二级索引列与常数进行等值匹配  
 - eq_rel  在连接查询时，如果被驱动表是通过主键或者唯一二级索引列等值匹配的方式进行访问  
@@ -580,45 +575,26 @@ IN子查询优化
 - range  使用索引获取某些范围区间的记录  
 - index  扫描全部的索引记录  
 - all  全表扫描  
-```
 
-**possible_keys**  
-```
-可能用到的索引
-```
+possible_keys  可能用到的索引
 
-**key**  
-```
-实际用到的索引  
-```
+key  实际用到的索引  
 
-**key_len**  
-```
-索引记录的最大长度，由三个部分构成，主要用来区分某个使用联合索引的查询具体用了几个索引列
+key_len  索引记录的最大长度，由三个部分构成，主要用来区分某个使用联合索引的查询具体用了几个索引列  
 - 索实际占用的存储空间的最大长度
 - 如果该索引列可以存储NULL值，则key_len比不可以存储NULL值时多1个字节
 - 对于变长字段来说，都会有2个字节的空间来存储该变长列的实际长度
-```
 
-**ref**  
-```
-与索引列作等值匹配的内容  
+ref  与索引列作等值匹配的内容  
 - const 常数
 - 列名
 - func 函数
-```
 
-**rows**  
-```
-预计需要扫描的行数
-```
+rows  预计需要扫描的行数  
 
-**filtered**  
-驱动表扇出值
+filtered  驱动表扇出值  
 
-**Extra**  
-```
-额外信息    
+Extra  额外信息  
 - No tables used  查询语句的没有FROM子句  
 - Impossible WHERE  查询语句的WHERE子句永远为FALSE  
 - No matching min/max row  当查询列表处有MIN或者MAX聚集函数，但是并没有符合WHERE子句中的搜索条件的记录时  
@@ -637,25 +613,25 @@ IN子查询优化
 ```
 
 #### optimizer trace ####
-**开启**  
+```
+开启    
 `SET optimizer_trace="enabled=on"`
 
-**查询**    
-```
+查询
 可以到information_schema数据库下的OPTIMIZER_TRACE表中查看完整的优化过程  
 - QUERY 表示我们的查询语句  
 - TRACE 表示优化过程的JSON格式文本  
 - MISSING_BYTES_BEYOND_MAX_MEM_SIZE  由于优化过程可能会输出很多，如果超过某个限制时，多余的文本将不会被显示，这个字段展示了被忽略的文本字节数  
 - INSUFFICIENT_PRIVILEGES  表示是否没有权限查看优化过程，默认值是0，只有某些特殊情况下才会是1，我们暂时不关心这个字段的值  
-```
 
-**过程**  
+过程
 - prepare阶段
 - optimize阶段
 - execute阶段  
+```
 
 <details>
-<summary>过程</summary>
+<summary>详解</summary>
 <pre>
 <code>
 
