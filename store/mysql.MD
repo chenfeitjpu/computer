@@ -49,10 +49,6 @@
     - [执行计划](#执行计划)
       - [Explain](#explain)
       - [optimizer trace](#optimizer-trace)
-- [分析的查询语句是什么](#分析的查询语句是什么)
-- [优化的具体过程](#优化的具体过程)
-- [因优化过程文本太多而丢弃的文本字节大小，值为0时表示并没有丢弃](#因优化过程文本太多而丢弃的文本字节大小值为0时表示并没有丢弃)
-- [权限字段](#权限字段)
   - [事务](#事务)
     - [特性](#特性)
     - [状态](#状态)
@@ -651,19 +647,22 @@ IN子查询优化
 - MISSING_BYTES_BEYOND_MAX_MEM_SIZE  由于优化过程可能会输出很多，如果超过某个限制时，多余的文本将不会被显示，这个字段展示了被忽略的文本字节数  
 - INSUFFICIENT_PRIVILEGES  表示是否没有权限查看优化过程，默认值是0，只有某些特殊情况下才会是1，我们暂时不关心这个字段的值  
 ```
-  
+
+**过程**  
+- prepare阶段
+- optimize阶段
+- execute阶段  
+
 <details>
 <summary>过程</summary>
 <pre>
 <code>
-# 分析的查询语句是什么
 QUERY: SELECT * FROM s1 WHERE
     key1 > 'z' AND
     key2 < 1000000 AND
     key3 IN ('a', 'b', 'c') AND
     common_field = 'abc'
 
-# 优化的具体过程
 TRACE: {
   "steps": [
     {
@@ -929,18 +928,9 @@ TRACE: {
   ] /* steps */
 }
 
-# 因优化过程文本太多而丢弃的文本字节大小，值为0时表示并没有丢弃
 MISSING_BYTES_BEYOND_MAX_MEM_SIZE: 0
 
-# 权限字段
-INSUFFICIENT_PRIVILEGES: 0
-
-优化过程大致分为了三个阶段
-- prepare阶段
-- optimize阶段
-- execute阶段
-<details>
-<summary>过程</summary>
+INSUFFICIENT_PRIVILEGES: 1
 </code>
 </pre>
 </details>
