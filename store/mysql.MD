@@ -30,6 +30,7 @@
       - [explain](#explain)
       - [optimizer trace](#optimizer-trace)
   - [事务](#事务)
+    - [使用](#使用-1)
     - [并发](#并发)
   - [存储程序](#存储程序)
     - [语法](#语法)
@@ -47,7 +48,7 @@
       - [InnoDB数据页结构](#innodb数据页结构)
     - [视图](#视图)
     - [索引结构](#索引结构)
-      - [使用](#使用-1)
+      - [使用](#使用-2)
       - [InnoDB索引结构](#innodb索引结构)
       - [MyISAM索引结构](#myisam索引结构)
     - [数据目录](#数据目录)
@@ -907,6 +908,7 @@ INSUFFICIENT_PRIVILEGES: 1
 </details>
 
 ## 事务 ##
+### 使用 ###
 ![avatar](./images/mysql/transaction-state.awebp)
 
 ```
@@ -945,20 +947,14 @@ INSUFFICIENT_PRIVILEGES: 1
 ```
 
 ### 并发 ###
-***问题***
-- 脏写 
-  一个事务修改了另一个未提交事务修改过的数据，那就意味着发生了脏写  
+```
+问题  
+- 脏写 一个事务修改了另一个未提交事务修改过的数据，那就意味着发生了脏写  
+- 脏读 一个事务读到了另一个未提交事务修改过的数据，那就意味着发生了脏读   
+- 不可重复读 一个事务读到另一个已经提交的事务修改过的数据，并且其他事务每对该数据进行一次修改并提交后，该事务都能查询得到最新值，那就意味着发生了不可重复读  
+- 幻读 一个事务先根据某些条件查询出一些记录，之后另一个事务又向表中插入了符合这些条件的记录，原先的事务再次按照该条件查询时，能把另一个事务插入的记录也读出来，那就意味着发生了幻读
 
-- 脏读 
-  一个事务读到了另一个未提交事务修改过的数据，那就意味着发生了脏读   
-
-- 不可重复读 
-  一个事务读到另一个已经提交的事务修改过的数据，并且其他事务每对该数据进行一次修改并提交后，该事务都能查询得到最新值，那就意味着发生了不可重复读  
-
-- 幻读
-  一个事务先根据某些条件查询出一些记录，之后另一个事务又向表中插入了符合这些条件的记录，原先的事务再次按照该条件查询时，能把另一个事务插入的记录也读出来，那就意味着发生了幻读
-
-***隔离级别***
+隔离级别  
 - READ UNCOMMITTED 未提交读
 - READ COMMITTED 已提交读   
 - REPEATABLE READ 可重复读
@@ -971,9 +967,8 @@ INSUFFICIENT_PRIVILEGES: 1
 | REPEATABLE READ | Not Possible | Not Possible | Possible |
 | SERIALIZABLE | Not Possible | Not Possible | Not Possible |
 
-**设置隔离级别**
+设置隔离级别  
 `SET [GLOBAL|SESSION] TRANSACTION ISOLATION LEVEL level`
-```
 level: {
     REPEATABLE READ
     READ COMMITTED
@@ -982,30 +977,31 @@ level: {
 }
 ```
 
-***MVCC原理***
-**版本链**  
+*MVCC原理*  
+```
+版本链    
 记录中包含两个必要的隐藏列  
 - trx_id 每次一个事务对某条聚簇索引记录进行改动时，都会把该事务的事务id赋值给trx_id隐藏列
 - roll_pointer 每次对某条聚簇索引记录进行改动时，都会把旧的版本写入到undo日志中，然后这个隐藏列就相当于一个指针，可以通过它来找到该记录修改前的信息  
 记录每次更新后，都会将旧值放到一条undo日志中，就算是该记录的一个旧版本，随着更新次数的增多，所有的版本都会被roll_pointer属性连接成一个链表，我们把这个链表称之为版本链
 
-**ReadView**  
-*主要内容*  
+ReadView    
 - m_ids  表示在生成ReadView时当前系统中活跃的读写事务的事务id列表  
 - min_trx_id  表示在生成ReadView时当前系统中活跃的读写事务中最小的事务id，也就是m_ids中的最小值
 - max_trx_id  表示生成ReadView时系统中应该分配给下一个事务的id值
 - creator_trx_id  表示生成该ReadView的事务的事务id  
 
-*访问过程*
+访问过程
 - 如果被访问版本的trx_id属性值与ReadView中的creator_trx_id值相同，意味着当前事务在访问它自己修改过的记录，所以该版本可以被当前事务访问  
 - 如果被访问版本的trx_id属性值小于ReadView中的min_trx_id值，表明生成该版本的事务在当前事务生成ReadView前已经提交，所以该版本可以被当前事务访问  
 - 如果被访问版本的trx_id属性值大于或等于ReadView中的max_trx_id值，表明生成该版本的事务在当前事务生成ReadView后才开启，所以该版本不可以被当前事务访问
 - 如果被访问版本的trx_id属性值在ReadView的min_trx_id和max_trx_id之间，那就需要判断一下trx_id属性值是不是在m_ids列表中，如果在，说明创建ReadView时生成该版本的事务还是活跃的，该版本不可以被访问；如果不在，说明创建ReadView时生成该版本的事务已经被提交，该版本可以被访问  
 
-*生成时机*  
+生成时机  
 - READ COMMITTED  每次读取数据前都生成一个ReadView  
 - REPEATABLE READ  在第一次读取数据时生成一个ReadView  
-  
+```
+
 ## 存储程序 ##
 ### 语法 ###
 ```  
