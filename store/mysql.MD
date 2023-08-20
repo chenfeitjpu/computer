@@ -657,6 +657,8 @@ IN子查询优化
 <summary>过程</summary>
 <pre>
 <code>
+
+```
 QUERY: SELECT * FROM s1 WHERE
     key1 > 'z' AND
     key2 < 1000000 AND
@@ -931,6 +933,7 @@ TRACE: {
 MISSING_BYTES_BEYOND_MAX_MEM_SIZE: 0
 
 INSUFFICIENT_PRIVILEGES: 1
+```
 </code>
 </pre>
 </details>
