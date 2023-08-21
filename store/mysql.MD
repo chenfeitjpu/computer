@@ -65,7 +65,6 @@
     - [bin日志](#bin日志)
     - [两阶段提交](#两阶段提交)
   - [锁](#锁)
-    - [概述](#概述)
     - [InnoDB存储引擎中的锁](#innodb存储引擎中的锁)
 
 # 定义 #
@@ -1590,67 +1589,41 @@ innodb_flush_log_at_trx_commit
 ```
 
 ### undo日志 ###
-***事务id***  
+```
+事务id
+分配时机
 - 对于只读事务来说，只有在它第一次对某个用户创建的临时表执行增、删、改操作时才会为这个事务分配一个事务id，否则的话是不分配事务id的  
 - 对于读写事务来说，只有在它第一次对某个表（包括用户创建的临时表）执行增、删、改操作时才会为这个事务分配一个事务id，否则的话也是不分配事务id的
-  
-***undo日志的格式***  
-**INSERT操作对应的undo日志**  
 
-**DELETE操作对应的undo日志**  
-
-**UPDATE操作对应的undo日志**  
-
-***undo页面链表***  
-![avatar](./images/mysql/undo-log-list.awebp)
-
-***undo日志具体写入过程***  
-**Undo Log Segment Header**  
-![avatar](./images/mysql/undo-log-segment-header.awebp)
-
-***重用Undo页面***    
-**重用的条件**  
-- 该链表中只包含一个Undo页面  
-- 该Undo页面已经使用的空间小于整个页面空间的3/4
-
-**策略**  
-- insert undo链表  
-  insert undo链表中只存储类型为TRX_UNDO_INSERT_REC的undo日志，这种类型的undo日志在事务提交之后就没用了，就可以被清除掉
-
-- update undo链表   
-  在一个事务提交后，它的update undo链表中的undo日志也不能立即删除掉（这些日志用于MVCC）
-
-***回滚段***  
-**Rollback Segment Header**  
-MySQL设计了一个称之为Rollback Segment Header的页面，在这个页面中存放了各个Undo页面链表的frist undo page的页号
-
-**多个回滚段**  
-MySQL默认定义了128个回滚段  
-![avatar](./images/mysql/undo-log-rollback-segment.awebp)
+来源
+- 服务器会在内存中维护一个全局变量
+- 每当这个变量的值为256的倍数时，就会将该变量的值刷新到系统表空间的页号为5的页面中一个称之为Max Trx ID的属性处
+```
 
 ### bin日志 ###
-***作用***  
+```
+作用  
 - 用于复制  
-- 用于恢复  
+- 用于备份 
+```
 
 ### 两阶段提交 ###
 ![avatar](./images/mysql/transaction-xa-commit.webp)
 
 ## 锁 ##
-### 概述 ###
-***并发事务访问相同记录***  
-- 读-读 并发事务相继读取相同的记录  
-
-- 写-写 并发事务相继对相同的记录做出改动  
+*通用锁*  
+```
+并发问题
+- 读-读  
+- 写-写
   脏写  
-  - 加锁  
-  
+  - 加锁    
 - 读-写或写-读 一个事务进行读取操作，另一个进行改动操作  
   脏读、不可重复读、幻读  
-  - 读操作利用多版本并发控制（MVCC），写操作进行加锁  
+  - 读操作利用多版本并发控制（MVCC），写操作进行加锁
   - 读、写操作都采用加锁的方式  
 
-***共享锁和独占锁***  
+共享锁和独占锁  
 - 共享锁，S锁
 - 独占锁，X锁   
 兼容情况  
@@ -1659,44 +1632,42 @@ MySQL默认定义了128个回滚段
   | X | 不兼容 | 不兼容 |
   | S | 不兼容 | 兼容 |
 
-***锁定读***
-- 对读取的记录加S锁
-  `SELECT ... LOCK IN SHARE MODE`
+锁定读  
+- 对读取的记录加S锁 `SELECT ... LOCK IN SHARE MODE`
+- 对读取的记录加X锁 `SELECT ... FOR UPDATE`
 
-- 对读取的记录加X锁
-  `SELECT ... FOR UPDATE`
-
-***写操作***
-- DELETE
-  加X锁  
+写操作
+- DELETE 加X锁  
 - UPDATE
-  加X锁  
-- INSERT
-  不加锁  
+  - 不修改键值，原纪录修改 加X锁
+  - 不修改键值，新记录修改 彻底删除再添加
+  - 修改键值 删除再添加
+- INSERT 不加锁  
 
-***表级别***  
+表级别  
 - S锁
 - X锁
 - IS锁
 - IX锁  
-兼容性  
-  | 兼容性 | X | IX | S | IS |
-  | :---: | :---: | :---: | :---: | :---: |
-  | X | 不兼容 | 不兼容 | 不兼容 | 不兼容 |
-  | IX | 不兼容 | 兼容 | 不兼容 | 兼容 |
-  | S | 不兼容 | 不兼容 | 兼容 | 兼容 |
-  | IS | 不兼容 | 兼容 | 兼容 | 兼容 |
+| 兼容性 | X | IX | S | IS |
+| :---: | :---: | :---: | :---: | :---: |
+| X | 不兼容 | 不兼容 | 不兼容 | 不兼容 |
+| IX | 不兼容 | 兼容 | 不兼容 | 兼容 |
+| S | 不兼容 | 不兼容 | 兼容 | 兼容 |
+| IS | 不兼容 | 兼容 | 兼容 | 兼容 |
+```
 
 ### InnoDB存储引擎中的锁 ###
-***表级锁***
+```
+表级锁
 - S锁、 X锁
 - IS锁、IX锁
 - AUTO-INC锁
 
-***行级锁***
+行级锁
 - Record Locks
 - Gap Locks
 - Next-Key Locks
 - Insert Intention Locks
 - 隐式锁  
-  
+```
