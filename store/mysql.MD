@@ -1513,41 +1513,38 @@ LRU链表
 
 ## 日志 ##
 ### redo日志 ###
-***数据页刷新到磁盘面临的问题***
+![avatar](./images/mysql/redo-log-struct.awebp)
+![avatar](./images/mysql/redo-log-block-struct.awebp)
+![avatar](./images/mysql/redo-log-log-buffer.awebp)
+![avatar](./images/mysql/redo-log-file-struct.awebp)  
+
+```
+背景  
+在事务提交完成之前把该事务所修改的所有页面都刷新到磁盘  
 - 刷新一个完整的数据页太浪费了
 - 随机IO刷起来比较慢
 
-***redo日志刷新到磁盘的好处***
+redo日志刷新到磁盘的好处
 - redo日志占用的空间非常小
 - redo日志是顺序写入磁盘的
 
-***redo日志格式***  
-![avatar](./images/mysql/redo-log-struct.awebp)
+结构
 - type  日志的类型  
 - space ID  表空间ID  
 - page number  页号
 - data  日志的具体内容
 
-***Mini-Transaction***
-**概念**
-对底层页面中的一次原子访问的过程称之为一个Mini-Transaction
-![avatar](./images/mysql/redo-log-mini-transaction.awebp)
+mini-transaction  
+- 对底层页面中的一次原子访问的过程称之为一个Mini-Transaction  
+- 一个事务可以包含若干条语句，每一条语句其实是由若干个mtr组成，每一个mtr又可以包含若干条redo日志  
+- 一个mtr可以包含一组redo日志，在进行崩溃恢复时这一组redo日志作为一个不可分割的整体  
 
-**以组的形式写入redo日志**
+写入
+- redo日志都放在了大小为512字节的页中，我们这里把用来存储redo日志的页称为block 
+- 在服务器启动时会向操作系统申请了一大片称之为redo log buffer的连续内存空间，翻译成中文就是redo日志缓冲区，我们也可以简称为log buffer
+- buf_free 指明后续写入的redo日志应该写入到log buffer中的哪个位置
 
-***redo日志的写入过程***
-**redo log block**
-redo日志都放在了大小为512字节的页中，我们这里把用来存储redo日志的页称为block  
-![avatar](./images/mysql/redo-log-block-struct.awebp)
-
-**redo日志缓冲区**
-在服务器启动时会向操作系统申请了一大片称之为redo log buffer的连续内存空间，翻译成中文就是redo日志缓冲区，我们也可以简称为log buffer
-![avatar](./images/mysql/redo-log-log-buffer.awebp)
-
-**redo日志写入log buffer**
-*buf_free* 指明后续写入的redo日志应该写入到log buffer中的哪个位置
-
-***redo日志刷盘时机***
+刷盘时机
 - log buffer空间不足时
 - 事务提交时
 - 将某个脏页刷新到磁盘前，会保证先将该脏页对应的redo日志刷新到磁盘中
@@ -1555,51 +1552,42 @@ redo日志都放在了大小为512字节的页中，我们这里把用来存储r
 - 正常关闭服务器时
 - 做checkpoint时
 
-***redo日志文件组***
-**配置**
+redo日志文件组
+设置
 - `innodb_log_group_home_dir`  指定了redo日志文件所在的目录  
 - `innodb_log_file_size`  指定了每个redo日志文件的大小  
 - `innodb_log_files_in_group`  指定redo日志文件的个数
-
-**格式**
+格式
 - 前2048个字节，也就是前4个block是用来存储一些管理信息的  
 - 从第2048字节往后是用来存储log buffer中的block镜像的  
-![avatar](./images/mysql/redo-log-file-struct.awebp)  
 
-***Log Sequence Number***
-`lsn`  日志序列号，初始值为8704  
-`flushed_to_disk_lsn`  刷新到磁盘中的redo日志量
+Log Sequence Number
+- `lsn`  日志序列号，初始值为8704  
+- `flushed_to_disk_lsn`  刷新到磁盘中的redo日志量
 
-**flush链表中的LSN**  
-- oldest_modification  
-  某个页面被加载到Buffer Pool后进行第一次修改，那么就将修改该页面的mtr开始时对应的lsn值写入这个属性  
+flush链表中的LSN  
+- oldest_modification  某个页面被加载到Buffer Pool后进行第一次修改，那么就将修改该页面的mtr开始时对应的lsn值写入这个属性  
+- newest_modification  每修改一次页面，都会将修改该页面的mtr结束时对应的lsn值写入这个属性  
+flush链表中的脏页按照修改发生的时间顺序进行排序  
 
-- newest_modification
-  每修改一次页面，都会将修改该页面的mtr结束时对应的lsn值写入这个属性
-
-flush链表中的脏页按照修改发生的时间顺序进行排序
-
-***checkpoint***  
-**过程**  
+checkpoint  
 - 计算一下当前系统中可以被覆盖的redo日志对应的lsn值最大是多少  
 - 将checkpoint_lsn和对应的redo日志文件组偏移量以及此次checkpint的编号写到日志文件的管理信息
-![avatar](./images/mysql/redo-log-file-lsn.awebp)
 
-***innodb_flush_log_at_trx_commit的用法***  
+innodb_flush_log_at_trx_commit
 - 0 在事务提交时不立即向磁盘中同步redo日志
 - 1 在事务提交时需要将redo日志同步到磁盘
 - 2 在事务提交时需要将redo日志写到操作系统的缓冲区中，但并不需要保证将日志真正的刷新到磁盘
 
-***崩溃恢复***  
-**确定恢复的起点**   
-我们只要把checkpoint1和checkpoint2这两个block中的checkpoint_no值读出来比一下大小，哪个的checkpoint_no值更大，说明哪个block存储的就是最近的一次checkpoint信息。这样我们就能拿到最近发生的checkpoint对应的checkpoint_lsn值以及它在redo日志文件组中的偏移量checkpoint_offset
+崩溃恢复
+起点和终点
+- 我们只要把checkpoint1和checkpoint2这两个block中的checkpoint_no值读出来比一下大小，哪个的checkpoint_no值更大，说明哪个block存储的就是最近的一次checkpoint信息。这样我们就能拿到最近发生的checkpoint对应的checkpoint_lsn值以及它在redo日志文件组中的偏移量checkpoint_offset  
+- 普通block的log block header部分有一个称之为LOG_BLOCK_HDR_DATA_LEN的属性，该属性值记录了当前block里使用了多少字节的空间。对于被填满的block来说，该值永远为512。如果该属性的值不为512，那么就是它了，它就是此次崩溃恢复中需要扫描的最后一个block  
 
-**确定恢复的终点**  
-普通block的log block header部分有一个称之为LOG_BLOCK_HDR_DATA_LEN的属性，该属性值记录了当前block里使用了多少字节的空间。对于被填满的block来说，该值永远为512。如果该属性的值不为512，那么就是它了，它就是此次崩溃恢复中需要扫描的最后一个block
-
-**怎么恢复**  
-- 使用哈希表  
-- 跳过已经刷新到磁盘的页面  
+优化
+- 使用哈希表 根据redo日志的space ID和page number属性，将同一个页面进行修改的redo日志都放在一起 
+- 跳过已经刷新到磁盘的页面  File Header里有一个称之为FIL_PAGE_LSN的属性，该属性记载了最近一次修改页面时对应的lsn值， 该页对应的FIL_PAGE_LSN代表的lsn值肯定大于checkpoint_lsn的值
+```
 
 ### undo日志 ###
 ***事务id***  
