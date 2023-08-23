@@ -1590,11 +1590,11 @@ innodb_flush_log_at_trx_commit
 
 ### undo日志 ###
 ```
-每个事务有四个链表
-- 普通表 insert链表
-- 普通版 update链表
-- 临时表 insert链表
-- 临时表 update链表
+每个事务有四个段
+- 普通表 insert段
+- 普通表 update段
+- 临时表 insert段
+- 临时表 update段
 ```
 
 ### bin日志 ###

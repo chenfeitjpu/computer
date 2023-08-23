@@ -1,49 +1,47 @@
-Redis
+**Redis**
 - [定义](#定义)
-- [内容](#内容)
-  - [键](#键)
-    - [常用命令](#常用命令)
-  - [库](#库)
-    - [常用命令](#常用命令-1)
+- [使用](#使用)
+  - [基础命令](#基础命令)
   - [数据类型](#数据类型)
     - [string](#string)
-      - [常用命令](#常用命令-2)
+      - [常用命令](#常用命令)
       - [数据类型](#数据类型-1)
     - [list](#list)
-      - [常用命令](#常用命令-3)
+      - [常用命令](#常用命令-1)
       - [数据结构](#数据结构)
     - [hash](#hash)
-      - [常用命令](#常用命令-4)
+      - [常用命令](#常用命令-2)
       - [数据结构](#数据结构-1)
     - [set](#set)
-      - [常用命令](#常用命令-5)
+      - [常用命令](#常用命令-3)
       - [数据结构](#数据结构-2)
     - [sorted set](#sorted-set)
-      - [常用命令](#常用命令-6)
+      - [常用命令](#常用命令-4)
       - [数据结构](#数据结构-3)
     - [基数统计(HyperLogLog)](#基数统计hyperloglog)
-      - [常用命令](#常用命令-7)
+      - [常用命令](#常用命令-5)
     - [位图(bitmap)](#位图bitmap)
-      - [常用命令](#常用命令-8)
+      - [常用命令](#常用命令-6)
     - [地理位置(GEO)](#地理位置geo)
-      - [常用命令](#常用命令-9)
+      - [常用命令](#常用命令-7)
     - [流(stream)](#流stream)
-      - [常用命令](#常用命令-10)
+      - [常用命令](#常用命令-8)
   - [数据结构](#数据结构-4)
-    - [Redis存储模型 ###](#redis存储模型-)
-    - [Redis对象 ###](#redis对象-)
+    - [Redis存储模型](#redis存储模型)
+    - [Redis对象](#redis对象)
     - [SDS](#sds)
   - [事务](#事务)
-    - [常用命令](#常用命令-11)
+    - [常用命令](#常用命令-9)
   - [订阅](#订阅)
-    - [常用命令](#常用命令-12)
+    - [常用命令](#常用命令-10)
   
 # 定义 #
 键值数据库
 
-# 内容 #
-## 键 ##
-### 常用命令 ###
+# 使用 #
+## 基础命令 ##
+```
+键  
 - KEYS pattern
 - SCAN CURSOR MATCH pattern COUNT count
 - EXISTS key
@@ -51,24 +49,24 @@ Redis
 - RANDOMKEY
 - DEL key
 - UNLINK key
-- RENAME key newkey
-- RENAMENX key newkey
-- MOVE key db
-- DUMP key
-- EXPIRE key second
-- PEXPIRE key millisecond
-- EXPIREAT key timestamp
-- PEXPIREAT key millitimestamp
-- PERSIST key
-- TTL key
-- PTTL key
-- DBSIZE
-  
-## 库 ##
-### 常用命令 ###
-- SELECT db
-- FLUSHDB
-- FLUSHALL
+- `rename key newkey` 修改key的名称
+- `renamex key newkey` 
+- `move key db` 将当前数据库的key移动到给定的数据库db中
+- `dump key` 序列化key
+- `expire key second` 设置key过期时间，以秒计
+- `pexpire key millisecond` 设置key过期时间，以毫秒计
+- `expireat key timestamp` 设置key过期时间的时间戳，以秒计
+- `pexpireat key millitimestamp` 设置 key过期时间的时间戳，以毫秒计
+- `persist key` 设置key永久有效
+- `ttl key`  以秒为单位返回key的剩余过期时间
+- `pttl key` 以毫秒为单位返回key的剩余过期时间
+
+库  
+- `select 库号` 切换数据库
+- `flushdb` 清空当前数据库中的所有key
+- `flushall` 清空所有数据库的所有key
+- `dbsize` 当前数据库的key数量
+```
 
 ## 数据类型 ##
 ### string ###
