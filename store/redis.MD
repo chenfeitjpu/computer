@@ -2,7 +2,7 @@
 - [定义](#定义)
 - [使用](#使用)
   - [基础命令](#基础命令)
-  - [数据结构](#数据结构)
+  - [数据类型](#数据类型)
     - [字符串(string)](#字符串string)
     - [列表(list)](#列表list)
     - [哈希(hash)](#哈希hash)
@@ -12,7 +12,7 @@
     - [基础统计(hyperloglog)](#基础统计hyperloglog)
     - [位置(geo)](#位置geo)
     - [流(stream)](#流stream)
-  - [数据结构](#数据结构-1)
+  - [数据结构](#数据结构)
     - [Redis存储模型](#redis存储模型)
     - [Redis对象](#redis对象)
     - [SDS](#sds)
@@ -34,9 +34,9 @@
 - `TYPE key`  返回键所储存的值的类型
 - `RANDOMKEY`  随机返回一个键
 - `DEL key`  删除键
-- `UNLINK 键`  异步删除键
-- `RENAME 旧键 新键`  修改键的名称
-- `RENAMENX 旧键 新键`  修改键的名称, 新键不存在
+- `UNLINK key`  异步删除键
+- `RENAME key newkey`  修改键的名称
+- `RENAMENX key newkey`  修改键的名称, 新键不存在
 - `MOVE key db`  将当前数据库的键移动到给定的数据库db中
 - `DUMP key`  序列化键
 - `EXPIRE key second`  设置键过期时间，以秒计
@@ -144,17 +144,18 @@ sorted set
 - `ZCOUNT key min max`  获取分数区间的成员数量
 - `ZLEXCOUNT key min max`  获取字典区间的成员数量
 
-hyperloglog
-- `PFADD key element [element]`  添加元素
-- `PFCOUNT key [key]`   获取统计数量
-- `PFMERGE destkey sourcekey sourcekey`  合并多个集合
-
 bit
 - `SETBIT key offset value`  设置bit位
 - `GETBIT key offset`  获取bit位
 - `BITPOS key bit [start] [end] [BYTE|BIT]` 在指定字节区间查找bit出现的位置
 - `BITCOUNT key [start] [end]`  在指定位区间统计1出现的次数
 - `BITOP operation destkey key key`  对key进行位运算
+
+
+hyperloglog
+- `PFADD key element [element]`  添加元素
+- `PFCOUNT key [key]`   获取统计数量
+- `PFMERGE destkey sourcekey sourcekey`  合并多个集合
 
 geo
 - `GEOADD key longitude latitude member [longitude latitude member]`  添加坐标
@@ -174,7 +175,7 @@ stream
 - `XLEN key`  获取消息长度
 ```
 
-## 数据结构 ##
+## 数据类型 ##
 ### 字符串(string) ###
 **内部实现**  
 - int(整数)
@@ -249,10 +250,12 @@ stream
 ## 数据结构 ##
 ### Redis存储模型 ###  
 ![avatar](./images/redis/redis-struct.png)  
-- redisDb结构  Redis数据库的结构，结构体里存放了指向了dict结构的指针   
+```
+- redisDb结构  Redis数据库的结构 结构体里存放了指向了dict结构的指针   
 - dict结构  结构体里存放了2个哈希表，正常情况下都是用「哈希表1」，「哈希表2」只有在 rehash 的时候才用  
 - ditctht结构 结构里存放了哈希表数组，数组中的每个元素都是指向一个哈希表节点结构（dictEntry）的指针  
 - dictEntry结构  结构里存放了void *key和void *value指针，*key 指向的是String对象，而*value则可以指向String对象，也可以指向集合类型的对象，比如List对象、Hash对象、Set对象和Zset对象  
+```
 
 ### Redis对象 ###  
 ![avatar](./images/redis/redis-object-struct.png)  
