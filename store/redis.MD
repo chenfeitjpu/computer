@@ -104,6 +104,87 @@ list
 - `LINDEX key index` 通过索引获取列表的值
 - `LRANGE key start stop` 获取指定范围的值
 - `LLEN key` 获取列表长度
+
+hash
+- `HSET key field value`  设置哈希表字段
+- `HSETNX key field value`  设置哈希表字段，属性不存在
+- `HMSET key field value field value`  批量设置哈希表字段
+- `HGET key field`  获取哈希表字段
+- `HMGET key field field`  批量获取哈希表字段
+- `HDEL key field [field]`  删除哈希表字段
+- `HINCR key field increment`  自增，按整型值
+- `HINCRBYFLOAT key field increment`  自增，按浮点值
+- `HEXISTS key field`  判断哈希表字段是否存在
+- `HKEYS key`  获取哈希表所有字段
+- `HVALS key` 获取哈希表所有值
+- `HGETALL key`  获取哈希表所有字段和值
+- `HLEN key`  获取哈希表长度
+
+set
+- `SADD key member [member]`  向集合中添加元素
+- `SPOP key`  从集合中移除元素
+- `SREM key member [member]`  从集合中移除指定元素
+- `SMOVE source destination member` 移动集合元素
+- `SISMEMBER key member`  判断元素是否在集合中
+- `SRANDOMMEMBER key count`  随机返回集合中的元素
+- `SMEMBERS key`  返回集合中所有元素
+- `SINNER key key`  求集合交集
+- `SINNERSTORE destination key key`  存储集合交集
+- `SUNION key key`  求集合并集
+- `SUNIONSTORE destination key key`  存储集合并集
+- `SDIFF key key`  求集合差集
+- `SDIFFSTORE destination key key`  存储集合差集
+- `SCARD key`  获取集合长度
+
+sorted set
+- `ZADD key score member [score member]`  添加元素
+- `ZREM key member [member]`  移除元素
+- `ZREMRANGEBYRANK key start stop`  按索引排名移除元素
+- `ZREMRANGEBYSCORE key min max`  按分数区间移除元素
+- `ZREMRANGEBYLEX key min max`  按字典区间移除元素
+- `ZRANK key member`  获取元素排名
+- `ZREVRANK key member`  获取元素反向排名
+- `ZSCORE key member`  获取元素分数
+- `ZRANGE key start stop [WITHSCORES]`  获取指定排名区间的成员
+- `ZREVRANGE key start stop [WITHSCORES]`  获取指定排名区间的成员
+- `ZRANGEBYSCORE key min max [WITHSCORES] [LIMIT offset count]`  获取指定分数区间的成员
+- `ZREVRANGEBYSCORE key min max [WITHSCORES]`  获取指定分数区间的成员
+- `ZRANGEBYLEX key min max [LIMIT offset count]`  获取指定字典区间的成员
+- `ZINTERSTORE destination numkeys key key`  存储交集
+- `ZUNIONSTORE destination numkeys key key`  存储并集
+- `ZINCRBY key increment member`  自增
+- `ZCARD key`  获取成员数量
+- `ZCOUNT key min max`  获取分数区间的成员数量
+- `ZLEXCOUNT key min max`  获取字典区间的成员数量
+
+hyperloglog
+- `PFADD key element [element]`  添加元素
+- `PFCOUNT key [key]`   获取统计数量
+- `PFMERGE destkey sourcekey sourcekey`  合并多个集合
+
+bit
+- `SETBIT key offset value`  设置bit位
+- `GETBIT key offset`  获取bit位
+- `BITPOS key bit [start] [end] [BYTE|BIT]` 在指定字节区间查找bit出现的位置
+- `BITCOUNT key [start] [end]`  在指定位区间统计1出现的次数
+- `BITOP operation destkey key key`  对key进行位运算
+
+geo
+- `GEOADD key longitude latitude member [longitude latitude member]`  添加坐标
+- `GEOPOS key member [member]`  获取坐标
+- `GEODIST key member member [m|km|ft|mi]`  获取两个位置的距离
+- `GEORADIUS key longitude latitude radius [m|km|ft|mi] [WITHCOORD] [WITHDIST] [WITHHASH] [COUNT count] [AES|DESC] [STORE key]`  以给定的经纬度为中心， 返回指定范围内的元素
+- `GEORADIUSBYMEMBER key member m|km|ft|mi [WITHCOORD] [WITHDIST] [WITHHASH] [COUNT count] [AES|DESC] [STORE key]`  以给定的位置为中心， 返回指定范围内的元素
+- `GEOHASH key member [member]`  获取坐标的hash位置
+
+stream
+- `XADD key id field value [field value]`  添加消息
+- `XDEL key id [id]`  删除消息
+- `XTRIM key [MAXLEN|MINIID] [~] [count]`  裁剪为指定数量的项目
+- `XRANGE key start end [COUNT count]`  获取消息列表
+- `XREVRANGE key end start [COUNT count]` 反向获取消息列表
+- `XREAD [COUNT count] [BLOCK milliseconds] STREAMS key [key] id [id]` 获取消息
+- `XLEN key`  获取消息长度
 ```
 
 ## 数据结构 ##
@@ -126,19 +207,7 @@ list
   
 ### hash ###
 #### 常用命令 ####
-- HSET key field value
-- HSETNX key field value
-- HMSET key field value field value
-- HDEL key field [field]
-- HINCR key field increment
-- HINCRBYFLOAT key field increment
-- HEXISTS key field
-- HGET key field
-- HMGET key field field
-- HKEYS key
-- HVALUES key
-- HGETALL key
-- HLEN key
+
 
 #### 数据结构 ####
 - ziplist(压缩列表)
@@ -146,20 +215,7 @@ list
 
 ### set ###
 #### 常用命令 ####
-- SADD key member [member]
-- SREM key member member
-- SPOP key
-- SMOVE source destination member
-- SISMEMBER key member
-- SRANDOMMEMBER key count
-- SMEMBERS key
-- SINNER key key
-- SINNERSTORE destination key key
-- SUNION key key
-- SUNIONSTORE destination key key
-- SDIFF key key
-- SDIFFSTORE destination key key
-- SCARD key
+
 
 #### 数据结构 ####
 - intset(整数集合)
@@ -167,25 +223,7 @@ list
 
 ### sorted set ###
 #### 常用命令 ####
-- ZADD key score member [score member]
-- ZREM key member [member]
-- ZREMRANGEBYRANK key start stop
-- ZREMRANGEBYSCORE key min max
-- ZREMRANGEBYLEX key min max
-- ZINCRBY key increment member
-- ZRANK key member
-- ZREVRANK key member
-- ZSCORE key member
-- ZRANGE key start stop [WITHSCORES]
-- ZREVRANGE key start stop [WITHSCORES] 
-- ZRANGEBYSCORE key min max [WITHSCORES] [LIMIT offset count]
-- ZREVRANGEBYSCORE key min max [WITHSCORES]
-- ZRANGEBYLEX key min max [LIMIT offset count]
-- ZINTERSTORE destination numkeys key key
-- ZUNIONSTORE destination numkeys key key
-- ZCARD key
-- ZCOUNT key min max
-- ZLEXCOUNT key min max
+
 
 #### 数据结构 ####
  - ziplist(压缩列表)
@@ -193,37 +231,18 @@ list
 
 ### 基数统计(HyperLogLog) ###
 #### 常用命令 ####
-- PFADD key element [element] 
-- PFCOUNT key [key]
-- PFMERGE destkey sourcekey sourcekey
+
 
 ### 位图(bitmap) ###
 #### 常用命令 ####
-- SETBIT key offset value
-- GETBIT key offset
-- BITPOS key bit [start] [end]
-- BITCOUNT key [start] [end]
-- BITOP operation destkey key key
-- BITFIELD key [GET type offset] [SET TYPE offset value] [INCRBY type offset increment] [OVERFLOW WRAP|SAT|FAIL]
 
 ### 地理位置(GEO) ###
 #### 常用命令 ####
-- GEOADD key longitude latitude member [longitude latitude member]
-- GEOPOS key member [member]
-- GEODIST key member member [m|km|ft|mi]
-- GEORADIUS key longitude latitude m|km|ft|mi [WITHCOORD] [WITHDIST] [WITHHASH] [COUNT count] [AES|DESC] [STORE key]
-- GEORADIUSBYMEMBER key member m|km|ft|mi [WITHCOORD] [WITHDIST] [WITHHASH] [COUNT count] [AES|DESC] [STORE key]
-- GEOHASH key member [member]
+
 
 ### 流(stream) ###
 #### 常用命令 ####
-- XADD key ID field value [field value]
-- XDEL key ID [ID]
-- XTRIM key [MAXLEN|MINIID] threshold [LIMIT count]
-- XRANGE key start end [COUNT count]
-- XREVRANGE key end start [COUNT count]
-- XREAD [COUNT count] [BLOCK milliseconds] STREAMS key [key] id [id]
-- XLEN key
+
 
 ## 数据结构 ##
 ### Redis存储模型 ###  
