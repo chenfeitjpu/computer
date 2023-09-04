@@ -2,38 +2,37 @@
 - [定义](#定义)
 - [使用](#使用)
   - [基础命令](#基础命令)
-  - [数据类型](#数据类型)
-    - [string](#string)
-      - [常用命令](#常用命令)
-      - [数据类型](#数据类型-1)
+  - [数据结构](#数据结构)
+  - [string](#string)
+      - [数据类型](#数据类型)
     - [list](#list)
-      - [常用命令](#常用命令-1)
-      - [数据结构](#数据结构)
-    - [hash](#hash)
-      - [常用命令](#常用命令-2)
+      - [常用命令](#常用命令)
       - [数据结构](#数据结构-1)
-    - [set](#set)
-      - [常用命令](#常用命令-3)
+    - [hash](#hash)
+      - [常用命令](#常用命令-1)
       - [数据结构](#数据结构-2)
-    - [sorted set](#sorted-set)
-      - [常用命令](#常用命令-4)
+    - [set](#set)
+      - [常用命令](#常用命令-2)
       - [数据结构](#数据结构-3)
+    - [sorted set](#sorted-set)
+      - [常用命令](#常用命令-3)
+      - [数据结构](#数据结构-4)
     - [基数统计(HyperLogLog)](#基数统计hyperloglog)
-      - [常用命令](#常用命令-5)
+      - [常用命令](#常用命令-4)
     - [位图(bitmap)](#位图bitmap)
-      - [常用命令](#常用命令-6)
+      - [常用命令](#常用命令-5)
     - [地理位置(GEO)](#地理位置geo)
-      - [常用命令](#常用命令-7)
+      - [常用命令](#常用命令-6)
     - [流(stream)](#流stream)
-      - [常用命令](#常用命令-8)
-  - [数据结构](#数据结构-4)
+      - [常用命令](#常用命令-7)
+  - [数据结构](#数据结构-5)
     - [Redis存储模型](#redis存储模型)
     - [Redis对象](#redis对象)
     - [SDS](#sds)
   - [事务](#事务)
-    - [常用命令](#常用命令-9)
+    - [常用命令](#常用命令-8)
   - [订阅](#订阅)
-    - [常用命令](#常用命令-10)
+    - [常用命令](#常用命令-9)
   
 # 定义 #
 键值数据库
@@ -66,29 +65,50 @@
 - `flushdb`  清空当前数据库中的所有键
 - `flushall`  清空所有数据库的所有键
 - `dbsize`  当前数据库的key数量
+
+string 
+- `SET key value [EX second | PX millisecond] [EXAT timestamp | PXAT timestamp] [nx | xx] [GET] [KEEPTTL]` 设置键值对
+- `SETNX key value` 设置键值对，key不存在
+- `SETEX key second value` 设置过期时间，以秒为单位
+- `PSETEX key millisecond value` 设置过期时间，以毫秒为单位
+- `GET key` 获取key
+- `GETSET key value` 设置新值，返回旧值
+- `APPEND key value` 追加值
+- `INCR key` 自增1
+- `INCRBY key increment` 指定自增量，整数
+- `INCRBYFLOAT key increment` 指定自增量，浮点数
+- `DECR key` 自减1
+- `DECRBY key decrement` 指定自减量，整数
+- `MSET key value [key value]` 批量设置
+- `MSETNX key value [key value]` 批量设置，key不存在
+- `MGET key [key]` 批量获取key
+- `SETRANGE key offset value` 从指定位置覆盖值 
+- `GETRANGE key start end` 获取指定位置字符串
+- `STRLEN key` 获取字符串长度
+
+list 
+- `LPUSH key value [value]` 左边添加列表元素
+- `LPUSHX key value [value]` 左边添加列表元素，key已存在
+- `RPUSH key value [value]` 右边添加列表元素
+- `RPUSHX key value [value]` 右边添加列表元素，key已存在
+- `LINSERT key BEFORE|AFTER pivot value` 在指定位置添加列表元素
+- `LPOP key` 左边移除列表元素
+- `BLPOP key [key] timeout` 左边移除列表元素，等待指定时间
+- `RPOP key` 右边边移除列表元素
+- `BRPOP key [key] timeout` 右边移除列表元素，等待指定时间
+- `RPOPLPUSH source destination` 右边移除列表元素，左边追加列表元素
+- `BRPOPLPUSH source destination timeout` 右边移除列表元素，左边追加列表元素，等待指定时间
+- `LREM key count value` 移除列表元素
+- `LTRIM key start stop` 保留列表指定区间的元素
+- `LSET key index value` 通过索引设置列表的值
+- `LINDEX key index` 通过索引获取列表的值
+- `LRANGE key start stop` 获取指定范围的值
+- `LLEN key` 获取列表长度
 ```
 
-## 数据类型 ##
-### string ###
-#### 常用命令 ####
-- SET key value [EX second | PX millisecond] [nx | xx]
-- SETEX key second value
-- PSETEX <key> <millisecond> <value>
-- SETNX key value
-- MSET key value [key value]
-- MSETNX key value [key value]
-- GETSET key value
-- APPEND key value
-- SETRANGE key offset value
-- INCR key
-- INCRBY key increment
-- INCRBYFLOAT key increment
-- DECR key
-- DECRBY key decrement
-- GET key
-- MGET key [key]
-- GETRANGE key start end
-- STRLEN key
+## 数据结构 ##
+## string ###
+
   
 #### 数据类型 ####
 - int(整数)
@@ -97,23 +117,7 @@
 
 ### list ###
 #### 常用命令 ####
-- LPUSH key value [value]
-- LPUSHX key value [value]
-- RPUSH key value [value]
-- RPUSHX key value [value]
-- LINSERT key BEFORE|AFTER pivot value
-- LPOP key
-- BLPOP key [key] timeout 
-- RPOP key
-- BRPOP key [key] timeout
-- RPOPLPUSH source destination
-- BRPOPLPUSH source destination timeout
-- LREM key count value
-- LTRIM key start stop
-- LSET key index value
-- LINDEX key index
-- LRANGE key start stop
-- LLEN key
+
   
 #### 数据结构 ####
 - ziplist(压缩列表)
@@ -254,35 +258,6 @@
 - 节省空间  
   不同的flags
   不字节拉齐
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 ## 事务 ##
