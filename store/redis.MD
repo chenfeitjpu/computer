@@ -17,9 +17,7 @@
     - [Redis对象](#redis对象)
     - [SDS](#sds)
   - [事务](#事务)
-    - [常用命令](#常用命令)
   - [订阅](#订阅)
-    - [常用命令](#常用命令-1)
   
 # 定义 #
 键值数据库
@@ -258,47 +256,54 @@ stream
 ```
 
 ### Redis对象 ###  
-![avatar](./images/redis/redis-object-struct.png)  
+![avatar](./images/redis/redis-object-struct.png) 
+``` 
 - type  标识该对象是什么类型的对象（String对象、List对象、Hash对象、Set对象和Zset对象） 
 - encoding  标识该对象使用了哪种底层的数据结构  
 - ptr  指向底层数据结构的指针  
+```
 
 ### SDS ###
 简单动态字符串（simple dynamic string）
 ![avatar](./images/redis/redis-sds-struct.png)  
+```
+结构
 - len  记录了字符串长度    
 - alloc  分配给字符数组的空间长度  
 - flags  不同类型的SDS，sdshdr5、sdshdr8、sdshdr16、sdshdr32和sdshdr64  
 - buf[]  字符数组，用来保存实际数据  
 
-*优点*  
+优点  
 - 高效  
   直接获取长度 
   柔性数组  
-
 - 二进制安全  
   不以\0结束
-
 - 节省空间  
   不同的flags
   不字节拉齐
-
+```
 
 ## 事务 ##
-### 常用命令 ###
+**常用命令**    
+```
 - MULTI
 - EXEC
 - DISCARD
 - WATCH key [key]
 - UNWATCH
+```
 
 ## 订阅 ##
-### 常用命令 ###
+**常用命令**  
+```
 - SUBSCRIBE channel [channel]
 - PSUBSCRIBE pattern [pattern]
 - UNSUBSCRIBE channel [channel]
 - PUNSUBSCRIBE pattern [pattern]
 - PUBLISH channel message
 - PUBSUB subcommand [argument]
+```
+
 
 
