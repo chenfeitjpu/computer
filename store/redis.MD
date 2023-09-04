@@ -41,30 +41,30 @@
 ## 基础命令 ##
 ```
 键  
-- `keys 模式`  查找所有符合给定模式的键
-- `scan 游标 [match 模式] [count 数量]`  迭代数据库中的键
-- `exists 键`  检查给定键是否存在
-- `type 键`  返回键所储存的值的类型
-- `randomkey`  随机返回一个键
-- `del 键`  删除键
-- `unlink 键`  异步删除键
-- `rename 旧键 新键`  修改键的名称
-- `renamnx 旧键 新键`  修改键的名称, 新键不存在
-- `move 键 库号`  将当前数据库的键移动到给定的数据库db中
-- `dump 键`  序列化键
-- `expire 键 秒`  设置键过期时间，以秒计
-- `pexpire 键 毫秒`  设置键过期时间，以毫秒计
-- `expireat 键 秒`  设置键过期时间的时间戳，以秒计
-- `pexpireat 键 毫秒`  设置键过期时间的时间戳，以毫秒计
-- `persist 键`  设置键永久有效
-- `ttl 键`  以秒为单位返回键的剩余过期时间
-- `pttl 键`  以毫秒为单位返回键的剩余过期时间
+- `KEYS pattern`  查找所有符合给定模式的键
+- `SCAN cursor [MATCH pattern] [COUNT count]`  迭代数据库中的键
+- `EXISTS key`  检查给定键是否存在
+- `TYPE key`  返回键所储存的值的类型
+- `RANDOMKEY`  随机返回一个键
+- `DEL key`  删除键
+- `UNLINK 键`  异步删除键
+- `RENAME 旧键 新键`  修改键的名称
+- `RENAMENX 旧键 新键`  修改键的名称, 新键不存在
+- `MOVE key db`  将当前数据库的键移动到给定的数据库db中
+- `DUMP key`  序列化键
+- `EXPIRE key second`  设置键过期时间，以秒计
+- `PEXPIRE key millisecond`  设置键过期时间，以毫秒计
+- `EXPIREAT key second`  设置键过期时间的时间戳，以秒计
+- `PEXPIREAT key millisecond`  设置键过期时间的时间戳，以毫秒计
+- `PERSIST KEY`  设置键永久有效
+- `TTL key`  以秒为单位返回键的剩余过期时间
+- `PTTL key`  以毫秒为单位返回键的剩余过期时间
 
 库  
-- `select 库号`  切换数据库
-- `flushdb`  清空当前数据库中的所有键
-- `flushall`  清空所有数据库的所有键
-- `dbsize`  当前数据库的key数量
+- `SELECT db`  切换数据库
+- `FLUSHDB`  清空当前数据库中的所有键
+- `FLUSHALL`  清空所有数据库的所有键
+- `DBSIZE`  当前数据库的key数量
 
 string 
 - `SET key value [EX second | PX millisecond] [EXAT timestamp | PXAT timestamp] [nx | xx] [GET] [KEEPTTL]` 设置键值对
