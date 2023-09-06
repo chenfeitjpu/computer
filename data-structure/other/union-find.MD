@@ -20,6 +20,8 @@ LeetCode
 <summary>模版</summary>
 <pre>
 <code>
+
+```
 type UF struct {
 	parent []int
 }
@@ -56,6 +58,7 @@ func (u *UF) Connected(x, y int) bool {
 func (u *UF) Count() int {
 	return len(u.parent)
 }
+```
 </pre>
 </code>
 </details>
