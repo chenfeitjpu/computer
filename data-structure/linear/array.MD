@@ -102,7 +102,7 @@ func (this *Difference) GetResult() []int {
 
 **应用**  
 ```
-LeetCode* 
+LeetCode 
 - 370.区间加法
 - 1109.航班预订统计
 - 1094.拼车
