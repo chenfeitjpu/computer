@@ -1,19 +1,25 @@
 **并查集**
 - [定义](#定义)
-- [使用](#使用)
-  - [实现](#实现)
-  - [应用](#应用)
+- [应用](#应用)
 
 
 # 定义 #
-不相交集合的合并及查询问题
-
-# 使用 #
-## 实现 ##
-<details>
-<summary>代码</summary>
-
 ```
+定义
+不相交集合的合并及查询问题
+```
+
+# 应用 #
+```
+LeetCode  
+- 323.无向图中的连通分量数目
+- 990.等式方程的可满足性
+```
+
+<details>
+<summary>模版</summary>
+<pre>
+<code>
 type UF struct {
 	parent []int
 }
@@ -50,10 +56,7 @@ func (u *UF) Connected(x, y int) bool {
 func (u *UF) Count() int {
 	return len(u.parent)
 }
-```
+</pre>
+</code>
 </details>
 
-## 应用 ##
-**LeetCode**  
-- 323.无向图中的连通分量数目
-- 990.等式方程的可满足性
