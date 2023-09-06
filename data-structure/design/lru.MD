@@ -1,14 +1,19 @@
 **LRU**
 - [定义](#定义)
 - [实现](#实现)
-- [应用](#应用)
+- [使用](#使用)
 
 # 定义 #
+```
+定义
 最近最少使用
+```
 
 # 实现 #
 <details>
 <summary>代码</summary>
+<pre>
+<code>
 
 ```
 type LinkedListNode struct {
@@ -117,8 +122,14 @@ func (l *LRUCache) Put(key int, value int) {
 	l.hashLinkedList.PutHead(node)
 }
 ```
+</code>
+</pre>
 </details>
 
-# 应用 #
-**LeetCode**  
+# 使用 #
+```
+应用
+LeetCode
 - 146.LRU缓存 
+```
+

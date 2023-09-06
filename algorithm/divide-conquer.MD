@@ -1,33 +1,19 @@
-# 分治 #
+**分治**
+- [定义](#定义)
+- [使用](#使用)
 
-## 定义 ##
+
+# 定义 #
+```
+定义
 把问题分解成子问题，再把子问题进行处理合并
+```
 
-## 应用 ##
-### LEETCODE ###
-#### 241.为运算表达式设计优先级 ####
-<details>
-<summary>代码</summary>
-<pre>
-<code>
-</code>
-</pre>
-</details>
-
-#### 932.漂亮数组 ####
-<details>
-<summary>代码</summary>
-<pre>
-<code>
-</code>
-</pre>
-</details>
-
-#### 312.戳气球 ####
-<details>
-<summary>代码</summary>
-<pre>
-<code>
-</code>
-</pre>
-</details>
+# 使用 #
+```
+应用
+LeetCode
+- 241.为运算表达式设计优先级
+- 932.漂亮数组
+- 312.戳气球 
+```

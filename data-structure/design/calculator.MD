@@ -1,14 +1,19 @@
 **计算器**
 - [定义](#定义)
 - [实现](#实现)
-- [应用](#应用)
+- [使用](#使用)
 
 # 定义 #
+```
+定义
 基本计算器
+```
 
 # 实现 # 
 <details>
 <summary>代码</summary>
+<prv>
+<code>
 
 ```
 func calculate(s string) int {
@@ -88,10 +93,14 @@ func isDigit(char byte) bool {
 	return '0' <= char && char <= '9'
 }
 ```
+</code>
+</pre>
 </details>
 
 <details>
 <summary>代码</summary>
+<pre>
+<code>
 
 ```
 func calculate(s string) int {
@@ -144,9 +153,14 @@ func isDigit(char byte) bool {
 	return '0' <= char && char <= '9'
 }
 ```
+</code>
+</pre>
 </details>
 
-# 应用 #
-**LeetCode**  
+# 使用 #
+```
+应用
+LeetCode
 - 224.基本计算器
 - 227.基本计算器 II
+```

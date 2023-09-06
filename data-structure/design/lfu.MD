@@ -1,14 +1,19 @@
 **LFU**
 - [定义](#定义)
 - [实现](#实现)
-- [应用](#应用)
+- [使用](#使用)
 
 # 定义 #
+```
+定义
 最不经常使用
+```
 
 # 实现 #
 <details>
 <summary>代码</summary>
+<pre>
+<code>
 
 ```
 type LinkedListNode struct {
@@ -155,8 +160,13 @@ func (l *LFUCache) DeleteLast() {
 	hashLinkedList.Delete(tail)
 }
 ```
+</code>
+</pre>
 </details>
 
-# 应用 #
-**LeetCode** 
+# 使用 #
+```
+应用
+LeetCode
 - 460.LFU缓存
+```

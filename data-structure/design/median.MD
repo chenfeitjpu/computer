@@ -1,13 +1,13 @@
 
 **中位数**
-- [内容](#内容)
 - [实现](#实现)
-- [应用](#应用)
+- [使用](#使用)
 
-# 内容 #
 # 实现 #
 <details>
 <summary>代码</summary>
+<pre>
+<code>
 
 ```
 type intSmallHeap []int
@@ -103,8 +103,13 @@ func (m *MedianFinder) FindMedian() float64 {
 	return (float64(m.large.Top().(int)) + float64(m.small.Top().(int))) / 2
 }
 ```
+</code>
+</pre>
 </details>
 
-# 应用 #
-**LeetCode**
+# 使用 #
+```
+应用
+LeetCode
 - 295.数据流的中位数
+```

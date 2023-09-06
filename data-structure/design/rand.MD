@@ -1,13 +1,12 @@
 **随机算法**
-- [内容](#内容)
 - [实现](#实现)
-- [应用](#应用)
-
-# 内容 #
+- [使用](#使用)
 
 # 实现 #
 <details>
 <summary>代码</summary>
+<pre>
+<code>
 
 ```
 type RandomizedSet struct {
@@ -50,10 +49,14 @@ func (r *RandomizedSet) GetRandom() int {
 	return r.nums[index]
 }
 ```
+</code>
+</pre>
 </details>
 
 <details>
 <summary>代码</summary>
+<pre>
+<code>
 
 ```
 type Solution struct {
@@ -99,9 +102,14 @@ func (s *Solution) Pick() int {
 	return index
 }
 ```
+</code>
+</pre>
 </details>
 
-# 应用 #
-**LeetCode**  
+# 使用 #
+```
+应用
+LeetCode
 - 380.O(1)时间插入、删除和获取随机元素
 - 710.黑名单中的随机数
+```

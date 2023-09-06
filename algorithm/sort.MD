@@ -1,19 +1,30 @@
 **排序**
 - [定义](#定义)
-- [应用](#应用)
-  - [常见算法](#常见算法)
-  - [应用](#应用-1)
+- [使用](#使用)
 
 
 # 定义 #
+```
+定义
 对集合进行排序
+```
 
-# 应用 #
-## 常见算法 ##
+# 使用 #
+```
+应用 
+LeetCode
+- 215.数组中的第K个最大元素
+- 347.前K个高频元素
+- 451.根据字符出现频率排序 
+- 75.颜色分类
+```
+
 <details>
 <summary>冒泡</summary>
 <pre>
 <code>
+
+```
 func bubble(nums []int) []int {
 	for i := len(nums) - 1; i > 0; i-- {
 		for j := 0; j < i; j++ {
@@ -24,6 +35,7 @@ func bubble(nums []int) []int {
 	}
 	return nums
 }
+```
 </code>
 </pre>
 </details>
@@ -32,6 +44,8 @@ func bubble(nums []int) []int {
 <summary>选择</summary>
 <pre>
 <code>
+
+```
 func select(nums []int) []int {
 	for i := len(nums) - 1; i > 0; i-- {
 		max := 0
@@ -44,6 +58,7 @@ func select(nums []int) []int {
 	}
 	return nums
 }
+```
 </code>
 </pre>
 </details>
@@ -52,6 +67,8 @@ func select(nums []int) []int {
 <summary>插入</summary>
 <pre>
 <code>
+
+```
 func insert(nums []int) []int {
 	for i, length := 1, len(nums); i < length; i++ {
 		num, j := nums[i], i-1
@@ -65,6 +82,7 @@ func insert(nums []int) []int {
 	}
 	return nums
 }
+```
 </code>
 </pre>
 </details>
@@ -73,6 +91,8 @@ func insert(nums []int) []int {
 <summary>快排</summary>
 <pre>
 <code>
+
+```
 func quick(nums []int) []int {
 	quickSort(nums, 0, len(nums)-1)
 	return nums
@@ -102,6 +122,7 @@ func getPartition(nums []int, start, end int) int {
 	nums[start], nums[j] = nums[j], nums[start]
 	return j
 }
+```
 </code>
 </pre>
 </details>
@@ -110,6 +131,8 @@ func getPartition(nums []int, start, end int) int {
 <summary>归并</summary>
 <pre>
 <code>
+
+```
 func merge(nums []int) []int {
 	mergeSort(nums, 0, len(nums)-1)
 	return nums
@@ -150,6 +173,7 @@ func mergeSortArray(nums []int, start, mid, end int) {
 		}
 	}
 }
+```
 </code>
 </pre>
 </details>
@@ -158,6 +182,8 @@ func mergeSortArray(nums []int, start, mid, end int) {
 <summary>堆排序</summary>
 <pre>
 <code>
+
+```
 func heapSort(nums []int) []int {
 	length := len(nums)
 	initHeap(nums, length-1)
@@ -188,6 +214,7 @@ func buildHeap(nums []int, i, end int) {
 		buildHeap(nums, large, end)
 	}
 }
+```
 </code>
 </pre>
 </details>
@@ -196,6 +223,8 @@ func buildHeap(nums []int, i, end int) {
 <summary>计数</summary>
 <pre>
 <code>
+
+```
 func count(nums []int) []int {
 	min, max := getMinAndMax(nums)
 	countArr := make([][]int, max-min+1)
@@ -229,6 +258,7 @@ func getMinAndMax(nums []int) (int, int) {
 	}
 	return min, max
 }
+```
 </code>
 </pre>
 </details>
@@ -237,6 +267,8 @@ func getMinAndMax(nums []int) (int, int) {
 <summary>基数</summary>
 <pre>
 <code>
+
+```
 func radix(nums []int) []int {
 	max := getMax(nums)
 	d := len(strconv.Itoa(max))
@@ -272,6 +304,7 @@ func getMax(nums []int) int {
 	}
 	return max
 }
+```
 </code>
 </pre>
 </details>
@@ -280,6 +313,8 @@ func getMax(nums []int) int {
 <summary>桶</summary>
 <pre>
 <code>
+
+```
 func bucket(nums []int) []int {
 	min, max := getMinAndMax(nums)
 	var (
@@ -325,13 +360,9 @@ func getMinAndMax(nums []int) (int, int) {
 	}
 	return min, max
 }
+```
 </code>
 </pre>
 </details>
 
-## 应用 ##
-**LeetCode*  
-- 215.数组中的第K个最大元素
-- 347.前K个高频元素
-- 451.根据字符出现频率排序 
-- 75.颜色分类
+
