@@ -9,7 +9,7 @@
     - [集合(set)](#集合set)
     - [有序集合(sorted set)](#有序集合sorted-set)
     - [位图(bitmap)](#位图bitmap)
-    - [基础统计(hyperloglog)](#基础统计hyperloglog)
+    - [基数统计(hyperloglog)](#基数统计hyperloglog)
     - [位置(geo)](#位置geo)
     - [流(stream)](#流stream)
   - [数据结构](#数据结构)
@@ -25,7 +25,7 @@
 # 使用 #
 ## 基础命令 ##
 ```
-键  
+key 
 - `KEYS pattern`  查找所有符合给定模式的键
 - `SCAN cursor [MATCH pattern] [COUNT count]`  迭代数据库中的键
 - `EXISTS key`  检查给定键是否存在
@@ -45,7 +45,7 @@
 - `TTL key`  以秒为单位返回键的剩余过期时间
 - `PTTL key`  以毫秒为单位返回键的剩余过期时间
 
-库  
+db  
 - `SELECT db`  切换数据库
 - `FLUSHDB`  清空当前数据库中的所有键
 - `FLUSHALL`  清空所有数据库的所有键
@@ -175,15 +175,17 @@ stream
 
 ## 数据类型 ##
 ### 字符串(string) ###
-**内部实现**  
+```
+内部实现
 - int(整数)
 - embstr(sds)
 - raw(sds)
 
-**应用**  
+应用
 - 缓存对象
 - 计数
 - 分布式锁
+```
 
 ### 列表(list) ###
 ```
@@ -225,7 +227,6 @@ stream
 - 排序
 ```
 
-
 ### 位图(bitmap) ###
 ```
 内部实现
@@ -236,8 +237,7 @@ stream
 - 登陆
 ```
 
-  
-### 基础统计(hyperloglog) ###
+### 基数统计(hyperloglog) ###
 ```
 应用  
 - UV计数
@@ -251,7 +251,6 @@ stream
 
 应用  
 - 打车
-
 ```
 
 ### 流(stream) ###
