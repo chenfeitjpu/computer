@@ -266,7 +266,7 @@ stream
 - redisDb结构  Redis数据库的结构 结构体里存放了指向了dict结构的指针   
 - dict结构  结构体里存放了2个哈希表，正常情况下都是用「哈希表1」，「哈希表2」只有在 rehash 的时候才用  
 - ditctht结构 结构里存放了哈希表数组，数组中的每个元素都是指向一个哈希表节点结构（dictEntry）的指针  
-- dictEntry结构  结构里存放了void *key和void *value指针，*key 指向的是String对象，而*value则可以指向String对象，也可以指向集合类型的对象，比如List对象、Hash对象、Set对象和Zset对象  
+- dictEntry结构  结构里存放了key和value指针，key指向的是String对象，而value则可以指向String对象，也可以指向集合类型的对象，比如List对象、Hash对象、Set对象和Zset对象  
 ```
 
 ### Redis对象 ###  
