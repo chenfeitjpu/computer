@@ -300,24 +300,22 @@ stream
 ```
 
 ## 事务 ##
-**常用命令**    
 ```
-- MULTI
-- EXEC
-- DISCARD
-- WATCH key [key]
-- UNWATCH
+- MULTI  开始事务
+- EXEC  执行事务
+- DISCARD  取消事务
+- WATCH key [key]  监视key
+- UNWATCH  取消监视
 ```
 
 ## 订阅 ##
-**常用命令**  
 ```
-- SUBSCRIBE channel [channel]
-- PSUBSCRIBE pattern [pattern]
-- UNSUBSCRIBE channel [channel]
-- PUNSUBSCRIBE pattern [pattern]
-- PUBLISH channel message
-- PUBSUB subcommand [argument]
+- SUBSCRIBE channel [channel]  订阅频道
+- PSUBSCRIBE pattern [pattern]  订阅指定模式的频道
+- UNSUBSCRIBE channel [channel]  退订频道
+- PUNSUBSCRIBE pattern [pattern]  退订指定模式的频道
+- PUBLISH channel message  发送消息
+- PUBSUB subcommand [argument]  查看订阅发布系统状态
 ```
 
 
