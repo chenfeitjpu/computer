@@ -15,7 +15,7 @@
   - [数据结构](#数据结构)
     - [Redis存储模型](#redis存储模型)
     - [Redis对象](#redis对象)
-    - [SDS](#sds)
+    - [SDS(简单动态字符串)](#sds简单动态字符串)
   - [事务](#事务)
   - [订阅](#订阅)
   
@@ -277,8 +277,7 @@ stream
 - ptr  指向底层数据结构的指针  
 ```
 
-### SDS ###
-简单动态字符串（simple dynamic string）
+### SDS(简单动态字符串) ###
 ![avatar](./images/redis/redis-sds-struct.png)  
 ```
 结构
