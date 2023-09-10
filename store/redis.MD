@@ -16,6 +16,8 @@
     - [Redis存储模型](#redis存储模型)
     - [Redis对象](#redis对象)
     - [SDS(简单动态字符串)](#sds简单动态字符串)
+    - [整数集合](#整数集合)
+    - [哈希表](#哈希表)
   - [事务](#事务)
   - [订阅](#订阅)
   
@@ -177,8 +179,8 @@ stream
 ### 字符串(string) ###
 ```
 内部实现
-- int(整数)
-- embstr(sds)
+- int(整数) 字符串对象保存的是整数值，并且这个整数值可以用long类型来表示
+- embstr(sds) 字符串的长度小于等于44字节
 - raw(sds)
 
 应用
@@ -280,6 +282,14 @@ stream
 ### SDS(简单动态字符串) ###
 ![avatar](./images/redis/redis-sds-struct.png)  
 ```
+struct __attribute__ ((__packed__)) sdshdr16 {
+    uint16_t len;
+    uint16_t alloc; 
+    unsigned char flags; 
+    char buf[];
+}
+```
+```
 结构
 - len  记录了字符串长度    
 - alloc  分配给字符数组的空间长度  
@@ -289,13 +299,18 @@ stream
 优点  
 - 高效  
   直接获取长度 
-  柔性数组  
 - 二进制安全  
   不以\0结束
 - 节省空间  
   不同的flags
   不字节拉齐
 ```
+
+
+
+### 整数集合 ###
+
+### 哈希表  ###
 
 ## 事务 ##
 ```
