@@ -314,7 +314,7 @@ typedef struct listNode {
     struct listNode *next;
     //节点的值
     void *value;
-} listNode;
+}
 
 typedef struct list {
     //链表头节点
@@ -329,7 +329,7 @@ typedef struct list {
     int (*match)(void *ptr, void *key);
     //链表节点数量
     unsigned long len;
-} list;
+}
 
 优点
 - 获取某个节点的前置节点或后置节点的时间复杂度只需O(1)
