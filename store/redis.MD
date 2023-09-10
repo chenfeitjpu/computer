@@ -16,6 +16,7 @@
     - [Redis存储模型](#redis存储模型)
     - [Redis对象](#redis对象)
     - [SDS(简单动态字符串)](#sds简单动态字符串)
+    - [链表](#链表)
     - [整数集合](#整数集合)
     - [哈希表](#哈希表)
   - [事务](#事务)
@@ -280,23 +281,20 @@ stream
 ```
 
 ### SDS(简单动态字符串) ###
-![avatar](./images/redis/redis-sds-struct.png)  
 ```
+结构
 struct __attribute__ ((__packed__)) sdshdr16 {
     uint16_t len;
     uint16_t alloc; 
     unsigned char flags; 
     char buf[];
 }
-```
-```
-结构
 - len  记录了字符串长度    
 - alloc  分配给字符数组的空间长度  
 - flags  不同类型的SDS，sdshdr5、sdshdr8、sdshdr16、sdshdr32和sdshdr64  
 - buf[]  字符数组，用来保存实际数据  
 
-优点  
+优点 
 - 高效  
   直接获取长度 
 - 二进制安全  
@@ -306,7 +304,41 @@ struct __attribute__ ((__packed__)) sdshdr16 {
   不字节拉齐
 ```
 
+### 链表 ###
+```
+结构
+typedef struct listNode {
+    //前置节点
+    struct listNode *prev;
+    //后置节点
+    struct listNode *next;
+    //节点的值
+    void *value;
+} listNode;
 
+typedef struct list {
+    //链表头节点
+    listNode *head;
+    //链表尾节点
+    listNode *tail;
+    //节点值复制函数
+    void *(*dup)(void *ptr);
+    //节点值释放函数
+    void (*free)(void *ptr);
+    //节点值比较函数
+    int (*match)(void *ptr, void *key);
+    //链表节点数量
+    unsigned long len;
+} list;
+
+优点
+- 获取某个节点的前置节点或后置节点的时间复杂度只需O(1)
+- 获取链表的表头节点和表尾节点的时间复杂度只需O(1)
+- 获取链表中的节点数量的时间复杂度只需O(1)
+缺点
+- 内存都是不连续的，无法很好利用CPU缓存
+- 保存一个链表节点的值都需要一个链表节点结构头的分配，内存开销较大
+```
 
 ### 整数集合 ###
 
