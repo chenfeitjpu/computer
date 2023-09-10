@@ -328,7 +328,7 @@ typedef struct list {
 ```
 
 **压缩列表**
-![avatar](./images/redis/redis-redis_ziplist_struct.webp) 
+![avatar](./images/redis/redis_ziplist_struct.webp) 
 ```
 结构
 - zlbytes  记录整个压缩列表占用内存字节数
