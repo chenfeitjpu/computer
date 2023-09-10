@@ -3,26 +3,7 @@
 - [使用](#使用)
   - [基础命令](#基础命令)
   - [数据类型](#数据类型)
-    - [字符串(string)](#字符串string)
-    - [列表(list)](#列表list)
-    - [哈希(hash)](#哈希hash)
-    - [集合(set)](#集合set)
-    - [有序集合(sorted set)](#有序集合sorted-set)
-    - [位图(bitmap)](#位图bitmap)
-    - [基数统计(hyperloglog)](#基数统计hyperloglog)
-    - [位置(geo)](#位置geo)
-    - [流(stream)](#流stream)
   - [数据结构](#数据结构)
-    - [Redis存储模型](#redis存储模型)
-    - [Redis对象](#redis对象)
-    - [SDS(简单动态字符串)](#sds简单动态字符串)
-    - [链表](#链表)
-    - [压缩列表](#压缩列表)
-    - [哈希表](#哈希表)
-    - [整数集合](#整数集合)
-    - [跳表](#跳表)
-    - [quicklist](#quicklist)
-    - [listpack](#listpack)
   - [事务](#事务)
   - [订阅](#订阅)
   
@@ -181,7 +162,7 @@ stream
 ```
 
 ## 数据类型 ##
-### 字符串(string) ###
+**字符串(string)**
 ```
 内部实现
 - int(整数) 字符串对象保存的是整数值，并且这个整数值可以用long类型来表示
@@ -194,7 +175,7 @@ stream
 - 分布式锁
 ```
 
-### 列表(list) ###
+**列表(list)**
 ```
 内部实现
 - quicklist
@@ -203,7 +184,7 @@ stream
 - 消息队列
 ```
   
-### 哈希(hash) ###
+**哈希(hash)**
 ```
 内部实现
 - listpack(元素个数小于512个, 元素值小于64字节)
@@ -213,7 +194,7 @@ stream
 - 缓存对象
 ```
 
-### 集合(set) ###
+**集合(set)**
 ```
 内部实现  
 - 整数集合(元素个数小于512个, 元素都是整数)
@@ -225,7 +206,7 @@ stream
 - 抽奖  
 ```
 
-### 有序集合(sorted set) ###
+**有序集合(sorted set)**
 ```
 内部实现
 - listpack(元素个数小于128个，元素的值小于64字节)
@@ -236,7 +217,7 @@ stream
 - 排序
 ```
 
-### 位图(bitmap) ###
+**位图(bitmap)**
 ```
 内部实现
 - string
@@ -246,14 +227,14 @@ stream
 - 登陆
 ```
 
-### 基数统计(hyperloglog) ###
+**基数统计(hyperloglog)**
 ```
 应用  
 - UV计数
 ```
 
 
-### 位置(geo) ###
+**位置(geo)**
 ```
 内部实现
 - sorted set
@@ -262,14 +243,14 @@ stream
 - 打车
 ```
 
-### 流(stream) ###
+**流(stream)**
 ```
 应用
 - 消息队列
 ```
 
 ## 数据结构 ##
-### Redis存储模型 ###  
+**redis存储模型**  
 ![avatar](./images/redis/redis-struct.png)  
 ```
 - redisDb结构  Redis数据库的结构 结构体里存放了指向了dict结构的指针   
@@ -278,7 +259,7 @@ stream
 - dictEntry结构  结构里存放了key和value指针，key指向的是String对象，而value则可以指向String对象，也可以指向集合类型的对象，比如List对象、Hash对象、Set对象和Zset对象  
 ```
 
-### Redis对象 ###  
+**redis对象** 
 ![avatar](./images/redis/redis-object-struct.png) 
 ``` 
 - type  标识该对象是什么类型的对象（String对象、List对象、Hash对象、Set对象和Zset对象） 
@@ -286,7 +267,7 @@ stream
 - ptr  指向底层数据结构的指针  
 ```
 
-### SDS(简单动态字符串) ###
+**sds**
 ```
 结构
 struct __attribute__ ((__packed__)) sdshdr16 {
@@ -310,7 +291,7 @@ struct __attribute__ ((__packed__)) sdshdr16 {
   不字节拉齐
 ```
 
-### 链表 ###
+**链表**
 ```
 结构
 typedef struct listNode {
@@ -346,7 +327,7 @@ typedef struct list {
 - 保存一个链表节点的值都需要一个链表节点结构头的分配，内存开销较大
 ```
 
-### 压缩列表 ###
+**压缩列表**
 ![avatar](./images/redis/redis-redis_ziplist_struct.webp) 
 ```
 结构
@@ -367,7 +348,7 @@ entry
 - 新增或修改某个元素时，压缩列表占用的内存空间需要重新分配，甚至可能引发连锁更新的问题
 ```
 
-### 哈希表  ###
+**哈希表**
 ```
 typedef struct dictht {
     //哈希表数组
@@ -399,7 +380,7 @@ typedef struct dictEntry {
 - 哈希冲突加剧，导致查询性能降低
 ```
 
-### 整数集合 ###
+**整数集合**
 ```
 结构
 typedef struct intset {
@@ -418,7 +399,7 @@ typedef struct intset {
 - 节省内存资源
 ```
 
-### 跳表  ###
+**跳表**
 ```
 typedef struct zskiplistNode {
     //Zset 对象的元素值
@@ -454,7 +435,7 @@ typedef struct zskiplist {
 跳表在创建节点时候，会生成范围为[0-1]的一个随机数，如果这个随机数小于等于0.25（相当于概率25%），那么层数就增加1层，然后继续生成下一个随机数，直到随机数的结果大于0.25结束，最终确定该节点的层数
 ```
 
-### quicklist ###
+**quicklist**
 ```
 结构
 typedef struct quicklist {
@@ -484,7 +465,7 @@ typedef struct quicklistNode {
 
 ```
 
-### listpack ###
+**listpack**
 ![avatar](./images/redis/redis-listpack-struct.webp)
 ```
 结构
