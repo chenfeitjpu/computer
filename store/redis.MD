@@ -15,7 +15,7 @@
 ## 基础命令 ##
 ```
 key 
-- `KEYS pattern`  查找所有符合给定模式的键
+- `KEYS pattern`  查找所有符合给定模式的键  ?|*|[]|^|-
 - `SCAN cursor [MATCH pattern] [COUNT count]`  迭代数据库中的键
 - `EXISTS key`  检查给定键是否存在
 - `TYPE key`  返回键所储存的值的类型
@@ -26,10 +26,11 @@ key
 - `RENAMENX key newkey`  修改键的名称, 新键不存在
 - `MOVE key db`  将当前数据库的键移动到给定的数据库db中
 - `DUMP key`  序列化键
-- `EXPIRE key second`  设置键过期时间，以秒计
-- `PEXPIRE key millisecond`  设置键过期时间，以毫秒计
-- `EXPIREAT key second`  设置键过期时间的时间戳，以秒计
-- `PEXPIREAT key millisecond`  设置键过期时间的时间戳，以毫秒计
+- `RESTORE key ttl serialized-value`  反序列化
+- `EXPIRE key seconds`  设置键过期时间，以秒计
+- `PEXPIRE key milliseconds`  设置键过期时间，以毫秒计
+- `EXPIREAT key unix-time-seconds`  设置键过期时间的时间戳，以秒计
+- `PEXPIREAT key unix-time-milliseconds`  设置键过期时间的时间戳，以毫秒计
 - `PERSIST KEY`  设置键永久有效
 - `TTL key`  以秒为单位返回键的剩余过期时间
 - `PTTL key`  以毫秒为单位返回键的剩余过期时间
@@ -41,12 +42,10 @@ db
 - `DBSIZE`  当前数据库的key数量
 
 string 
-- `SET key value [EX second | PX millisecond] [EXAT timestamp | PXAT timestamp] [nx | xx] [GET] [KEEPTTL]` 设置键值对
+- `SET key value [EX second | PX millisecond] [EXAT timestamp | PXAT timestamp] [nx|xx] [GET] [KEEPTTL]` 设置键值对
 - `SETNX key value` 设置键值对，key不存在
 - `SETEX key second value` 设置过期时间，以秒为单位
 - `PSETEX key millisecond value` 设置过期时间，以毫秒为单位
-- `GET key` 获取key
-- `GETSET key value` 设置新值，返回旧值
 - `APPEND key value` 追加值
 - `INCR key` 自增1
 - `INCRBY key increment` 指定自增量，整数
@@ -55,6 +54,8 @@ string
 - `DECRBY key decrement` 指定自减量，整数
 - `MSET key value [key value]` 批量设置
 - `MSETNX key value [key value]` 批量设置，key不存在
+- `GET key` 获取key
+- `GETSET key value` 设置新值，返回旧值
 - `MGET key [key]` 批量获取key
 - `SETRANGE key offset value` 从指定位置覆盖值 
 - `GETRANGE key start end` 获取指定位置字符串
@@ -83,12 +84,12 @@ hash
 - `HSET key field value`  设置哈希表字段
 - `HSETNX key field value`  设置哈希表字段，属性不存在
 - `HMSET key field value field value`  批量设置哈希表字段
-- `HGET key field`  获取哈希表字段
-- `HMGET key field field`  批量获取哈希表字段
 - `HDEL key field [field]`  删除哈希表字段
-- `HINCR key field increment`  自增，按整型值
+- `HINCRBY key field increment`  自增，按整型值
 - `HINCRBYFLOAT key field increment`  自增，按浮点值
 - `HEXISTS key field`  判断哈希表字段是否存在
+- `HGET key field`  获取哈希表字段
+- `HMGET key field field`  批量获取哈希表字段
 - `HKEYS key`  获取哈希表所有字段
 - `HVALS key` 获取哈希表所有值
 - `HGETALL key`  获取哈希表所有字段和值
@@ -112,6 +113,7 @@ set
 
 sorted set
 - `ZADD key score member [score member]`  添加元素
+- `ZINCRBY key increment member`  自增
 - `ZREM key member [member]`  移除元素
 - `ZREMRANGEBYRANK key start stop`  按索引排名移除元素
 - `ZREMRANGEBYSCORE key min max`  按分数区间移除元素
@@ -126,7 +128,6 @@ sorted set
 - `ZRANGEBYLEX key min max [LIMIT offset count]`  获取指定字典区间的成员
 - `ZINTERSTORE destination numkeys key key`  存储交集
 - `ZUNIONSTORE destination numkeys key key`  存储并集
-- `ZINCRBY key increment member`  自增
 - `ZCARD key`  获取成员数量
 - `ZCOUNT key min max`  获取分数区间的成员数量
 - `ZLEXCOUNT key min max`  获取字典区间的成员数量
@@ -138,7 +139,6 @@ bit
 - `BITCOUNT key [start] [end]`  在指定位区间统计1出现的次数
 - `BITOP operation destkey key key`  对key进行位运算
 
-
 hyperloglog
 - `PFADD key element [element]`  添加元素
 - `PFCOUNT key [key]`   获取统计数量
@@ -149,7 +149,7 @@ geo
 - `GEOPOS key member [member]`  获取坐标
 - `GEODIST key member member [m|km|ft|mi]`  获取两个位置的距离
 - `GEORADIUS key longitude latitude radius [m|km|ft|mi] [WITHCOORD] [WITHDIST] [WITHHASH] [COUNT count] [AES|DESC] [STORE key]`  以给定的经纬度为中心， 返回指定范围内的元素
-- `GEORADIUSBYMEMBER key member m|km|ft|mi [WITHCOORD] [WITHDIST] [WITHHASH] [COUNT count] [AES|DESC] [STORE key]`  以给定的位置为中心， 返回指定范围内的元素
+- `GEORADIUSBYMEMBER key member radius m|km|ft|mi [WITHCOORD] [WITHDIST] [WITHHASH] [COUNT count] [AES|DESC] [STORE key]`  以给定的位置为中心， 返回指定范围内的元素
 - `GEOHASH key member [member]`  获取坐标的hash位置
 
 stream
@@ -168,6 +168,7 @@ stream
 - WATCH key [key]  监视key
 - UNWATCH  取消监视
 
+发布&订阅
 - SUBSCRIBE channel [channel]  订阅频道
 - PSUBSCRIBE pattern [pattern]  订阅指定模式的频道
 - UNSUBSCRIBE channel [channel]  退订频道
