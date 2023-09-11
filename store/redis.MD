@@ -4,8 +4,7 @@
   - [基础命令](#基础命令)
   - [数据类型](#数据类型)
   - [数据结构](#数据结构)
-  - [事务](#事务)
-  - [订阅](#订阅)
+  - [持久化](#持久化)
   
 # 定义 #
 键值数据库
@@ -159,6 +158,20 @@ stream
 - `XREVRANGE key end start [COUNT count]` 反向获取消息列表
 - `XREAD [COUNT count] [BLOCK milliseconds] STREAMS key [key] id [id]` 获取消息
 - `XLEN key`  获取消息长度
+
+事务
+- MULTI  开始事务
+- EXEC  执行事务
+- DISCARD  取消事务
+- WATCH key [key]  监视key
+- UNWATCH  取消监视
+
+- SUBSCRIBE channel [channel]  订阅频道
+- PSUBSCRIBE pattern [pattern]  订阅指定模式的频道
+- UNSUBSCRIBE channel [channel]  退订频道
+- PUNSUBSCRIBE pattern [pattern]  退订指定模式的频道
+- PUBLISH channel message  发送消息
+- PUBSUB subcommand [argument]  查看订阅发布系统状态
 ```
 
 ## 数据类型 ##
@@ -474,24 +487,39 @@ typedef struct quicklistNode {
 - len  encoding+data的总长度
 ```
 
-## 事务 ##
+## 持久化 ##
+**aof**
 ```
-- MULTI  开始事务
-- EXEC  执行事务
-- DISCARD  取消事务
-- WATCH key [key]  监视key
-- UNWATCH  取消监视
+执行过程
+- 执行写命令
+- 记录命令到日志
+
+开启
+appendonly yes //是否开启aof持久化(默认no:关闭)
+appendfilename "appendonly.aof" //aof持久化文件名称
+
+先写命令，后写文件
+优点
+- 避免额外检查开销
+- 不会阻塞当前操作命令
+缺点
+- 写命令和写日志是两个过程，有丢失数据的风险
+- 阻塞下一个命令的执行
+
+写回策略
+- Always  每次写操作命令执行完后，同步将AOF日志数据写回硬盘
+- Everysec  每次写操作命令执行完后，先将命令写入到AOF文件的内核缓冲区，然后每隔一秒将缓冲区里的内容写回到硬盘
+- No  每次写操作命令执行完后，先将命令写入到AOF文件的内核缓冲区，再由操作系统决定何时将缓冲区内容写回硬盘
+
+fsync()函数的调用时机
+- Always  每次写入AOF文件数据后，就执行fsync()函数；
+- Everysec  创建一个异步任务来执行fsync()函数；
+- No  永不执行fsync()函数
+
+AOF重写机制
+- 主进程在通过fork系统调用生成bgrewriteaof子进程(会阻塞主进程)
+- 子进程进行aof文件重写(异步执行)
+- 主进程修改了已经存在key-value，发生写时复制(会阻塞主进程)
+- 子进程完成AOF重写工作，会向主进程发送一条信号
+- 主进程收到信号后，将AOF重写缓冲区中的所有内容追加到新的AOF的文件中，新的AOF的文件进行改名，覆盖现有的AOF文件(会阻塞主进程)
 ```
-
-## 订阅 ##
-```
-- SUBSCRIBE channel [channel]  订阅频道
-- PSUBSCRIBE pattern [pattern]  订阅指定模式的频道
-- UNSUBSCRIBE channel [channel]  退订频道
-- PUNSUBSCRIBE pattern [pattern]  退订指定模式的频道
-- PUBLISH channel message  发送消息
-- PUBSUB subcommand [argument]  查看订阅发布系统状态
-```
-
-
-
