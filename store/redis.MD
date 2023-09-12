@@ -16,7 +16,7 @@
 ```
 key 
 - `KEYS pattern`  查找所有符合给定模式的键  ?|*|[]|^|-
-- `SCAN cursor [MATCH pattern] [COUNT count]`  迭代数据库中的键
+- `SCAN cursor [MATCH pattern] [COUNT count] [TYPE type]`  迭代数据库中的键
 - `EXISTS key`  检查给定键是否存在
 - `TYPE key`  返回键所储存的值的类型
 - `RANDOMKEY`  随机返回一个键
@@ -97,14 +97,14 @@ hash
 
 set
 - `SADD key member [member]`  向集合中添加元素
-- `SPOP key`  从集合中移除元素
+- `SPOP key`  随机从集合中移除元素
 - `SREM key member [member]`  从集合中移除指定元素
 - `SMOVE source destination member` 移动集合元素
 - `SISMEMBER key member`  判断元素是否在集合中
 - `SRANDOMMEMBER key count`  随机返回集合中的元素
 - `SMEMBERS key`  返回集合中所有元素
-- `SINNER key key`  求集合交集
-- `SINNERSTORE destination key key`  存储集合交集
+- `SINTER key key`  求集合交集
+- `SINTERSTORE destination key key`  存储集合交集
 - `SUNION key key`  求集合并集
 - `SUNIONSTORE destination key key`  存储集合并集
 - `SDIFF key key`  求集合差集
@@ -115,7 +115,7 @@ sorted set
 - `ZADD key score member [score member]`  添加元素
 - `ZINCRBY key increment member`  自增
 - `ZREM key member [member]`  移除元素
-- `ZREMRANGEBYRANK key start stop`  按索引排名移除元素
+- `ZREMRANGEBYRANK key start stop`  按排名区间移除元素
 - `ZREMRANGEBYSCORE key min max`  按分数区间移除元素
 - `ZREMRANGEBYLEX key min max`  按字典区间移除元素
 - `ZRANK key member`  获取元素排名
@@ -160,6 +160,14 @@ stream
 - `XREVRANGE key end start [COUNT count]` 反向获取消息列表
 - `XREAD [COUNT count] [BLOCK milliseconds] STREAMS key [key] id [id]` 获取消息
 - `XLEN key`  获取消息长度
+- `XGROUP CREATE key group <id|$> [MKSTREAM]`  创建消费组
+- `XREADGROUP GROUP group consumer [COUNT count] [BLOCK milliseconds] STREAMS key [key ...] id [id ...]`  创建消费者
+- `XPENDING key group [[IDLE min-idle-time] start end count [consumer]]`  查看消费情况
+- `XACK key group id [id ...]`  确认消息
+- `XCLAIM key group consumer min-idle-time id [id ...]`  转移消息
+- `XINFO STREAM key`  查看队列状态
+- `XINFO GROUPS key`  查看组状态
+- `XINFO CONSUMERS key group`  查看消费者状态
 
 事务
 - MULTI  开始事务
@@ -174,7 +182,6 @@ stream
 - UNSUBSCRIBE channel [channel]  退订频道
 - PUNSUBSCRIBE pattern [pattern]  退订指定模式的频道
 - PUBLISH channel message  发送消息
-- PUBSUB subcommand [argument]  查看订阅发布系统状态
 ```
 
 ## 数据类型 ##
