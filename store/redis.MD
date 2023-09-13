@@ -605,6 +605,12 @@ redis采用的策略
 
 **内存淘汰**
 ```
+设置Redis最大运行内存
+redis.conf
+maxmemory <bytes>
+- 在64位操作系统中，maxmemory的默认值是0，表示没有内存大小限制
+- 在32位操作系统中，maxmemory的默认值是3G，因为32位的机器最大只支持4GB的内存，而系统本身就需要一定的内存资源来支持运行
+
 策略
 - 不进行数据淘汰
   - noeviction  当运行内存超过最大设置内存时，不淘汰任何数据，这时如果有新的数据写入，会报错通知禁止写入，不淘汰任何数据
@@ -620,6 +626,21 @@ redis采用的策略
 设置
 `config get maxmemory-policy`  查看当前淘汰策略
 `config set maxmemory-policy <策略>`  设置当前淘汰策略
+
+lru实现
+Redis对象头的24bits的lru字段是用来记录key的访问时间戳
+随机取5个值(此值可配置)，然后淘汰最久没有使用的那个
+
+lfu实现
+Redis对象头的24bits的lru字段被分成两段来存储，高16bit存储ldt(Last Decrement Time)，低8bit存储logc(Logistic Counter)
+- ldt是用来记录key的访问时间戳
+- logc是用来记录key的访问频次，它的值越小表示使用频率越低，越容易淘汰，每个新加入的key的logc初始值为5
+Redis在访问key时，对于 logc 是这样变化的
+- 先按照上次访问距离当前的时长，来对logc进行衰减
+- 再按照一定概率增加logc的值
+redis.conf提供了两个配置项，用于调整lfu算法从而控制logc的增长和衰减
+- lfu-decay-time 用于调整logc的衰减速度，它是一个以分钟为单位的数值，默认值为1，lfu-decay-time值越大，衰减越慢
+- lfu-log-factor 用于调整logc的增长速度，lfu-log-factor值越大，logc增长越慢
 ```
 
 **缓存**
