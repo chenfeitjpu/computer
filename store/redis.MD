@@ -301,7 +301,7 @@ struct __attribute__ ((__packed__)) sdshdr16 {
 }
 - len  记录了字符串长度    
 - alloc  分配给字符数组的空间长度  
-- flags  不同类型的SDS，sdshdr5、sdshdr8、sdshdr16、sdshdr32和sdshdr64  
+- flags  不同容量的sds，sdshdr5、sdshdr8、sdshdr16、sdshdr32和sdshdr64  
 - buf[]  字符数组，用来保存实际数据  
 
 优点 
@@ -310,7 +310,7 @@ struct __attribute__ ((__packed__)) sdshdr16 {
 - 二进制安全  
   不以\0结束
 - 节省空间  
-  不同的flags
+  不同的容量
   不字节拉齐
 ```
 
@@ -400,7 +400,10 @@ typedef struct dictEntry {
 }
 
 缺点
-- 哈希冲突加剧，导致查询性能降低
+哈希冲突加剧，导致查询性能降低
+
+解决
+refresh
 ```
 
 **整数集合**
@@ -416,6 +419,7 @@ typedef struct intset {
 }
 
 整数集合升级
+过程
 - 当我们将一个新元素加入到整数集合里面，如果新元素的类型比整数集合现有所有元素的类型都要长时，整数集合需要先进行升级，也就是按新元素的类型扩展contents数组的空间大小，然后才能将新元素加入到整数集合里，当然升级的过程中，也要维持整数集合的有序性
 - 整数集合升级的过程不会重新分配一个新类型的数组，而是在原本的数组上扩展空间，然后在将每个元素按间隔类型大小分割
 好处
