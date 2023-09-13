@@ -510,7 +510,7 @@ appendonly yes //是否开启aof持久化(默认no:关闭)
 appendfilename "appendonly.aof" //aof持久化文件名称
 
 手动
-bgrewriteaof
+bgrewriteaof(异步)
 
 执行过程
 - 执行写命令
@@ -548,8 +548,8 @@ save 300 10
 save 60 10000
 
 手动
-save
-bgsave
+save(同步)
+bgsave(异步)
 
 过程
 - 主进程在通过fork系统调用生成bgsave子进程(会阻塞主进程)
@@ -635,9 +635,12 @@ lfu实现
 Redis对象头的24bits的lru字段被分成两段来存储，高16bit存储ldt(Last Decrement Time)，低8bit存储logc(Logistic Counter)
 - ldt是用来记录key的访问时间戳
 - logc是用来记录key的访问频次，它的值越小表示使用频率越低，越容易淘汰，每个新加入的key的logc初始值为5
-Redis在访问key时，对于 logc 是这样变化的
+随机取5个值(此值可配置)，然后淘汰频次最小的
+
+Redis在访问key时，对于logc是这样变化的
 - 先按照上次访问距离当前的时长，来对logc进行衰减
 - 再按照一定概率增加logc的值
+
 redis.conf提供了两个配置项，用于调整lfu算法从而控制logc的增长和衰减
 - lfu-decay-time 用于调整logc的衰减速度，它是一个以分钟为单位的数值，默认值为1，lfu-decay-time值越大，衰减越慢
 - lfu-log-factor 用于调整logc的增长速度，lfu-log-factor值越大，logc增长越慢
