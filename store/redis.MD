@@ -695,7 +695,16 @@ replicaof <服务器的IP地址> <服务器的Redis端口号>
 - 从服务器在恢复网络后，会发送psync命令给主服务器，此时的psync命令里的offset参数不是-1
 - 主服务器收到该命令后，然后用CONTINUE响应命令告诉从服务器接下来采用增量复制的方式同步数据
 - 然后主服务将主从服务器断线期间，所执行的写命令发送给从服务器，然后从服务器执行这些命令
+
+repl backlog buffer&replication buffer区别
+出现的阶段不一样
+repl backlog buffer是在增量复制阶段出现，一个主节点只分配一个repl backlog buffer
+replication buffer是在全量复制阶段和增量复制阶段都会出现，主节点会给每个新连接的从节点，分配一个replication buffer
+这两个Buffer都有大小限制的，当缓冲区满了之后，发生的事情不一样
+当repl backlog buffer满了，因为是环形结构，会直接覆盖起始位置数据;
+当replication buffer满了，会导致连接断开，删除缓存，从节点重新连接，重新开始全量复制
 ```
+
 
 **哨兵**
 ```
