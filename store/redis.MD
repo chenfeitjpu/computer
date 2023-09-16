@@ -66,7 +66,7 @@ list
 - `LPUSHX key value [value]` 左边添加列表元素，key已存在
 - `RPUSH key value [value]` 右边添加列表元素
 - `RPUSHX key value [value]` 右边添加列表元素，key已存在
-- `LINSERT key BEFORE|AFTER pivot value` 在指定位置添加列表元素
+- `LINSERT key BEFORE|AFTER pivot value` 在指定元素前后添加列表元素
 - `LPOP key` 左边移除列表元素
 - `BLPOP key [key] timeout` 左边移除列表元素，等待指定时间
 - `RPOP key` 右边边移除列表元素
@@ -147,15 +147,15 @@ hyperloglog
 geo
 - `GEOADD key longitude latitude member [longitude latitude member]`  添加坐标
 - `GEOPOS key member [member]`  获取坐标
-- `GEODIST key member member [m|km|ft|mi]`  获取两个位置的距离
-- `GEORADIUS key longitude latitude radius [m|km|ft|mi] [WITHCOORD] [WITHDIST] [WITHHASH] [COUNT count] [AES|DESC] [STORE key]`  以给定的经纬度为中心， 返回指定范围内的元素
-- `GEORADIUSBYMEMBER key member radius m|km|ft|mi [WITHCOORD] [WITHDIST] [WITHHASH] [COUNT count] [AES|DESC] [STORE key]`  以给定的位置为中心， 返回指定范围内的元素
+- `GEODIST key member member [M|KM|FT|MI]`  获取两个位置的距离
+- `GEORADIUS key longitude latitude radius [M|KM|FT|MI] [WITHCOORD] [WITHDIST] [WITHHASH] [COUNT count] [AES|DESC] [STORE key]`  以给定的经纬度为中心， 返回指定范围内的元素
+- `GEORADIUSBYMEMBER key member radius [M|KM|FT|MI] [WITHCOORD] [WITHDIST] [WITHHASH] [COUNT count] [AES|DESC] [STORE key]`  以给定的位置为中心， 返回指定范围内的元素
 - `GEOHASH key member [member]`  获取坐标的hash位置
 
 stream
 - `XADD key id field value [field value]`  添加消息
 - `XDEL key id [id]`  删除消息
-- `XTRIM key [MAXLEN|MINIID] [~] [count]`  裁剪为指定数量的项目
+- `XTRIM key <MAXLEN|MINID> [=|~] threshold [LIMIT count]`  裁剪为指定数量的项目
 - `XRANGE key start end [COUNT count]`  获取消息列表
 - `XREVRANGE key end start [COUNT count]` 反向获取消息列表
 - `XREAD [COUNT count] [BLOCK milliseconds] STREAMS key [key] id [id]` 获取消息
@@ -310,7 +310,7 @@ struct __attribute__ ((__packed__)) sdshdr16 {
 - 二进制安全  
   不以\0结束
 - 节省空间  
-  不同的容量
+  不同的类型
   不字节拉齐
 ```
 
@@ -697,12 +697,27 @@ replicaof <服务器的IP地址> <服务器的Redis端口号>
 - 然后主服务将主从服务器断线期间，所执行的写命令发送给从服务器，然后从服务器执行这些命令
 
 repl backlog buffer&replication buffer区别
-出现的阶段不一样
-repl backlog buffer是在增量复制阶段出现，一个主节点只分配一个repl backlog buffer
-replication buffer是在全量复制阶段和增量复制阶段都会出现，主节点会给每个新连接的从节点，分配一个replication buffer
+使用的阶段不一样
+repl backlog buffer是在增量复制阶段使用，一个主节点只分配一个repl backlog buffer
+replication buffer是在全量复制阶段和增量复制阶段都会使用，主节点会给每个新连接的从节点，分配一个replication buffer
 这两个Buffer都有大小限制的，当缓冲区满了之后，发生的事情不一样
 当repl backlog buffer满了，因为是环形结构，会直接覆盖起始位置数据;
 当replication buffer满了，会导致连接断开，删除缓存，从节点重新连接，重新开始全量复制
+
+数据不一致
+原因
+主从节点间的命令复制是异步进行的
+方案
+- 尽量保证主从节点间的网络连接状况良好，避免主从节点在不同的机房
+- 监控主从节点间的复制进度(master_repl_offset&slave_repl_offset)
+
+数据丢失
+原因
+- 异步复制同步丢失
+- 集群产生脑裂数据丢失
+方案
+- min-slaves-to-write x，主节点必须要有至少 x 个从节点连接，如果小于这个数，主节点会禁止写数据。
+- min-slaves-max-lag x，主从数据复制和同步的延迟不能超过x秒，如果主从同步的延迟超过x秒，主节点会禁止写数据
 ```
 
 **哨兵**
@@ -715,7 +730,7 @@ sentinel monitor <master-name> <ip> <redis-port> <quorum>
 主从切换
 故障发现
 - 主节点或者从节点没有在规定的时间内响应哨兵的PING命令，哨兵就会将它们标记为「主观下线」
-- 个哨兵判断主节点为「主观下线」后，就会向其他哨兵发起命令，其他哨兵收到这个命令后，就会根据自身和主节点的网络状况，做出赞成投票或者拒绝投票的响应
+- 一个哨兵判断主节点为「主观下线」后，就会向其他哨兵发起命令，其他哨兵收到这个命令后，就会根据自身和主节点的网络状况，做出赞成投票或者拒绝投票的响应
 - 这个哨兵的赞同票数达到哨兵配置文件中的quorum配置项设定的值后，这时主节点就会被该哨兵标记为「客观下线」
 
 选举leader
