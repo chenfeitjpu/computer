@@ -1,12 +1,11 @@
 **MySQL**
 - [定义](#定义)
 - [使用](#使用)
-  - [基础](#基础)
+  - [系统](#系统)
   - [数据类型](#数据类型)
   - [SQL](#sql)
   - [查询](#查询)
-    - [运算符](#运算符)
-    - [函数](#函数)
+    - [使用](#使用-1)
     - [优化](#优化)
       - [访问方式](#访问方式)
       - [成本优化](#成本优化)
@@ -16,7 +15,7 @@
       - [explain](#explain)
       - [optimizer trace](#optimizer-trace)
   - [事务](#事务)
-    - [使用](#使用-1)
+    - [使用](#使用-2)
     - [并发](#并发)
   - [存储程序](#存储程序)
     - [语法](#语法)
@@ -34,7 +33,7 @@
       - [InnoDB数据页结构](#innodb数据页结构)
     - [视图](#视图)
     - [索引结构](#索引结构)
-      - [使用](#使用-2)
+      - [使用](#使用-3)
       - [InnoDB索引结构](#innodb索引结构)
       - [MyISAM索引结构](#myisam索引结构)
     - [数据目录](#数据目录)
@@ -57,7 +56,7 @@
 关系型数据库
 
 # 使用 #
-## 基础 ##
+## 系统 ##
 ```
 连接
 - mysql --host=主机名 --user=用户名 --password=密码
@@ -262,47 +261,33 @@ DCL
 ```
 
 ## 查询 ##
+### 使用 ###
 ```
 简单查询   
 - `select * from`
-
 分组查询  
 - `group by 列名 [, 列名] having`
-  
 子查询    
 - 标量子查询
 - 列子查询
 - 行子查询
 - 表子查询
 - exists和not exists子查询
-
 连接查询
 - `[inner] [cross] join on` 内连接
 - `left join on` 左外连接
 - `right join on` 右外连接
- 
 组合查询
 - `union all` 保留重复记录
 - `union` 去除重复记录
-```
 
-### 运算符 ###
-```
-算术   
-`+, -, *, /, %`
+运算符
+- 算术  `+, -, *, /, %`
+- 比较  `\>, \>=, \<, \<=, =, !=, between and, in, not in, is null, is not null, like, not like`
+- 逻辑  `and, or, xor`
+- 通配  `_, %`
 
-比较    
-`\>, \>=, \<, \<=, =, !=, between and, in, not in, is null, is not null, like, not like`
-
-逻辑    
-`and, or, xor`
-
-通配  
-`_, %`
-```
-
-### 函数 ###
-```
+函数
 文本  
 - `left` 从左边取指定长度的子串
 - `right` 从右边取指定长度的子串
@@ -313,7 +298,6 @@ DCL
 - `rtrim` 去掉字符串右边空格
 - `substring` 字符串截取
 - `concat` 字符串拼接
- 
 时间  
 - `now` 获取当前日期和时间
 - `curdate` 获取当前日期
@@ -323,8 +307,7 @@ DCL
 - `date_sub(datetime, interval value type)` 减去指定的时间间隔
 - `datediff(date, date)` 返回两个日期之间的天数
 - `date_format(datetime, format)` 格式化显示日期和时间
-   
-数值  
+算术  
 - `rand` 随机数
 - `mod` 取余
 - `abs` 绝对值
@@ -334,7 +317,6 @@ DCL
 - `sin` 正弦
 - `cos` 余弦
 - `tan` 正切
- 
 聚集  
 - `count` 总数
 - `max` 最大值
