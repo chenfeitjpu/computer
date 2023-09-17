@@ -2,12 +2,7 @@
 - [定义](#定义)
 - [使用](#使用)
   - [基础](#基础)
-    - [连接管理](#连接管理)
     - [执行过程](#执行过程)
-    - [存储引擎](#存储引擎)
-    - [系统变量](#系统变量)
-    - [系统状态](#系统状态)
-    - [字符集](#字符集)
   - [数据类型](#数据类型)
     - [数值](#数值)
     - [时间和日期](#时间和日期)
@@ -72,49 +67,30 @@
 
 # 使用 #
 ## 基础 ##
-### 连接管理 ###
-*连接*  
-```  
+```
+连接
 - mysql --host=主机名 --user=用户名 --password=密码
 - mysql -h主机名  -u用户名 -p密码
-```
 
-*退出*  
-```  
+退出  
 - quit
 - exit
-- q
-```
+- \q
 
-### 执行过程 ###
-*查询*  
-![avatar](./image/mysql/../../images/mysql/flow_query.webp)
-
-### 存储引擎 ###
-```
+存储引擎
 - `show engines` 查看存储引擎
-```
 
-### 系统变量 ###
-```
+系统变量
 - `show [global|session] variables [LIKE 匹配的模式]` 查看系统变量
 - `set [global|session] 变量名=值` 设置系统变量
 - `set [@@global|session.] 变量名=值` 设置系统变量
-```
 
-### 系统状态 ###
-```
+系统状态
 - `show [global|session] status [LIKE 匹配的模式]` 查看系统状态
-```
 
-### 字符集 ###
-*查看*  
-```  
+字符集
 - `show (character set | charset)` 查看字符集
 - `show collation` 查看比较规则
-```
-
-*后缀*    
 | 后缀 | 英文释义 | 描述 |
 | :--: | :--: | :--: |
 | _ai | accent insensitive | 不区分重音 |
@@ -123,55 +99,51 @@
 | _cs | case sensitive | 区分大小写 |
 | _bin | binary | 以二进制方式比较 |
 
-  
-*设置*
-```
+字符集设置
 服务器级别  
-show variables like 'character_set_server'
-show variables like 'collation_server'
-
-set character_set_server='utf8mb4'
-set collation_server='utf8mb4_0900_ai_ci'
+`show variables like 'character_set_server'`
+`show variables like 'collation_server'`
+`set character_set_server='utf8mb4'`
+`set collation_server='utf8mb4_0900_ai_ci'`
 
 数据库级别  
-show create database 数据库名
-  
-create database 数据库名
+`show create database 数据库名`
+`create database 数据库名
 [[default] character set 字符集名称]
-[[default] collate 比较规则名称]
-
-alter database 数据库名
+[[default] collate 比较规则名称]`
+`alter database 数据库名
 [[default] character set 字符集名称]
-[[default] collate 比较规则名称]
+[[default] collate 比较规则名称]`
 
 表级别   
-show create table 表名
-
+`show create table 表名
 create table 表名 (列的信息)
 [[default] character set 字符集名称]
-[collate 比较规则名称]
-
-alter table 表名
+[collate 比较规则名称]`
+`alter table 表名
 [[default] character set 字符集名称]
-[collate 比较规则名称]
+[collate 比较规则名称]`
 
 列级别  
-show create table 表名
-
-CREATE TABLE 表名(
+`show create table 表名`
+`CREATE TABLE 表名(
     列名 字符串类型 [CHARACTER SET 字符集名称] [COLLATE 比较规则名称]
-)
+)`
+`ALTER TABLE 表名 MODIFY 列名 字符串类型 [CHARACTER SET 字符集名称] [COLLATE 比较规则名称]`
 
-ALTER TABLE 表名 MODIFY 列名 字符串类型 [CHARACTER SET 字符集名称] [COLLATE 比较规则名称]
+字符集转换过程   
+- 客户端使用操作系统的字符集编码请求字符串，向服务器发送的是经过编码的一个字节串  
+- 服务器将客户端发送来的字节串采用character_set_client代表的字符集进行解码，将解码后的字符串再按照character_set_connection代表的字符集进行编码  
+- 如果character_set_connection代表的字符集和具体操作的列使用的字符集一致，则直接进行相应操作，
+- 否则的话需要将请求中的字符串从character_set_connection代表的字符集转换为具体操作的列使用的字符集之后再进行操作  
+- 将从某个列获取到的字节串从该列使用的字符集转换为character_set_results代表的字符集后发送到客户端  
+- 客户端使用操作系统的字符集解析收到的结果集字节串
 ```
 
-*转换过程*   
-> + 客户端使用操作系统的字符集编码请求字符串，向服务器发送的是经过编码的一个字节串  
-> + 服务器将客户端发送来的字节串采用character_set_client代表的字符集进行解码，将解码后的字符串再按照character_set_connection代表的字符集进行编码  
-> + 如果character_set_connection代表的字符集和具体操作的列使用的字符集一致，则直接进行相应操作，
-> 否则的话需要将请求中的字符串从character_set_connection代表的字符集转换为具体操作的列使用的字符集之后再进行操作  
-> + 将从某个列获取到的字节串从该列使用的字符集转换为character_set_results代表的字符集后发送到客户端  
-> + 客户端使用操作系统的字符集解析收到的结果集字节串
+### 执行过程 ###
+*查询*  
+![avatar](./image/mysql/../../images/mysql/flow_query.webp)
+
 
 ## 数据类型 ##
 ### 数值 ###
