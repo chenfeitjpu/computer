@@ -4,10 +4,6 @@
   - [基础](#基础)
   - [数据类型](#数据类型)
   - [SQL](#sql)
-    - [DDL](#ddl)
-    - [DML](#dml)
-    - [DQL](#dql)
-    - [DCL](#dcl)
   - [查询](#查询)
     - [运算符](#运算符)
     - [函数](#函数)
@@ -209,27 +205,25 @@ create table 表名 (列的信息)
 ```
 
 ## SQL ##
-### DDL ###
 ```
+DDL
 数据库    
 - `show databases` 查看所有库
 - `create database [if not exists] 库名` 创建库
 - `drop database [if exists] 库名` 删除库
 - `use 库名` 选择库
-  
 表    
 - `show tables [from 库名]` 查看所有表
 - `show create table [库名.]表名` 查看表定义
 - `[describe|desc|explain|show columns from|show fields form] 表名` 查看表描述
 - `create table [if not exists] 表名` 创建表
 - `drop table [if exists ]表名` 删除表
-- `alter table 旧表名 rename to 新表名` 修改表名
 - `rename table 旧表名 to 新表名` 修改表名
+- `alter table 旧表名 rename to 新表名` 修改表名
 - `alter table 表名 add [column] 列名 数据类型 [列的属性] [first|after 列名]` 增加列
 - `alter table 表名 drop [column] 列名` 删除列
 - `alter table 表名 modify [column] 列名 新数据类型 [新属性] [first|after 列名]` 修改列
 - `alter table 表名 change [column] 列名 新列名 新数据类型 [新属性]` 修改列
-
 列    
 - `default` 默认值
 - `not null` 非空
@@ -245,29 +239,24 @@ create table 表名 (列的信息)
 - `primary key` 主键
 - `unique [key] [约束名] (列名)` 唯一键
 - `constraint [约束名] foreign key [索引名](列1, 列2, ...) references 父表名 (父列1, 父列2, ...)` 外键
-```
 
-### DML ###
-```
+
+DML
 - `insert into 表名 [(列名, 列名)] values (值, 值) [,(值, 值)]` 插入单条|多条数据
 - `insert into 表名 select` 插入结果集
 - `insert ignore into` 插入忽略错误
 - `insert into ... on duplicate key update 列名 = 值|values(列名)` 插入重复值
 - `delete from 表名 [where 表达式]` 删除数据
 - `update 表名 set 列名=值 [where 表达式]` 更新数据 
-```
 
-### DQL ###
-```
-- `select 列名 [as] [别名][, 列名 [as] [别名]] from 表名` 查询单个｜多个列
+DQL
+- `select 列名 [as] [别名][, 列名 [as] [别名]] from 表名` 查询单个|多个列
 - `select * from 表名` 查询所有列
 - `select distinct 列名[, 列名] from 表名` 去除单列|多列的重复结果 
 - `limit [开始行,] 限制条数` 限制查询结果条数
 - `order by 列名 asc|desc[, 列名 asc|desc]` 按照单列|多列的值进行排序，默认升序
-```
 
-### DCL ###
-```
+DCL
 - `grant 权限 on 库名.表名 to 用户@主机 identified by 密码` 授权
 - `revoke 权限 on 库名.表名 to 用户@主机` 回收权限  
 ```
