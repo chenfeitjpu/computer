@@ -12,9 +12,6 @@
   - [存储程序](#存储程序)
   - [存储结构](#存储结构)
     - [行结构](#行结构)
-      - [基本操作](#基本操作)
-      - [InnoDB行结构](#innodb行结构)
-      - [行溢出](#行溢出)
     - [页结构](#页结构)
       - [InnoDB数据页结构](#innodb数据页结构)
     - [视图](#视图)
@@ -773,9 +770,7 @@ INSUFFICIENT_PRIVILEGES: 1
 </details>
 
 ## 事务 ##
-状态转移
-![avatar](./images/mysql/transaction-state.awebp)
-
+[状态转移](https://raw.githubusercontent.com/chenfeitjpu/computer/master/store/images/mysql/transaction-state.awebp)
 ```
 特性  
 - 原子性（Atomicity）
@@ -943,22 +938,17 @@ end loop
 
 ## 存储结构 ##
 ### 行结构 ###  
-#### 基本操作 ####  
-```
-show table status like 表名\G
-
-create table 表名 (列的信息) row_format=行格式名称
-alter table 表名 row_format=行格式名称
-```
-
-#### InnoDB行结构 ####  
-*Compact*  
-<table>
-    <tr><td colspan="3">记录的额外信息</td><td>记录的真实数据</td></tr>
-    <tr><td>变长字段长度列表</td><td>NULL值列表</td><td>记录头信息</td><td>列的值</td></tr>
-</table>
+[compact行格式](https://raw.githubusercontent.com/chenfeitjpu/computer/master/store/images/mysql/innodb_row_format_compact.webp)
+[redundant行格式](https://raw.githubusercontent.com/chenfeitjpu/computer/master/store/images/mysql/innodb_row_format_redundant.webp)
 
 ```
+行结构 
+`show table status like 表名\G`  查看行结构
+`create table 表名 (列的信息) row_format=行格式名称`  设置行结构
+`alter table 表名 row_format=行格式名称`  修改行结构
+
+InnoDB行结构
+compact
 变长字段长度列表
 - 所有的列都不是变长的数据类型的话，这一部分就不需要有
 - 逆序排列  
@@ -970,28 +960,6 @@ NULL值列表
 - 逆序排列  
 - NULL值列表必须用整数个字节的位表示
 
-记录头信息  
-| 名称 | 大(单位：bit) | 描述 |
-| :---: | :---: | :---: |
-| 预留位1 | 1 | 没有使用 |
-| 预留位2 | 1 | 没有使用 |
-| delete_mask | 1 | 标记该记录是否被删除 |
-| min_rec_mask | 1 | B+树的每层非叶子节点中的最小记录都会添加该标记 |
-| n_owned | 4 | 表示当前记录拥有的记录数 |
-| heap_no | 13 | 表示当前记录在记录堆的位置信息 |
-| record_type | 3 | 0表示普通记录，1表示B+树非叶子节点记录，2表示最小记录，3表示最大记录 |
-| next_record | 16 | 表示下一条记录的相对位置 |  
-固定5个字节, 40个二进制位
-
-记录的真实数据  
-隐藏列  
-| 列名 | 是否必须 | 占用空间 | 描述 |
-| :---: | :---: | :---: | :---: |
-| DB_ROW_ID | 否 | 6字节 | 行ID，唯一标识一条记录 |
-| DB_TRX_ID | 是 | 6字节 | 事务ID |
-| DB_ROLL_PTR | 是 | 7字节 | 回滚指针 |  
-InnoDB表对主键的生成策略：优先使用用户自定义主键作为主，如果用户没有定义主键，则选取一个Unique键作为主键，如果表中连Unique键都没有定义的话，则InnoDB会为表默认添加一个名为row_id的隐藏列作为主键  
-InnoDB存储引擎会为每条记录都添加 transaction_id 和 roll_pointer 这两个列，但是 row_id 是可选的
 
 NULL值处理    
 - 不存储 
@@ -999,54 +967,26 @@ NULL值处理
 CHAR(M)列的存储格式  
 - 当列采用的是定长字符集时，该列占用的字节数不会被加到变长字段长度列表，而如果采用变长字符集时，该列占用的字节数也会被加到变长字段长度列表  
 - 变长字符集的CHAR(M)类型的列要求至少占用M个字节
-```
 
-*Redundant*    
-<table>
-    <tr><td colspan="2">记录的额外信息</td><td>记录的真实数据</td></tr>
-    <tr><td>字段长度偏移列表</td><td>记录头信息</td><td>列的值</td></tr>
-</table>
-
-```
+Redundant
 字段长度偏移列表  
 - 采用两个相邻数值的差值来计算各个列值的长度  
 - 偏移量值的第一个比特位作为是否为NULL的依据
 
-记录头信息  
-| 名称 | 大(单位：bit) | 描述 |
-| :---: | :---: | :---: |
-| 预留位1 | 1 | 没有使用 |
-| 预留位2 | 1 | 没有使用 |
-| delete_mask | 1 | 标记该记录是否被删除 |
-| min_rec_mask | 1 | B+树的每层非叶子节点中的最小记录都会添加该标记 |
-| n_owned | 4 | 表示当前记录拥有的记录数 |
-| heap_no | 13 | 表示当前记录在记录堆的位置信息 |
-| n_field | 10 | 表示记录中列的数量 |
-| 1byte_offs_flag | 1 | 标记字段长度偏移列表中每个列对应的偏移量是使用1字节还是2字节表示的 |
-| next_record | 16 | 表示下一条记录的相对位置 |
-固定6个字节, 48个二进制位  
-1byte_offs_flag 记录的真实数据占用的存储空间大小大于127, 使用2个字节来表示该列对应的偏移量  
-
-记录的真实数据  
 NULL值处理  
 - 如果存储NULL值的字段是定长类型的，则NULL值也将占用记录的真实数据部分，并把该字段对应的数据使用0x00字节填充  
 - 如果该存储NULL值的字段是变长类型的，则不在记录的真实数据处占用任何存储空间
 
 CHAR(M)列的存储格式   
 - 占用空间M×W个字节  
-```
 
-*Dynamic*  
-```  
+Dynamic
 格式类似于COMPACT行格式，处理行溢出数据时把所有的字节都存储到其他页面中，只在记录的真实数据处存储其他页面的地址
-```
-*Compressed*  
-```
-格式类似于Dynamic，采用压缩算法对页面进行压缩
-```
 
-#### 行溢出 ####
-```
+Compressed
+格式类似于Dynamic，采用压缩算法对页面进行压缩
+
+行溢出
 一个页一般是16KB，当记录中的数据太多，当前页放不下的时候，会把多余的数据存储到其他页中，这种现象称为行溢出  
 对于Compact和Redundant行格式来说，如果某一列中的数据非常多的话，在本记录的真实数据处只会存储该列的前768个字节的数据和一个指向其他页的地址，然后把剩下的数据存放到其他页中
 ```
