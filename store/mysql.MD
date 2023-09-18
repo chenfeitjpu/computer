@@ -9,15 +9,7 @@
     - [优化](#优化)
     - [计划](#计划)
   - [事务](#事务)
-    - [使用](#使用-1)
-    - [并发](#并发)
   - [存储程序](#存储程序)
-    - [语法](#语法)
-    - [游标](#游标)
-    - [存储函数](#存储函数)
-    - [存储过程](#存储过程)
-    - [触发器](#触发器)
-    - [事件](#事件)
   - [存储结构](#存储结构)
     - [行结构](#行结构)
       - [基本操作](#基本操作)
@@ -27,7 +19,7 @@
       - [InnoDB数据页结构](#innodb数据页结构)
     - [视图](#视图)
     - [索引结构](#索引结构)
-      - [使用](#使用-2)
+      - [使用](#使用-1)
       - [InnoDB索引结构](#innodb索引结构)
       - [MyISAM索引结构](#myisam索引结构)
     - [数据目录](#数据目录)
@@ -124,10 +116,13 @@ create table 表名 (列的信息)
 - 否则的话需要将请求中的字符串从character_set_connection代表的字符集转换为具体操作的列使用的字符集之后再进行操作  
 - 将从某个列获取到的字节串从该列使用的字符集转换为character_set_results代表的字符集后发送到客户端  
 - 客户端使用操作系统的字符集解析收到的结果集字节串
-```
 
-查询过程  
-![avatar](./image/mysql/../../images/mysql/flow_query.webp)
+查询过程
+- 连接管理
+- 解析与优化
+- 存储引擎
+```
+[查询流程图](./image/mysql/../../images/mysql/flow_query.webp)
 
 ## 数据类型 ##
 ```
@@ -422,7 +417,7 @@ IN子查询优化
 ### 计划 ###
 ```
 explain
-- id 查询语句中每出现一个SELECT关键字，就会为它分配一个唯一的id值
+- id  查询语句中每出现一个SELECT关键字，就会为它分配一个唯一的id值
 - select_type  查询方式
   - SIMPLE  查询语句中不包含UNION或者子查询的查询都算作是SIMPLE类型  
   - PRIMARY  对于包含UNION、UNION ALL或者子查询的大查询来说，它是由几个小查询组成的，其中最左边的那个查询的select_type值就是PRIMARY  
@@ -463,7 +458,7 @@ explain
   - No matching min/max row  当查询列表处有MIN或者MAX聚集函数，但是并没有符合WHERE子句中的搜索条件的记录时  
   - Using index  查询列表以及搜索条件中只包含属于某个索引的列，也就是在可以使用索引覆盖的情况下  
   - Using index condition  索引条件下推  
-  - Using where  WHERE子句中有搜索条件  
+  - Using where  搜索条件需要在server层进行判断时 
   - Using join buffer (Block Nested Loop)  基于块的嵌套循环算法  
   - Not exists  使用左（外）连接时，如果WHERE子句中包含要求被驱动表的某个列等于NULL值的搜索条件，而且那个列又是不允许存储NULL值的  
   - Using intersect(...)、Using union(...)和Using sort_union(...)  使用索引合并的方式执行查询  
@@ -776,7 +771,7 @@ INSUFFICIENT_PRIVILEGES: 1
 </details>
 
 ## 事务 ##
-### 使用 ###
+状态转移
 ![avatar](./images/mysql/transaction-state.awebp)
 
 ```
@@ -787,35 +782,25 @@ INSUFFICIENT_PRIVILEGES: 1
 - 持久性（Durability）
 
 状态  
-- 活动的（active
-- 部分提交的（partially committed）
-- 失败的（failed）
-- 中止的（aborted）
-- 提交的（committed）
-
-开启事务    
-- `BEGIN [WORK]`  
-- `START TRANSACTION [READ ONLY | READ WRITE | WITH CONSISTENT SNAPSHOT]`  
-
-提交事务  
-`COMMIT [WORK]`
-
-手动中止事务  
-`ROLLBACK [WORK]`
-
-自动提交    
-`autocommit`
-
-隐式提交  
+- 活动的(active)
+- 部分提交的(partially committed)
+- 失败的(failed)
+- 中止的(aborted)
+- 提交的(committed)
  
+操作
+- `BEGIN [WORK]`  开启事务   
+- `START TRANSACTION [READ ONLY|READ WRITE] [WITH CONSISTENT SNAPSHOT]`  开启事务  
+- `COMMIT [WORK]`  提交事务
+- `ROLLBACK [WORK]`  手动中止事务 
+- `AUTOCOMMIT` 自动提交
+   
 保存点
 - `SAVEPOINT 保存点名称`  定义
 - `ROLLBACK [WORK] TO [SAVEPOINT] 保存点名称` 回滚
 - `RELEASE SAVEPOINT 保存点名称` 删除 
-```
 
-### 并发 ###
-```
+并发
 问题  
 - 脏写 一个事务修改了另一个未提交事务修改过的数据，那就意味着发生了脏写  
 - 脏读 一个事务读到了另一个未提交事务修改过的数据，那就意味着发生了脏读   
@@ -843,10 +828,8 @@ level: {
     READ UNCOMMITTED
     SERIALIZABLE
 }
-```
 
-*MVCC*  
-```
+MVCC
 版本链    
 记录中包含两个必要的隐藏列  
 - trx_id 每次一个事务对某条聚簇索引记录进行改动时，都会把该事务的事务id赋值给trx_id隐藏列
@@ -871,8 +854,8 @@ ReadView
 ```
 
 ## 存储程序 ##
-### 语法 ###
-```  
+``` 
+语法 
 - `declare 变量名 数据类型 [default value]` 定义局部变量
 - `set name=value` 变量赋值
 - `into name, name` 多个变量赋值
@@ -903,19 +886,15 @@ until 表达式 end repeat
 
 loop  
 end loop
-```
 
-### 游标 ###
-```  
+游标
 - `declare 游标名 cursor for select` 创建游标 
 - `declare continue handler for not found` 事件响应
 - `open 游标名` 打开游标  
 - `fetch 游标名 into` 移动游标
 - `close 游标名` 关闭游标
-```
 
-### 存储函数 ### 
-``` 
+存储函数
 - `show function status [like 函数名]` 查看所有函数
 - `show create function 函数名` 查看函数定义
 - `create function 函数名(参数名 数据类型, 参数名 数据类型)  
@@ -925,20 +904,16 @@ end loop
       return
   end`
 - `drop function 函数名` 删除函数
-```
 
-### 存储过程 ###
-```
+存储过程
 - `show procedure status [like 存储过程名]` 查看所有存储过程
 - `show create procedure 存储过程名` 查看存储过程定义
 - `create procedure 存储过程名([in|out|inout]参数名 数据类型)  
   begin  
   end`
 - `drop procedure 存储过程名` 删除存储过程
-```
 
-### 触发器 ###
-```
+触发器
 - `show triggers` 查看所有触发器
 - `show create trigger 触发器名` 查看触发器定义
 - `create trigger 触发器名  
@@ -948,10 +923,8 @@ end loop
     {old|new}  
   end` 
 - `drop trigger 触发器名` 删除触发器
-```
 
-### 事件 ###
-```
+事件
 - `show events` 查看所有事件
 - `show create event 事件名` 查看事件定义
 - `create event 事件名  
