@@ -122,7 +122,9 @@ create table 表名 (列的信息)
 - 解析与优化
 - 存储引擎
 ```
-[查询流程图](./image/mysql/../../images/mysql/flow_query.webp)
+[查询流程图](./images/mysql/flow_query.webp)
+
+
 
 ## 数据类型 ##
 ```
