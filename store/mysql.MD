@@ -1083,21 +1083,14 @@ myisam
 ```
 
 ### InnoDB表空间 ###
-[区](https://raw.githubusercontent.com/chenfeitjpu/computer/master/store/images/mysql/extent_xdes_entry.webp)
-
-[段](https://raw.githubusercontent.com/chenfeitjpu/computer/master/store/images/segment_inode_entry.webp)
-
-[独立表空间](https://raw.githubusercontent.com/chenfeitjpu/computer/master/store/images/mysql/table_space_per.webp)
-
-[系统表空间](https://raw.githubusercontent.com/chenfeitjpu/computer/master/store/images/mysql/table_space_system.webp)
-
-[FSP_HDR](https://raw.githubusercontent.com/chenfeitjpu/computer/master/store/images/mysql/table_space_page_fsp_hdr.webp)
-
-[INODE](https://raw.githubusercontent.com/chenfeitjpu/computer/master/store/images/mysql/table_space_page_inode.webp)
-
-[XDES](https://raw.githubusercontent.com/chenfeitjpu/computer/master/store/images/mysql/table_space_page_xdes.webp)
-
-[表空间](https://raw.githubusercontent.com/chenfeitjpu/computer/master/store/images/mysql/table_space.webp)
+[区](https://raw.githubusercontent.com/chenfeitjpu/computer/master/store/images/mysql/extent_xdes_entry.webp)  
+[段](https://raw.githubusercontent.com/chenfeitjpu/computer/master/store/images/mysql/egment_inode_entry.webp)  
+[独立表空间](https://raw.githubusercontent.com/chenfeitjpu/computer/master/store/images/mysql/table_space_per.webp)  
+[系统表空间](https://raw.githubusercontent.com/chenfeitjpu/computer/master/store/images/mysql/table_space_system.webp)  
+[FSP_HDR](https://raw.githubusercontent.com/chenfeitjpu/computer/master/store/images/mysql/table_space_page_fsp_hdr.webp)  
+[INODE](https://raw.githubusercontent.com/chenfeitjpu/computer/master/store/images/mysql/table_space_page_inode.webp)  
+[XDES](https://raw.githubusercontent.com/chenfeitjpu/computer/master/store/images/mysql/table_space_page_xdes.webp)  
+[表空间](https://raw.githubusercontent.com/chenfeitjpu/computer/master/store/images/mysql/table_space.webp)  
 ```
 区
 概念  
