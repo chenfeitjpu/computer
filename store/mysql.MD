@@ -17,7 +17,6 @@
     - [索引结构](#索引结构)
     - [数据目录](#数据目录)
     - [InnoDB表空间](#innodb表空间)
-      - [区](#区)
     - [InnoDB的Buffer Pool](#innodb的buffer-pool)
   - [日志](#日志)
     - [redo日志](#redo日志)
@@ -1084,7 +1083,6 @@ myisam
 ```
 
 ### InnoDB表空间 ###
-#### 区 ####
 [区](https://raw.githubusercontent.com/chenfeitjpu/computer/master/store/images/mysql/extent_xdes_entry.webp)
 
 [段](https://raw.githubusercontent.com/chenfeitjpu/computer/master/store/images/segment_inode_entry.webp)
