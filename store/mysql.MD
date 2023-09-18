@@ -5,6 +5,7 @@
   - [数据类型](#数据类型)
   - [SQL](#sql)
   - [查询](#查询)
+    - [加速](#加速)
     - [分类](#分类)
     - [优化](#优化)
     - [计划](#计划)
@@ -13,19 +14,10 @@
   - [存储结构](#存储结构)
     - [行结构](#行结构)
     - [页结构](#页结构)
-      - [InnoDB数据页结构](#innodb数据页结构)
-    - [视图](#视图)
     - [索引结构](#索引结构)
-      - [使用](#使用-1)
-      - [InnoDB索引结构](#innodb索引结构)
-      - [MyISAM索引结构](#myisam索引结构)
     - [数据目录](#数据目录)
     - [InnoDB表空间](#innodb表空间)
       - [区](#区)
-      - [段](#段)
-      - [独立表空间](#独立表空间)
-      - [系统表空间](#系统表空间)
-      - [总览](#总览)
     - [InnoDB的Buffer Pool](#innodb的buffer-pool)
   - [日志](#日志)
     - [redo日志](#redo日志)
@@ -249,6 +241,45 @@ DCL
 ```
 
 ## 查询 ##
+### 加速 ###
+```
+索引名
+基本操作  
+CREATE TALBE 表名 (
+    各种列的信息 ··· , 
+    [KEY|INDEX] 索引名 (需要被索引的单个列或多个列)
+)
+
+ALTER TABLE 表名 ADD [INDEX|KEY] 索引名 (需要被索引的单个列或多个列)
+ALTER TABLE 表名 DROP [INDEX|KEY] 索引名
+
+应用  
+- 全值匹配
+- 匹配左边的列
+- 匹配列前缀
+- 匹配范围值
+- 用于排序
+- 用于分组
+
+注意事项
+- 只为用于搜索、排序或分组的列创建索引
+- 为列的基数大的列创建索引
+- 索引列的类型尽量小
+- 可以只对字符串值的前缀建立索引
+- 只有索引列在比较表达式中单独出现才可以适用索引
+- 为了尽可能少的让聚簇索引发生页面分裂和记录移位的情况，建议让主键拥有AUTO_INCREMENT属性
+- 定位并删除表中的重复和冗余索引
+- 尽量使用覆盖索引进行查询，避免回表带来的性能损耗
+
+代价  
+- 占用额外的存储空间  
+- 增删改时需要维护索引值的顺序  
+
+回表  
+- 会使用到两个B+树索引，一个二级索引，一个聚簇索引  
+- 访问二级索引使用顺序I/O，访问聚簇索引使用随机I/O  
+```
+
 ### 分类 ###
 ```
 简单查询   
@@ -939,6 +970,7 @@ end loop
 ## 存储结构 ##
 ### 行结构 ###  
 [compact行格式](https://raw.githubusercontent.com/chenfeitjpu/computer/master/store/images/mysql/innodb_row_format_compact.webp)
+
 [redundant行格式](https://raw.githubusercontent.com/chenfeitjpu/computer/master/store/images/mysql/innodb_row_format_redundant.webp)
 
 ```
@@ -992,164 +1024,25 @@ Compressed
 ```
 
 ### 页结构 ###
-#### InnoDB数据页结构 ####  
-| 名称 | 中文名 | 占用空间 | 简单描述 |
-| :---: | :---: | :---: | :---: |
-| File Header | 文件头部 | 38字节 | 页的一些通用信息 |
-| Page Header | 页面头部 | 56字节 | 数据页专有的一些信息 |
-| Infimun + Supremum | 最小记录和最大记录 | 26字节 | 两个虚拟的行记录 |
-| User Records | 用户记录 | 不确定 | 实际存储的行记录内容 |
-| Free Space | 空闲空间 | 不确定 | 页中尚未使用的空间 |
-| Page Directory | 页面目录 | 不确定 | 页中的某些记录的相对位置 |
-| File Trailer | 文件尾部 | 8字节 | 校验页是否完整 |
+[innodb数据页结构](https://raw.githubusercontent.com/chenfeitjpu/computer/master/store/images/mysql/innodb_page.webp)
 
-*File Header*  
 ```
-| 名称 | 占用空间大小 | 描述 |
-| :---: | :---: | :---: |
-| FIL_PAGE_SPACE_OR_CHKSUM | 4字节 | 页的校验和 |
-| FIL_PAGE_OFFSET | 4字节 | 页号 |
-| FIL_PAGE_PREV | 4字节 | 上一页 |
-| FIL_PAGE_NEXT | 4字节 | 下一页 |
-| FIL_PAGE_LSN | 8字节 | 页面被最后修改时对应的日志序列位置 |
-| FIL_PAGE_TYPE | 2字节 | 该页的类型 |
-| FIL_PAGE_FILE_FLUSH_LSN | 8字节 | 仅在系统表空间的一个页中定义，代表文件至少被刷新到了对应的LSN值 |
-| FIL_PAGE_ARCH_LOG_NO_OR_SPACE_ID | 4字节 | 页属于哪个表空间 |
-```
-
-*Page Header*  
-```
-| 名称 | 占用空间大小 | 描述 |
-| :---: | :---: | :---: |
-| PAGE_N_DIR_SLOTS | 2字节 | 在页目录中的槽数量 |
-| PAGE_HEAP_TOP | 2字节 | 还未使用的空间最小地址，也就是说从该地址之后就是Free Space |
-| PAGE_N_HEAP | 2字节 | 本页中的记录的数量（包括最小和最大记录以及标记为删除的记录） |
-| PAGE_FREE | 2字节 | 第一个已经标记为删除的记录地址（各个已删除的记录通过next_record也会组成一个单链表，这个单链表中的记录可以被重新利用） |
-| PAGE_GARBAGE | 2字节 | 已删除记录占用的字节数 |
-| PAGE_LAST_INSERT | 2字节 | 最后插入记录的位置 |
-| PAGE_DIRECTION | 2字节 | 记录插入的方向 |
-| PAGE_N_DIRECTION | 2字节 | 一个方向连续插入的记录数量 |
-| PAGE_N_RECS | 2字节 | 该页中记录的数量（不包括最小和最大记录以及被标记为删除的记录） |
-| PAGE_MAX_TRX_ID | 8字节 | 修改当前页的最大事务ID，该值仅在二级索引中定义 |
-| PAGE_LEVEL | 2字节 | 当前页在B+树中所处的层级 |
-| PAGE_INDEX_ID | 8字节 | 索引ID，表示当前页属于哪个索引 |
-| PAGE_BTR_SEG_LEAF | 10字节 | B+树叶子段的头部信息，仅在B+树的Root页定义 |
-| PAGE_BTR_SEG_TOP | 10字节 | B+树非叶子段的头部信息，仅在B+树的Root页定义 |
-
-PAGE_DIRECTION  
-假如新插入的一条记录的主键值比上一条记录的主键值大，我们说这条记录的插入方向是右边，反之则是左边
-
-PAGE_N_DIRECTION  
-假设连续几次插入新记录的方向都是一致的，InnoDB会把沿着同一个方向插入记录的条数记下来
-```
-
-*Infimun + Supremum*  
-
-*User Records*  
-```
-| 名称 | 大小（单位：bit） | 描述 |
-| :---: | :---: | :---: |
-| 预留位1 | 1 | 没有使用 |
-| 预留位2 | 1 | 没有使用 |
-| delete_mask | 1 | 标记该记录是否被删除 |
-| min_rec_mask | 1 | B+树的每层非叶子节点中的最小记录都会添加该标记 |
-| n_owned | 4 | 表示当前记录拥有的记录数 |
-| heap_no | 13 | 表示当前记录在记录堆的位置信息 |
-| record_type | 3 | 表示当前记录的类型，0表示普通记录，1表示B+树非叶节点记录，2表示最小记录，3表示最大记录 |
-| next_record | 16 | 表示下一条记录的相对位置 |  
-
-delete_mask      
-这个属性标记着当前记录是否被删除，占用1个二进制位，值为0的时候代表记录并没有被删除，为1的时候代表记录被删除掉了  
-所有被删除掉的记录都会组成一个所谓的垃圾链表，在这个链表中的记录占用的空间称之为所谓的可重用空间  
-
-min_rec_mask  
-B+树的每层非叶子节点中的最小记录都会添加该标记  
-
-n_owned  
-该记录拥有多少条记录  
-
-heap_no   
-当前记录在本页中的位置  
-
-record_type  
-0表示普通记录，1表示B+树非叶节点记录，2表示最小记录，3表示最大记录
-
-next_record  
-当前记录的真实数据到下一条记录的真实数据的地址偏移量  
-下一条记录指得并不是按照我们插入顺序的下一条记录，而是按照主键值由小到大的顺序的下一条记录  
-```
-
-*Page Directory*  
-```
+InnoDB数据页结构
 目录的生成  
-将所有正常的记录（包括最大和最小记录，不包括标记为已删除的记录）划分为几个组  
-每个组的最后一条记录（也就是组内最大的那条记录）的头信息中的n_owned属性表示该记录拥有多少条记录，也就是该组内共有几条记录  
-将每个组的最后一条记录的地址偏移量单独提取出来按顺序存储到靠近页的尾部的地方
+- 将所有正常的记录（包括最大和最小记录，不包括标记为已删除的记录）划分为几个组  
+- 每个组的最后一条记录（也就是组内最大的那条记录）的头信息中的n_owned属性表示该记录拥有多少条记录，也就是该组内共有几条记录  
+- 将每个组的最后一条记录的地址偏移量单独提取出来按顺序存储到靠近页的尾部的地方
 
 记录分组过程
-分组规定：对于最小记录所在的分组只能有 1 条记录，最大记录所在的分组拥有的记录条数只能在 1~8 条之间，剩下的分组中记录的条数范围只能在是 4~8 条之间  
-初始情况下一个数据页里只有最小记录和最大记录两条记录，它们分属于两个分组  
-之后每插入一条记录，都会从页目录中找到主键值比本记录的主键值大并且差值最小的槽，然后把该槽对应的记录的n_owned值加1，表示本组内又添加了一条记录，直到该组中的记录数等于8个  
-在一个组中的记录数等于8个后再插入一条记录时，会将组中的记录拆分成两个组，一个组中4条记录，另一个5条记录。这个过程会在页目录中新增一个槽来记录这个新增分组中最大的那条记录的偏移量  
-```
-
-*File Trailer*  
-```
-前4个字节代表页的校验和  
-后4个字节代表页面被最后修改时对应的日志序列位置(LSN)
-```
-
-### 视图 ###
-```
-- `show tables` 查看所有视图
-- `desc 视图名` 查看视图描述
-- `show create view 视图名` 查看视图定义
-- `create view 视图名[(列名,列名)] as select` 创建视图
-- `drop view 视图名` 删除视图
+- 对于最小记录所在的分组只能有 1 条记录，最大记录所在的分组拥有的记录条数只能在 1~8 条之间，剩下的分组中记录的条数范围只能在是 4~8 条之间  
+- 初始情况下一个数据页里只有最小记录和最大记录两条记录，它们分属于两个分组  
+- 之后每插入一条记录，都会从页目录中找到主键值比本记录的主键值大并且差值最小的槽，然后把该槽对应的记录的n_owned值加1，表示本组内又添加了一条记录，直到该组中的记录数等于8个  
+- 在一个组中的记录数等于8个后再插入一条记录时，会将组中的记录拆分成两个组，一个组中4条记录，另一个5条记录。这个过程会在页目录中新增一个槽来记录这个新增分组中最大的那条记录的偏移量  
 ```
 
 ### 索引结构 ###
-#### 使用 ####
 ```
-基本操作  
-CREATE TALBE 表名 (
-    各种列的信息 ··· , 
-    [KEY|INDEX] 索引名 (需要被索引的单个列或多个列)
-)
-
-ALTER TABLE 表名 ADD [INDEX|KEY] 索引名 (需要被索引的单个列或多个列)
-ALTER TABLE 表名 DROP [INDEX|KEY] 索引名
-
-应用  
-- 全值匹配
-- 匹配左边的列
-- 匹配列前缀
-- 匹配范围值
-- 用于排序
-- 用于分组
-
-注意事项
-- 只为用于搜索、排序或分组的列创建索引
-- 为列的基数大的列创建索引
-- 索引列的类型尽量小
-- 可以只对字符串值的前缀建立索引
-- 只有索引列在比较表达式中单独出现才可以适用索引
-- 为了尽可能少的让聚簇索引发生页面分裂和记录移位的情况，建议让主键拥有AUTO_INCREMENT属性
-- 定位并删除表中的重复和冗余索引
-- 尽量使用覆盖索引进行查询，避免回表带来的性能损耗
-
-代价  
-- 占用额外的存储空间  
-- 增删改时需要维护索引值的顺序  
-
-回表  
-- 会使用到两个B+树索引，一个二级索引，一个聚簇索引  
-- 访问二级索引使用顺序I/O，访问聚簇索引使用随机I/O  
-```
-
-#### InnoDB索引结构 ####
-```
-索引方案  
+InnoDB索引方案  
 - 数据页中用户记录按主键值升序排列  
 - 给所有数据页建立一个目录项    
 
@@ -1163,16 +1056,15 @@ ALTER TABLE 表名 DROP [INDEX|KEY] 索引名
 - 通过目录项记录页确定用户记录所在的页  
 - 在用户记录的页中定位到具体的记录  
 - 根据主键值去聚簇索引中再查找一遍完整的用户记录  
-```
 
-#### MyISAM索引结构 ####
-```
+MyISAM索引结构
 - 将表中的记录按照记录的插入顺序单独存储在一个文件中，称之为数据文件。我们可以通过行号或者地址偏移量快速访问到一条记录
 - 把索引信息另外存储到一个称为索引文件的另一个文件中
 ```
 
 ### 数据目录 ###
-```    
+```
+基本操作    
 `show variables like 'datadir'` 查看数据目录
 
 数据库在文件系统中的表示  
@@ -1180,8 +1072,7 @@ ALTER TABLE 表名 DROP [INDEX|KEY] 索引名
 - 在该与数据库名同名的子目录下创建一个名为db.opt的文件，这个文件中包含了该数据库的各种属性  
 
 数据表在文件系统中的表示
-定义  
-表名.frm  
+定义  表名.frm  
 
 数据  
 innodb  
@@ -1194,32 +1085,40 @@ myisam
 
 ### InnoDB表空间 ###
 #### 区 ####
-![avatar](./images/mysql/extent_xdes_entry.webp)
+[区](https://raw.githubusercontent.com/chenfeitjpu/computer/master/store/images/mysql/extent_xdes_entry.webp)
 
+[段](https://raw.githubusercontent.com/chenfeitjpu/computer/master/store/images/segment_inode_entry.webp)
+
+[独立表空间](https://raw.githubusercontent.com/chenfeitjpu/computer/master/store/images/mysql/table_space_per.webp)
+
+[系统表空间](https://raw.githubusercontent.com/chenfeitjpu/computer/master/store/images/mysql/table_space_system.webp)
+
+[FSP_HDR](https://raw.githubusercontent.com/chenfeitjpu/computer/master/store/images/mysql/table_space_page_fsp_hdr.webp)
+
+[INODE](https://raw.githubusercontent.com/chenfeitjpu/computer/master/store/images/mysql/table_space_page_inode.webp)
+
+[XDES](https://raw.githubusercontent.com/chenfeitjpu/computer/master/store/images/mysql/table_space_page_xdes.webp)
+
+[表空间](https://raw.githubusercontent.com/chenfeitjpu/computer/master/store/images/mysql/table_space.webp)
 ```
+区
 概念  
 - 表空间被划分为许多连续的区，每个区默认由64个页组成  
 - 每256个区划分为一组，每个组的最开始的几个页面类型是固定的就好了  
 
-分类  
-| 状态名 | 含义 |
-| :--: | :-- : |
-| FREE | 空闲的区 |
-| FREE_FRAG | 有剩余空间的碎片区 |
-| FULL_FRAG | 没有剩余空间的碎片区 |
-| FSEG | 附属于某个段的区 |
+状体
+- 空闲区
+- 有剩余空间的碎片区
+- 没有剩余空间的碎片区
+- 附属于某个段的区
 
 结构
 - Segment ID(8字节) 该区所在的段  
 - List Node(12字节) 将若干个XDES Entry结构串联成一个链表
 - State(4字节) 区的状态
 - Page State Bitmap(16字节) 一个区默认有64个页，这128个比特位被划分为64个部分，每个部分2个比特位，对应区中的一个页，这两个比特位的第一个位表示对应的页是否是空闲的，第二个比特位还没有用  
-```
 
-#### 段 ####
-![avatar](./images/mysql/segment_inode_entry.webp)
-
-```
+段
 概念  
 某些零散的页面以及一些完整的区的集合  
 
@@ -1233,24 +1132,8 @@ myisam
 - List Base Node 分别为段的FREE链表、NOT_FULL链表、FULL链表定义了List Base Node
 - Magic Number 这个值是用来标记这个INODE Entry是否已经被初始化了（初始化的意思就是把各个字段的值都填进去了）。如果这个数字是值的97937874，表明该INODE Entry已经初始化，否则没有被初始化。（不用纠结这个值有啥特殊含义，人家规定的）
 - Fragment Array Entry 每个Fragment Array Entry结构都对应着一个零散的页面，这个结构一共4个字节，表示一个零散页面的页号
-``` 
-#### 独立表空间 ####
-![avatar](./images/mysql/table_space_per.webp)
+```
 
-*FSP_HDR*  
-![avatar](./images/mysql/table_space_page_fsp_hdr.webp)
-
-*INODE*  
-![avatar](./images/msyql/../mysql/table_space_page_inode.webp)
-
-#### 系统表空间 ####
-![avatar](./images/mysql/table_space_system.webp)
-
-**XDES**  
-![avatar](./images/mysql/table_space_page_xdes.webp)
-
-#### 总览 ####
-![avatar](./images/mysql/table_space.webp)
 
 ### InnoDB的Buffer Pool ###
 ![avatar](./images/mysql/innodb-buffer-pool.awebp)
