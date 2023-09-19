@@ -24,7 +24,6 @@
     - [bin日志](#bin日志)
     - [两阶段提交](#两阶段提交)
   - [锁](#锁)
-    - [InnoDB存储引擎中的锁](#innodb存储引擎中的锁)
 
 # 定义 #
 关系型数据库
@@ -242,7 +241,7 @@ DCL
 ## 查询 ##
 ### 加速 ###
 ```
-索引名
+索引
 基本操作  
 CREATE TALBE 表名 (
     各种列的信息 ··· , 
@@ -1084,7 +1083,7 @@ myisam
 
 ### InnoDB表空间 ###
 [区](https://raw.githubusercontent.com/chenfeitjpu/computer/master/store/images/mysql/extent_xdes_entry.webp)  
-[段](https://raw.githubusercontent.com/chenfeitjpu/computer/master/store/images/mysql/egment_inode_entry.webp)  
+[段](https://raw.githubusercontent.com/chenfeitjpu/computer/master/store/images/mysql/segment_inode_entry.webp)  
 [独立表空间](https://raw.githubusercontent.com/chenfeitjpu/computer/master/store/images/mysql/table_space_per.webp)  
 [系统表空间](https://raw.githubusercontent.com/chenfeitjpu/computer/master/store/images/mysql/table_space_system.webp)  
 [FSP_HDR](https://raw.githubusercontent.com/chenfeitjpu/computer/master/store/images/mysql/table_space_page_fsp_hdr.webp)  
@@ -1127,7 +1126,7 @@ myisam
 
 
 ### InnoDB的Buffer Pool ###
-![avatar](./images/mysql/innodb-buffer-pool.awebp)
+[buffer poll](https://raw.githubusercontent.com/chenfeitjpu/computer/master/store/images/mysql/innodb-buffer-pool.awebp)
 
 ```
 定义   
@@ -1266,7 +1265,6 @@ innodb_flush_log_at_trx_commit
 ![avatar](./images/mysql/transaction-xa-commit.webp)
 
 ## 锁 ##
-*通用锁*  
 ```
 并发问题
 - 读-读  
@@ -1278,23 +1276,23 @@ innodb_flush_log_at_trx_commit
   - 读操作利用多版本并发控制（MVCC），写操作进行加锁
   - 读、写操作都采用加锁的方式  
 
-共享锁和独占锁  
+分类
 - 共享锁，S锁
-- 独占锁，X锁   
+- 独占锁，X锁
 兼容情况  
-  | 兼容性 | X | S |
-  | :---: | :---: | :---: |
-  | X | 不兼容 | 不兼容 |
-  | S | 不兼容 | 兼容 |
+| 兼容性 | X | S |
+| :---: | :---: | :---: |
+| X | 不兼容 | 不兼容 |
+| S | 不兼容 | 兼容 |
 
 锁定读  
 - 对读取的记录加S锁 `SELECT ... LOCK IN SHARE MODE`
 - 对读取的记录加X锁 `SELECT ... FOR UPDATE`
 
 写操作
-- DELETE 加X锁  
+- DELETE 隐式删除，加X锁  
 - UPDATE
-  - 不修改键值，原纪录修改 加X锁
+  - 不修改键值，原记录修改 加X锁
   - 不修改键值，新记录修改 彻底删除再添加
   - 修改键值 删除再添加
 - INSERT 不加锁  
@@ -1310,10 +1308,9 @@ innodb_flush_log_at_trx_commit
 | IX | 不兼容 | 兼容 | 不兼容 | 兼容 |
 | S | 不兼容 | 不兼容 | 兼容 | 兼容 |
 | IS | 不兼容 | 兼容 | 兼容 | 兼容 |
-```
 
-### InnoDB存储引擎中的锁 ###
-```
+
+InnoDB存储引擎中的锁
 表级锁
 - S锁、 X锁
 - IS锁、IX锁
@@ -1324,5 +1321,4 @@ innodb_flush_log_at_trx_commit
 - Gap Locks
 - Next-Key Locks
 - Insert Intention Locks
-- 隐式锁  
 ```
