@@ -533,6 +533,7 @@ AOF重写机制
 自动重写
 `auto-aof-rewrite-min-size`  aof文件大小阀值
 `auto-aof-rewrite-percentage`  aof文件扩展比例
+`no-appendfsync-on-rewrite`  在执行AOF文件重写时是否禁用同步
 手动重写
 bgrewriteaof(异步)
 重写过程
