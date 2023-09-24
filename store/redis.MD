@@ -37,12 +37,12 @@ key
 
 db  
 - `SELECT db`  切换数据库
-- `FLUSHDB`  清空当前数据库中的所有键
-- `FLUSHALL`  清空所有数据库的所有键
+- `FLUSHDB [ASYNC]`  清空当前数据库中的所有键
+- `FLUSHALL [ASYNC]`  清空所有数据库的所有键
 - `DBSIZE`  当前数据库的key数量
 
 string 
-- `SET key value [EX second | PX millisecond] [EXAT timestamp | PXAT timestamp] [nx|xx] [GET] [KEEPTTL]` 设置键值对
+- `SET key value [EX second | PX millisecond] [EXAT timestamp | PXAT timestamp] [NX|XX] [GET] [KEEPTTL]` 设置键值对
 - `SETNX key value` 设置键值对，key不存在
 - `SETEX key second value` 设置过期时间，以秒为单位
 - `PSETEX key millisecond value` 设置过期时间，以毫秒为单位
@@ -101,7 +101,7 @@ set
 - `SREM key member [member]`  从集合中移除指定元素
 - `SMOVE source destination member` 移动集合元素
 - `SISMEMBER key member`  判断元素是否在集合中
-- `SRANDOMMEMBER key count`  随机返回集合中的元素
+- `SRANDMEMBER key count`  随机返回集合中的元素
 - `SMEMBERS key`  返回集合中所有元素
 - `SINTER key key`  求集合交集
 - `SINTERSTORE destination key key`  存储集合交集
@@ -403,7 +403,7 @@ typedef struct dictEntry {
 哈希冲突加剧，导致查询性能降低
 
 解决
-refresh
+rehash
 ```
 
 **整数集合**
@@ -509,9 +509,6 @@ redis.conf
 appendonly yes //是否开启aof持久化(默认no:关闭)
 appendfilename "appendonly.aof" //aof持久化文件名称
 
-手动
-bgrewriteaof(异步)
-
 执行过程
 - 执行写命令
 - 记录命令到日志
@@ -523,9 +520,9 @@ bgrewriteaof(异步)
 - 阻塞下一个命令的执行
 
 写回策略
-- Always  每次写操作命令执行完后，同步将AOF日志数据写回硬盘
-- Everysec  每次写操作命令执行完后，先将命令写入到AOF文件的内核缓冲区，然后每隔一秒将缓冲区里的内容写回到硬盘
-- No  每次写操作命令执行完后，先将命令写入到AOF文件的内核缓冲区，再由操作系统决定何时将缓冲区内容写回硬盘
+- Always  每次写操作命令执行完后，同步将AOF日志数据写回硬盘(同步将AOF日志数据写回硬盘)
+- Everysec  每次写操作命令执行完后，先将命令写入到AOF文件的内核缓冲区，然后每隔一秒将缓冲区里的内容写回到硬盘(异步)
+- No  每次写操作命令执行完后，先将命令写入到AOF文件的内核缓冲区，再由操作系统决定何时将缓冲区内容写回硬盘(异步)
 
 fsync()函数的调用时机
 - Always  每次写入AOF文件数据后，就执行fsync()函数；
@@ -533,6 +530,12 @@ fsync()函数的调用时机
 - No  永不执行fsync()函数
 
 AOF重写机制
+自动重写
+`auto-aof-rewrite-min-size`  aof文件大小阀值
+`auto-aof-rewrite-percentage`  aof文件扩展比例
+手动重写
+bgrewriteaof(异步)
+重写过程
 - 主进程在通过fork系统调用生成bgrewriteaof子进程(会阻塞主进程)
 - 子进程进行aof文件重写(异步执行)
 - 主进程修改了已经存在key-value，发生写时复制(会阻塞主进程)
@@ -573,6 +576,10 @@ aof
 - 当使用Always策略的时候，如果写入是一个大Key，主线程在执行fsync()函数的时候，阻塞的时间会比较久，因为当写入的数据量很大的时候，数据同步到硬盘这个过程是很耗时的
 - 当使用Everysec策略的时候，由于是异步执行fsync()函数，所以大Key持久化的过程不会影响主线程。
 - 当使用No策略的时候，由于永不执行fsync()函数，所以大Key持久化的过程不会影响主线程
+aof重写
+- 创建子进程的途中，由于要复制父进程的页表等数据结构，阻塞的时间跟页表的大小有关，页表越大，阻塞的时间也越长
+- 创建完子进程后，如果子进程或者父进程修改了共享数据，就会发生写时复制，这期间会拷贝物理内存，如果内存越大，自然阻塞的时间也越长
+- 主进程执行信号处理函数，当写入的数据量很大的时候，AOF重写缓冲区中的所有内容阻塞时间较长
 
 rdb
 - 创建子进程的途中，由于要复制父进程的页表等数据结构，阻塞的时间跟页表的大小有关，页表越大，阻塞的时间也越长
