@@ -462,6 +462,15 @@ typedef struct zskiplist {
 跳表在创建节点时候，会生成范围为[0-1]的一个随机数，如果这个随机数小于等于0.25（相当于概率25%），那么层数就增加1层，然后继续生成下一个随机数，直到随机数的结果大于0.25结束，最终确定该节点的层数
 ```
 
+**listpack**
+![avatar](./images/redis/redis-listpack-struct.webp)
+```
+结构
+- encoding  定义该元素的编码类型，会对不同长度的整数和字符串进行编码
+- data  实际存放的数据
+- len  encoding+data的总长度
+```
+
 **quicklist**
 ```
 结构
@@ -490,15 +499,6 @@ typedef struct quicklistNode {
     ....
 }
 
-```
-
-**listpack**
-![avatar](./images/redis/redis-listpack-struct.webp)
-```
-结构
-- encoding  定义该元素的编码类型，会对不同长度的整数和字符串进行编码
-- data  实际存放的数据
-- len  encoding+data的总长度
 ```
 
 ## 持久化 ##
@@ -691,10 +691,10 @@ redis.conf提供了两个配置项，用于调整lfu算法从而控制logc的增
 设置
 replicaof <服务器的IP地址> <服务器的Redis端口号>
 
-第一次同步
+全量同步
 - 建立链接、协商同步
-- 主服务器同步数据给从服务器(rdb文件)
-- 主服务器发送新写操作命令给从服务器
+- 主服务器执行bgsave命令来生成RDB文件，把文件发送给从服务器，从服务器收到RDB文件后，会先清空当前的数据，然后载入RDB文件
+- 主服务器发送新写操作命令(replication buffer缓冲区)给从服务器
 
 命令传播
 主从服务器在完成第一次同步后，双方之间就会维护一个TCP连接
@@ -706,8 +706,8 @@ replicaof <服务器的IP地址> <服务器的Redis端口号>
 
 repl backlog buffer&replication buffer区别
 使用的阶段不一样
-repl backlog buffer是在增量复制阶段使用，一个主节点只分配一个repl backlog buffer
-replication buffer是在全量复制阶段和增量复制阶段都会使用，主节点会给每个新连接的从节点，分配一个replication buffer
+repl backlog buffer 增量复制时使用，一个主节点只分配一个repl backlog buffer
+replication buffer 命令同步时使用，主节点会给每个新连接的从节点，分配一个replication buffer
 这两个Buffer都有大小限制的，当缓冲区满了之后，发生的事情不一样
 当repl backlog buffer满了，因为是环形结构，会直接覆盖起始位置数据;
 当replication buffer满了，会导致连接断开，删除缓存，从节点重新连接，重新开始全量复制
@@ -752,4 +752,9 @@ sentinel monitor <master-name> <ip> <redis-port> <quorum>
 - 让已下线主节点属下的所有「从节点」修改复制目标，修改为复制「新主节点」
 - 将新主节点的 IP 地址和信息，通过「发布者/订阅者机制」通知给客户端
 - 继续监视旧主节点，当这个旧主节点重新上线时，将它设置为新主节点的从节点
+```
+
+**分布式**
+```
+
 ```
