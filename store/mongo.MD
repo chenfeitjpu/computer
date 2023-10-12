@@ -62,9 +62,12 @@ MongoDb
 - skip
 
 聚合
+单一命令
 - count
 - distinct
-- aggregate
+分解
 - mapReduce 
+管道
+- aggregate
 ```
   
