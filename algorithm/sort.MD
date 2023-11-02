@@ -363,5 +363,3 @@ func getMinAndMax(nums []int) (int, int) {
 </code>
 </pre>
 </details>
-
-
