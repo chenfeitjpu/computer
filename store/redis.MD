@@ -122,9 +122,9 @@ sorted set
 - `ZREVRANK key member`  获取元素反向排名
 - `ZSCORE key member`  获取元素分数
 - `ZRANGE key start stop [WITHSCORES]`  获取指定排名区间的成员
-- `ZREVRANGE key start stop [WITHSCORES]`  获取指定排名区间的成员
+- `ZREVRANGE key start stop [WITHSCORES]`  获取指定反向排名区间的成员
 - `ZRANGEBYSCORE key min max [WITHSCORES] [LIMIT offset count]`  获取指定分数区间的成员
-- `ZREVRANGEBYSCORE key min max [WITHSCORES]`  获取指定分数区间的成员
+- `ZREVRANGEBYSCORE key min max [WITHSCORES]`  获取指定反向分数区间的成员
 - `ZRANGEBYLEX key min max [LIMIT offset count]`  获取指定字典区间的成员
 - `ZINTERSTORE destination numkeys key key`  存储交集
 - `ZUNIONSTORE destination numkeys key key`  存储并集
@@ -201,6 +201,7 @@ stream
 **列表(list)**
 ```
 内部实现
+- listpack(list_max_listpack_size正数表示数量，负数表示大小)
 - quicklist
 
 应用
@@ -210,7 +211,7 @@ stream
 **哈希(hash)**
 ```
 内部实现
-- listpack(元素个数小于512个, 元素值小于64字节)
+- listpack(元素个数(hash_max_listpack_entries)小于等于512个且元素值(hash_max_listpack_value)小于等于64字节)
 - 哈希表
 
 应用  
@@ -220,8 +221,8 @@ stream
 **集合(set)**
 ```
 内部实现  
-- 整数集合(元素个数小于512个, 元素都是整数)
-- 哈希表
+- intset(元素个数(set-max-intset-entries)小于等于512个且元素都是整数)
+- hashtable
   
 应用  
 - 点赞
@@ -232,8 +233,8 @@ stream
 **有序集合(sorted set)**
 ```
 内部实现
-- listpack(元素个数小于128个，元素的值小于64字节)
-- 跳表
+- listpack(元素个数(zset_max_listpack_entries)小于等于128个且元素值(zset_max_listpack_value)小于等于64字节)
+- skiplist
 
 应用 
 - 排行榜
