@@ -155,9 +155,76 @@ mutex
 - 读写互斥锁  sync.RWMutex
 
 context
+作用
+协程控制
+使用
+- Deadline()
+- Done()
+- Err()
+- Value()
+分类
+- emptyCtx
+- valueCtx
+- cancelCtx
+- timerCtx
 
+reflect
+作用 
+自描述和自管理
+使用
+- reflect.TypeOf()
+- reflect.Type.Field()
+- reflect.Type.Method()
+- reflect.ValueOf()
+- reflect.Value.Field()
+- reflect.Value.Method()
+- reflect.Value.MethodByName()
+- reflect.Value.Call()
+reflect慢的主要原因
+- 涉及到内存分配以及后续的GC
+- reflect实现里面有大量的枚举，也就是for循环，比如类型之类的
+
+panic&recover
 ```
 ## 内存管理 ##
+```
+内存分配(TCMalloc)
+- page
+- mspan
+- mcache
+- mcentral
+- mheap
+
+垃圾回收
+标记清除法
+- 启动STW
+- Mark标记
+- 清除垃圾
+- 停止STW
+升级
+- 启动STW
+- Mark标记
+- 停止STW
+- 清除垃圾
+
+三色标记法
+- 将所有对象标记为白色
+- 从根节点集合出发，将第一次遍历到的节点标记为灰色放入集合列表中
+- 遍历灰色集合，将灰色节点遍历到的白色节点标记为灰色，并把灰色节点标记为黑色
+- 直到灰色节点集合为空，回收所有的白色节点
+
+屏障机制
+强三色不变式  不允许黑色对象引用白色对象
+弱三色不变式  黑色对象可以引用白色，白色对象存在其他灰色对象对他的引用，或者他的链路上存在灰色对象
+插入屏障  对象被引用时触发的机制，当白色对象被黑色对象引用时，白色对象被标记为灰色
+删除屏障  对象被删除时触发的机制，如果灰色对象引用的白色对象被删除时，那么白色对象会被标记为灰色
+
+三色标记+混合写屏障
+- GC开始时将栈上可达对象全部标记为黑色
+- GC 期间，任何栈上创建的新对象均为黑色
+- 被删除引用的对象标记为灰色
+- 被添加引用的对象标记为灰色
+```
 ## 并发 ##
 ```
 goroutine
