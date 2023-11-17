@@ -37,10 +37,6 @@
   - request.timeout.ms  请求超时时间
 - 创建消息
 - 发送消息
-  发送方式
-  - 发后即忘(fire-and-forget)
-  - 同步(sync)
-  - 异步(async)
   发送过程
   - 拦截器
   - 序列化器
