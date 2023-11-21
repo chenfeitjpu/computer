@@ -178,7 +178,7 @@ func mergeSortArray(nums []int, start, mid, end int) {
 </details>
 
 <details>
-<summary>堆排序</summary>
+<summary>堆</summary>
 <pre>
 <code>
 
