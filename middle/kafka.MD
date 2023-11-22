@@ -1,6 +1,7 @@
 **kafka**
 - [定义](#定义)
 - [使用](#使用)
+  - [特点](#特点)
   - [架构](#架构)
   - [角色](#角色)
     - [生产者](#生产者)
@@ -8,13 +9,31 @@
     - [broker](#broker)
     - [副本](#副本)
   - [消费保障](#消费保障)
-  - [性能](#性能)
   - [存储](#存储)
 
 # 定义 #
 kafka是一种分布式消息系统
 
 # 使用 #
+## 特点 ##
+```
+优势
+- 多生产者
+- 多消费者
+- 基于磁盘存储  无需担心消息丢失
+- 伸缩性  可扩展多台broker
+- 高性能  轻松处理百万千万级消息流，同时保证亚秒级的消息延迟
+
+高性能的实现
+- 页缓存  数据先写入page cache，后写入磁盘
+- 磁盘顺序写  
+- 零拷贝
+
+消息有序
+kafka只保证同一个分区内的消息有序
+- 生产者顺序写入
+- 同一个分区内的消息只能被一个group里的一个消费者消费
+```
 ## 架构 ##
 ```
 - zookeeper  保存着集群broker、topic、partition等meta数据；负责broker故障发现，partition leader选举，负载均衡等功能
@@ -24,12 +43,11 @@ kafka是一种分布式消息系统
 - 服务节点(broker)  消息存储和转发  
 - 主题(topic)  消息分类  
 - 分区(partition)  一个topic可以包含多个partition，topic消息保存在各个partition上
-  - 副本
-    - AR  所有副本(leader+follower)
-    - ISR  保持同步的副本 
-    - OSR  滞后过多的副本
-  - HW(高水位)  消费者只能拉取到这个offset之前的消息，所有ISR的最小LEO
-  - LEO  副本下一条待写入消息的offset
+- 偏移量(offset)  消息在分区的唯一标识
+- 副本(replication)  同一Partition的数据可以在多Broker上存在多个副本
+- leader  消费者消费数据的对象都是leader
+- follower  实时从leader中同步数据，Leader发生故障时，某个follow会成为新的leader
+- 消息(record)  实际写入kafka中并可以被读取的消息记录
 ```
 
 ## 角色 ##
@@ -41,22 +59,25 @@ kafka是一种分布式消息系统
   - key.serializer&value.serializer  key&value的序列化器
   - client.id  生产者对应的客户端id
   - acks  消息确认类型
-    - 0  不需要服务端确认
-    - 1  需要leader副本确认
-    - -1  需要所有副本确认
   - max.request.size 消息的最大值
   - retries  重试次数
   - retry.backoff.ms  重试时间间隔
   - request.timeout.ms  请求超时时间
 - 创建消息
 - 发送消息
-  发送过程
-  - 拦截器
-  - 序列化器
-  - 分区器
 - 关闭生产者
+ 
+发送过程
+- 拦截器
+- 序列化器
+- 分区器
 
 分区策略
+- 轮询(round-robin)  
+- 随机(rand)
+- 哈希(hash)
+分区原则
+- 指定分区
 - 没有指定分区，key不为空，使用hash算法计算分区
 - 没有指定分区，key为空，用轮询的方式选择一个分区
 
@@ -66,8 +87,8 @@ kafka是一种分布式消息系统
 - -1 只有当所有参与复制的节点全部都收到消息时，生产者才会收到一个来自服务器的成功响应
 
 发送模式
-- 同步(sync)
-- 异步(async)
+- 同步(sync)  数据同步刷新到磁盘 
+- 异步(async)  数据异步刷新到磁盘
 
 发送方式
 - 负载均衡
@@ -96,9 +117,11 @@ range分配策略针对的是主题，分区指的某个主题的分区，消费
 - 将分区按数字顺序排行序
 - 消费者按消费者名称的字典序排好序
 - 用分区总数除以消费者总数，如果能够除尽平均分配；若除不尽，则位于排序前面的消费者将多负责一个分区
-roundrobin
+round robin
 将消费组内所有消费者以及消费者所订阅的所有topic的partition按照字典序排序，然后通过轮询算法逐个将分区以此分配给每个消费者
-skticky
+sticky
+- 分区的分配尽量的均衡
+- 每一次重分配的结果尽量与上一次分配结果保持一致
 ```
 
 ### broker ###
@@ -112,10 +135,20 @@ broker Leader选举
 
 ### 副本 ###
 ```
+副本集合
+- AR  所有副本(leader+follower)
+- ISR  保持同步的副本 
+- OSR  滞后过多的副本
+- HW(高水位)  消费者只能拉取到这个offset之前的消息，所有ISR的最小LEO
+- LEO  副本下一条待写入消息的offset
+- LW(低水位)  代表AR集合中最小的logStartOffset 值
+- LSO  LastStableOffset  对未完成的事务而言，LSO 的值等于事务中第一条消息的位置（firstUnstableOffset)，对已完成的事务而言，它的值同HW相同
+
 Leader副本选举
 每个分区的leader会维护一个ISR集合，ISR列表里面就是follower副本的Borker编号，只有跟得上Leader的follower副本才能加入到ISR里面，这个是通过replica.lag.time.max.ms参数配置的。只有ISR里的成员才有被选为leader的可能。
 所以当Leader挂掉了，而且unclean.leader.election.enable=false的情况下，Kafka会从ISR 列表中选择 第一个 follower作为新的Leader，因为这个分区拥有最新的已经committed的消息。通过这个可以保证已经committed的消息的数据可靠性
 ```
+
 ## 消费保障 ##
 ```
 消息保障等级 
@@ -123,10 +156,10 @@ Leader副本选举
 - 最少一次(at least once)  消息不会丢失，但可能会重复
 - 精准一次(exactly once)   消息不会丢失，也不会重复
 生产者 
-at least once  未收到确认消息，会进行重试
+- at least once  未收到确认消息，会进行重试
 消费者
-at least once  消费后再commit
-at most once  commit之后再消费
+- at least once  消费后再commit
+- at most once  commit之后再消费
 
 幂等性
 多次调用所产生的结果和调用一次是一致
@@ -139,26 +172,28 @@ broker会在内存中为每对<PID, 分区>维护一个序列号，对于收到�
 幂等性只能保证单个生产者单分区的幂等
 
 事务
+
 ```
 
-## 性能 ##
-```
-高性能的实现
-- 页缓存  数据先写入page cache，后写入磁盘
-- 磁盘顺序写  
-- 零拷贝
-```
 ## 存储 ##
 ```
-partition  每个分区以segment文件的方式存储数据
-文件结构
-- *.log
-- *.index
-- *.timeindex
+log结构
+一个topic下有多个partition，一个partition下有多个segment文件
+segment文件结构
+- *.log  数据
+- *.index  偏移量索引
+- *.timeindex  时间戳索引
 消息结构
+- record batch
+- record
+- record header
 - offset  消息编号
 - messagesize  消息大小
 - data  消息内容
+
+分段策略
+- `log.segment.bytes`  数据大小(默认是1GB)
+- `log.segment.ms`  数据时间(默认7天)
 
 过期数据清理
 `log.cleaner.enable=true`  启用清理
