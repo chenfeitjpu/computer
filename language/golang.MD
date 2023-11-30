@@ -14,38 +14,42 @@
 ## 基础语法 ##
 ```
 变量  
-- var name [type] = value  
-- var name, name [type] = value, value  
+- var name [type] [= expression]  
+- var name, name [type] [= expression, expression]  
 - var (  
-    name1 type1  
-    name2 type2  
+    name [type] [= expression]  
+    name [type] [= expression]  
   )
 - name := value
 - _ 不会分配内存
 
 常量
 常量数据类型只能是布尔型、数字型（整数型、浮点型和复数）和字符串型  
-- const name [type] = value
+- const name [type] = expression
 - const (  
-    name1 = value1  
-    name2 = value2  
-    name3
+    name [type] = expression  
+    name [type] = expression    
   )  
 - iota    
 
 数据类型
+- uint8 uint16 uint32 uint64 uint int8 int16 int32 int64 int
+- byte rune
+- uintptr
+- float32 float64 
+- complex64 complex128
 - bool
-- uint8 uint16 uint32 uint64 byte uint uintptr int8 int16 int32 int64 int rune
-- float32 float64 complex64 complex128
 - string
-- array slice map channel struct interface func pointer
+- array struct 
+- slice map channel func pointer
+- interface
 
 运算符
-- 算术运算符 + - * / % ++ --
-- 关系运算符 == != > < >= <=
-- 逻辑运算符 && || !
-- 位运算符 & | ^  << >>
-- 赋值运算符 =
+- 算术运算符  + - * / % ++ --
+- 关系运算符  > >= < <= == != 
+- 逻辑运算符  && || !
+- 位运算符  & | ^  << >>
+- 赋值运算符  =
 
 流程控制 
 - if else if else
@@ -53,6 +57,9 @@
 - for range 
 - break continue
 - goto
+  - 只能在函数内跳转，需要配合标签一起使用
+  - 不能跳过内部变量声明语句
+  - 只能跳到同级作用域或者上层作用域内，不能跳到内部作用域内
 ```
 
 ## 数据结构 ##
@@ -63,7 +70,7 @@ array
 - var name = [...]type{value}
 - var name = [...]type{index:value}
 遍历  
-- for
+- for index
 - for range
 多维数组   
 var name [size][size]type
@@ -73,7 +80,7 @@ var name [size][size]type
 
 slice
 声明  
-- var name []type = []type{}
+- var name []type
 - name := make([]type, length, capacity)
 切片表达式
 a[low : high : max]  
@@ -103,10 +110,10 @@ slice占用24个字节
 
 map
 声明  
-var name map[type]type 
-name := make(map[type]type, [cap])  
+- var name map[type]type 
+- name := make(map[type]type, [cap])  
 删除
-delete(map, key)
+- delete(map, key)
 线程安全
 - map+sync.RWMutex
 - sync.Map
@@ -116,20 +123,48 @@ delete(map, key)
 
 struct
 声明
-type 类型名 struct {  
-    字段名 字段类型  
-    字段名 字段类型  
-}  
+type name struct {  
+    name type 
+    name type  
+}
+嵌套结构体
+- 匿名结构体
+
+func 
+声明  
+func name(parameter type, parameter type) ([output] type, [output] type) {
+    return value, value
+}
+
+defer
+- 多个defer语句，按照先进后出的方式执行
+- 延迟函数的参数在defer声明时就决定了
+- return赋值 执行defer return返回
+
+panic&recover
+
+method
+声明
+func (name type) name(parameter type, parameter type) ([output] type, [output] type) {
+    return value, value
+}
+使用
+- object.method()
+- 方法变量
+- 方法表达式 
 
 interface
 声明
-type 接口类型名 interface {  
-    方法名(参数列表) 返回值列表  
-    方法名(参数列表) 返回值列表   
+type name interface {  
+    name(name type) type  
+    name(name type) type  
 }
 使用
 对于值接收者实现的接口，无论使用值类型还是指针类型都没有问题
 对于指针接收者实现的接口，只能使用指针类型
+断言
+- 类型转换 i.(T)
+- 类型查询 i.(type)
 
 pointer
 使用
@@ -141,23 +176,9 @@ pointer
 - 指针地址  uintptr
 比较
 - unsafe.Pointer只是单纯的通用指针类型，用于转换不同类型指针，它不可以参与指针运算
-- uintptr是用于指针运算的，GC不把uintptr当指针，也就是说uintptr无法持有对象，uintptr类型的目标会被回收
 - unsafe.Pointer可以和普通指针进行相互转换
 - unsafe.Pointer可以和uintptr进行相互转换
-
-func 
-声明  
-func funcName(parameter type, parameter type) (output type, output type) {
-    return value, value
-}
-defer
-- 多个defer语句，按照先进后出的方式执行
-- 延迟函数的参数在defer声明时就决定了
-- return赋值 执行defer return返回
-
-mutex
-- 互斥锁  sync.Mutex
-- 读写互斥锁  sync.RWMutex
+- uintptr是用于指针运算的，GC不把uintptr当指针，也就是说uintptr无法持有对象，uintptr类型的目标会被回收
 
 context
 作用
@@ -189,7 +210,7 @@ reflect慢的主要原因
 - 涉及到内存分配以及后续的GC
 - reflect实现里面有大量的枚举，也就是for循环，比如类型之类的
 
-panic&recover
+
 ```
 ## 内存管理 ##
 ```
@@ -251,6 +272,10 @@ channel
 选择
 select
 
+mutex
+- 互斥锁  sync.Mutex
+- 读写互斥锁  sync.RWMutex
+
 GMP
 - G  协程
 - M  线程
@@ -258,3 +283,4 @@ GMP
 ```
 
 # 学习资料 #
+https://github.com/yongxinz/gopher
