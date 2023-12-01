@@ -45,7 +45,7 @@
 - interface
 
 运算符
-- 算术运算符  + - * / % ++ --
+- 算术运算符  + - * / % variable++ variable--
 - 关系运算符  > >= < <= == != 
 - 逻辑运算符  && || !
 - 位运算符  & | ^  << >>
@@ -54,8 +54,7 @@
 流程控制 
 - if else if else
 - switch case fallthrough
-- for range 
-- break continue
+- for range break continue
 - goto
   - 只能在函数内跳转，需要配合标签一起使用
   - 不能跳过内部变量声明语句
@@ -141,7 +140,7 @@ defer
 - 延迟函数的参数在defer声明时就决定了
 - return赋值 执行defer return返回
 
-panic&recover
+error&panic&recover
 
 method
 声明
