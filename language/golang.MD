@@ -78,13 +78,13 @@ var name [size][size]type
 - 数组是值类型，赋值和传参会复制整个数组
 
 slice
-声明  
-- var name []type
-- name := make([]type, length, capacity)
-切片表达式
-a[low : high : max]  
-0 <= low <= high <= max <= cap(a)
-操作
+使用
+- 声明  
+  - var name []type
+  - name := make([]type, length, capacity)
+- 切片表达式
+  - a[low : high : max]  
+    0 <= low <= high <= max <= cap(a)
 - append
 - copy
 结构
@@ -98,27 +98,107 @@ slice占用24个字节
 - len 切片的长度，占用8个字节  
 - cap 切片的容量，cap 总是大于等于 len 的，占用8个字节  
 扩容
-1.17及以前
-- 如果新申请容量比两倍原有容量大，那么扩容后容量大小为新申请容量
-- 如果原有slice长度小于1024，那么每次就扩容为原来的2倍
-- 如果原有slice长度大于等于1024，那么每次扩容就扩为原来的1.25倍  
-1.18及以后
-- 如果新申请容量比两倍原有容量大，那么扩容后容量大小为新申请容量
-- 如果原有slice长度小于256，那么每次就扩容为原来的2倍
-- 如果原有slice长度大于等于256，那么每次扩容就扩为原来的1.25 倍+3/4*256    
+- 1.18以前
+  - 如果新申请容量比两倍原有容量大，那么扩容后容量大小为新申请容量
+  - 如果原有slice长度小于1024，那么就扩容为原来的2倍
+  - 如果原有slice长度大于等于1024，那么每次扩容就扩为原来的1.25倍，直到新容量大于期望容量
+  - 内存对齐(size_to_class&class_to_size)
+- 1.18及以后
+  - 如果新申请容量比两倍原有容量大，那么扩容后容量大小为新申请容量
+  - 如果原有slice长度小于256，那么就扩容为原来的2倍
+  - 如果原有slice长度大于等于256，那么每次扩容就扩为原来的1.25倍+3/4*256，直到新容量大于期望容量
+  - 内存对齐(size_to_class&class_to_size)
 
 map
-声明  
-- var name map[type]type 
-- name := make(map[type]type, [cap])  
-删除
-- delete(map, key)
+使用
+- 声明  
+  - var name map[type]type 
+  - name := make(map[type]type, [cap])  
+- 删除
+  - delete(map, key)
+特点
+- 无序
+  - 扩容时发生key的搬迁
+  - 读取时从一个随机序号的bucket开始遍历，并且是从这个bucket的一个随机序号的cell开始遍历
+结构
+type hmap struct {
+    // 元素个数，调用 len(map) 时，直接返回此值
+	count     int
+	flags     uint8
+	// buckets 的对数 log_2
+	B         uint8
+	// overflow 的 bucket 近似数
+	noverflow uint16
+	// 计算 key 的哈希的时候会传入哈希函数
+	hash0     uint32
+    // 指向 buckets 数组，大小为 2^B
+    // 如果元素个数为0，就为 nil
+	buckets    unsafe.Pointer
+	// 等量扩容的时候，buckets 长度和 oldbuckets 相等
+	// 双倍扩容的时候，buckets 长度会是 oldbuckets 的两倍
+	oldbuckets unsafe.Pointer
+	// 指示扩容进度，小于此地址的 buckets 迁移完成
+	nevacuate  uintptr
+	extra *mapextra // optional fields
+}
+type bmap struct {
+    topbits  [8]uint8
+    keys     [8]keytype
+    values   [8]valuetype
+    pad      uintptr
+    overflow uintptr
+}
+type mapextra struct {
+    // overflow[0] contains overflow buckets for hmap.buckets.
+    // overflow[1] contains overflow buckets for hmap.oldbuckets.
+    overflow [2]*[]*bmap
+
+    // nextOverflow 包含空闲的 overflow bucket，这是预分配的 bucket
+    nextOverflow *bmap
+}
+扩容
+- 等量扩容(桶中空位过多)
+  - 当B<15 时，overflow的bucket数量超过2^B
+  - 当B>=15 时，overflow的bucket数量超过2^15
+- 双倍扩容( 桶不够用了)
+  装载因子>6.5 双倍扩容
+  装载因子=count/(2^B) map中元素的个数/map中当前桶的个数
+操作
+- 查找
+  - 计算key的hash值
+  - 通过最后的B位来确定桶号
+  - 根据key对应的hash值前8位快速确定是在这个桶的哪个位置
+  - 对比key是否匹配
+  - 如果都没有找到，就去连接的下一个溢出桶中找
+  扩容期间需要通过新桶找旧桶
+- 遍历
+  双重循环
+- 赋值
+  查找key，进行修改或者新增
+- 删除  
+  查找key，对key和value进行清空
 线程安全
 - map+sync.RWMutex
 - sync.Map
   - sync.Map适用于读多、更新多、删多、写少的场景  
   - 倘若写操作过多，sync.Map基本等价于互斥锁+map  
   - sync.Map可能存在性能抖动问题
+
+sync.map
+使用
+- Store()  写入
+- Load()  读取
+- Range()  遍历
+- LoadOrStore()  读取或写入
+结构
+type Map struct {
+    mu Mutex
+    read atomic.Value
+    dirty map[any]*entry
+    misses int
+}
+实现
+sync.Map设置了两个map(dirty map和read map)，read map通过原子方式访问，dirty map的访问需要加锁
 
 struct
 声明
@@ -134,10 +214,13 @@ func
 func name(parameter type, parameter type) ([output] type, [output] type) {
     return value, value
 }
+闭包
+- 在函数外部访问函数内部变量成为可能
+- 函数内部变量离开其作用域后始终保持在内存中而不被销毁
 
 defer
-- 多个defer语句，按照先进后出的方式执行
 - 延迟函数的参数在defer声明时就决定了
+- 多个defer语句，按照先进后出的方式执行
 - return赋值 执行defer return返回
 
 error&panic&recover
@@ -179,20 +262,6 @@ pointer
 - unsafe.Pointer可以和uintptr进行相互转换
 - uintptr是用于指针运算的，GC不把uintptr当指针，也就是说uintptr无法持有对象，uintptr类型的目标会被回收
 
-context
-作用
-协程控制
-使用
-- Deadline()
-- Done()
-- Err()
-- Value()
-分类
-- emptyCtx
-- valueCtx
-- cancelCtx
-- timerCtx
-
 reflect
 作用 
 自描述和自管理
@@ -213,6 +282,10 @@ reflect慢的主要原因
 ```
 ## 内存管理 ##
 ```
+make & new
+- make 为slice、map、channel分配内存并初始化，返回值类型
+- new 为任意类型分配内存，返回引用类型
+
 内存分配(TCMalloc)
 - page
 - mspan
@@ -257,7 +330,7 @@ goroutine
 
 waitGroup
 - wg := &sync.WaitGroup{}
-- wg.Add(delta)
+- wg.Add()
 - wg.Done()
 - wg.Wait()
 
@@ -268,12 +341,28 @@ channel
 | 读 <-ch | 阻塞 | 成功或阻塞 | 读到零值 |
 | 写 ch<- | 阻塞 | 成功或阻塞 | panic |
 | 关闭 close(ch) | panic | 成功 | panic |
+
 选择
 select
+监听多个channel
 
 mutex
 - 互斥锁  sync.Mutex
 - 读写互斥锁  sync.RWMutex
+
+context
+作用
+用来解决goroutine之间元数据传递、退出通知
+使用
+- Deadline()
+- Done()
+- Err()
+- Value()
+分类
+- emptyCtx
+- valueCtx
+- cancelCtx
+- timerCtx
 
 GMP
 - G  协程
@@ -282,4 +371,5 @@ GMP
 ```
 
 # 学习资料 #
-https://github.com/yongxinz/gopher
+https://github.com/yongxinz/gopher  
+https://www.zhihu.com/people/raoquancheng
