@@ -199,6 +199,20 @@ type Map struct {
 }
 实现
 sync.Map设置了两个map(dirty map和read map)，read map通过原子方式访问，dirty map的访问需要加锁
+操作
+- 写入
+  - 如果在read里能够找到待存储的key，并且对应的entry的p值不为expunged，也就是没被删除时，直接更新对应的entry即可
+  - 第一步没有成功，要么read中没有这个key，要么key被标记为删除。则先加锁，再进行后续的操作
+  - 再次在read中查找是否存在这个key，也就是double check一下，这也是lock-free编程里的常见套路。如果read中存在该 key，但 p == expunged，说明 m.dirty != nil 并且 m.dirty 中不存在该key值 此时: a. 将p的状态由 expunged更改为nil；b. dirty map插入 key。然后，直接更新对应的value
+  - 如果 read 中没有此 key，那就查看 dirty 中是否有此 key，如果有，则直接更新对应的 value，这时 read 中还是没有此 key
+  - 最后一步，如果 read 和 dirty 中都不存在该 key，则：a. 如果 dirty 为空，则需要创建 dirty，并从 read 中拷贝未被删除的元素；b. 更新 amended 字段，标识 dirty map 中存在 read map 中没有的 key；c. 将 k-v 写入 dirty map 中，read.m 不变。最后，更新此 key 对应的 value
+- 读取
+  - 直接在read中找，如果找到了直接调用entry的load方法，取出其中的值
+  - 如果read中没有这个key，且amended为true，说明dirty中可能存在我们要找的 key。当然要先上锁，再尝试去dirty中查找。在这之前，仍然有一个 double check 的操作。若还是没有在read中找到，那么就从dirty中找。不管 dirty 中有没有找到，都要"记一笔"，因为在 dirty 被提升为 read 之前，都会进入这条路径
+  - read中没有这个key，且amended为fase，说明dirty为空，那直接返回 空和 false
+- 删除
+  - 先从read里查是否有这个key，如果有则执行entry.delete方法，将p置为 nil，这样read和dirty都能看到这个变化
+  - 如果没在read中找到这个key，并且dirty不为空，那么就要操作dirty了，操作之前，还是要先上锁。然后进行 double check，如果仍然没有在read里找到此 key，则从 dirty 中删掉这个 key。但不是真正地从 dirty 中删除，而是更新 entry 的状态
 
 struct
 声明
