@@ -208,11 +208,12 @@ sync.Map设置了两个map(dirty map和read map)，read map通过原子方式访
   - 最后一步，如果 read 和 dirty 中都不存在该 key，则：a. 如果 dirty 为空，则需要创建 dirty，并从 read 中拷贝未被删除的元素；b. 更新 amended 字段，标识 dirty map 中存在 read map 中没有的 key；c. 将 k-v 写入 dirty map 中，read.m 不变。最后，更新此 key 对应的 value
 - 读取
   - 直接在read中找，如果找到了直接调用entry的load方法，取出其中的值
-  - 如果read中没有这个key，且amended为true，说明dirty中可能存在我们要找的 key。当然要先上锁，再尝试去dirty中查找。在这之前，仍然有一个 double check 的操作。若还是没有在read中找到，那么就从dirty中找。不管 dirty 中有没有找到，都要"记一笔"，因为在 dirty 被提升为 read 之前，都会进入这条路径
-  - read中没有这个key，且amended为fase，说明dirty为空，那直接返回 空和 false
+  - 如果read中没有这个key，且amended为true，说明dirty中可能存在我们要找的key。当然要先上锁，再尝试去dirty中查找。在这之前，仍然有一个double check的操作。若还是没有在read中找到，那么就从dirty中找。不管 dirty 中有没有找到，都要"记一笔"，因为在dirty被提升为read之前，都会进入这条路径
+  - read中没有这个key，且amended为fase，说明dirty为空，那直接返回空和false
 - 删除
-  - 先从read里查是否有这个key，如果有则执行entry.delete方法，将p置为 nil，这样read和dirty都能看到这个变化
-  - 如果没在read中找到这个key，并且dirty不为空，那么就要操作dirty了，操作之前，还是要先上锁。然后进行 double check，如果仍然没有在read里找到此 key，则从 dirty 中删掉这个 key。但不是真正地从 dirty 中删除，而是更新 entry 的状态
+  - 先从read里查是否有这个key，如果有则执行entry.delete方法，将p置为nil，这样read和dirty都能看到这个变化
+  - 如果没在read中找到这个key，并且dirty不为空，那么就要操作dirty了，操作之前，还是要先上锁。然后进行double check，如果仍然没有在read里找到此ke，则从 dirty中删掉这个key。但不是真正地从 dirty 中删除，而是更新 entry 的状态
+  - read中没有这个key，且amended为fase，说明dirty为空，那直接返回空和false
 
 struct
 声明
@@ -355,6 +356,32 @@ channel
 | 读 <-ch | 阻塞 | 成功或阻塞 | 读到零值 |
 | 写 ch<- | 阻塞 | 成功或阻塞 | panic |
 | 关闭 close(ch) | panic | 成功 | panic |
+结构
+type hchan struct {
+    // chan 里元素数量
+    qcount   uint
+    // chan 底层循环数组的长度
+    dataqsiz uint
+    // 指向底层循环数组的指针
+    // 只针对有缓冲的 channel
+    buf      unsafe.Pointer
+    // chan 中元素大小
+    elemsize uint16
+    // chan 是否被关闭的标志
+    closed   uint32
+    // chan 中元素类型
+    elemtype *_type // element type
+    // 已发送元素在循环数组中的索引
+    sendx    uint   // send index
+    // 已接收元素在循环数组中的索引
+    recvx    uint   // receive index
+    // 等待接收的 goroutine 队列
+    recvq    waitq  // list of recv waiters
+    // 等待发送的 goroutine 队列
+    sendq    waitq  // list of send waiters
+    // 保护 hchan 中所有字段
+    lock mutex
+}
 
 选择
 select
@@ -366,12 +393,18 @@ mutex
 
 context
 作用
-用来解决goroutine之间元数据传递、退出通知
-使用
-- Deadline()
-- Done()
-- Err()
-- Value()
+并发控制和超时控制
+结构
+type Context interface {
+    // 当 context 被取消或者到了 deadline，返回一个被关闭的 channel
+    Done() <-chan struct{}
+    // 在 channel Done 关闭后，返回 context 取消原因
+    Err() error
+    // 返回 context 是否会被取消以及自动取消时间（即 deadline）
+    Deadline() (deadline time.Time, ok bool)
+    // 获取 key 对应的 value
+    Value(key interface{}) interface{}
+}
 分类
 - emptyCtx
 - valueCtx
