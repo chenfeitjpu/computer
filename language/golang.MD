@@ -251,6 +251,7 @@ func (name type) name(parameter type, parameter type) ([output] type, [output] t
 - 方法表达式 
 注意事项
 - 类型T只有接受者是T的方法；而类型*T拥有接受者是T和*T的方法
+
 interface
 声明
 type name interface {  
@@ -260,10 +261,11 @@ type name interface {
 使用
 对于值接收者实现的接口，无论使用值类型还是指针类型都没有问题
 对于指针接收者实现的接口，只能使用指针类型
-断言
-- 类型转换 i.(T)
-- 类型查询 i.(type)
+类型断言
+- i.(T)
+- i.(type)
 结构
+// 非空接口
 type iface struct {
     tab  *itab
     data unsafe.Pointer
@@ -278,6 +280,7 @@ type itab struct {
     unused [2]byte
     fun    [1]uintptr // variable sized
 }
+// 空接口
 type eface struct {
     _type *_type
     data  unsafe.Pointer
@@ -299,7 +302,7 @@ pointer
 
 reflect
 作用 
-自描述和自管理
+程序在运行的时候能够观察并且修改自己的行为
 使用
 - reflect.TypeOf()
 - reflect.Type.Field()
@@ -312,7 +315,6 @@ reflect
 reflect慢的主要原因
 - 涉及到内存分配以及后续的GC
 - reflect实现里面有大量的枚举，也就是for循环，比如类型之类的
-
 
 ```
 ## 内存管理 ##
