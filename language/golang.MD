@@ -215,15 +215,6 @@ sync.Map设置了两个map(dirty map和read map)，read map通过原子方式访
   - 如果没在read中找到这个key，并且dirty不为空，那么就要操作dirty了，操作之前，还是要先上锁。然后进行double check，如果仍然没有在read里找到此ke，则从 dirty中删掉这个key。但不是真正地从 dirty 中删除，而是更新 entry 的状态
   - read中没有这个key，且amended为fase，说明dirty为空，那直接返回空和false
 
-struct
-声明
-type name struct {  
-    name type 
-    name type  
-}
-嵌套结构体
-- 匿名结构体
-
 func 
 声明  
 func name(parameter type, parameter type) ([output] type, [output] type) {
@@ -240,6 +231,15 @@ defer
 
 error&panic&recover
 
+struct
+声明
+type name struct {  
+    name type 
+    name type  
+}
+嵌套结构体
+- 匿名结构体
+
 method
 声明
 func (name type) name(parameter type, parameter type) ([output] type, [output] type) {
@@ -249,7 +249,8 @@ func (name type) name(parameter type, parameter type) ([output] type, [output] t
 - object.method()
 - 方法变量
 - 方法表达式 
-
+注意事项
+- 类型T只有接受者是T的方法；而类型*T拥有接受者是T和*T的方法
 interface
 声明
 type name interface {  
@@ -262,6 +263,25 @@ type name interface {
 断言
 - 类型转换 i.(T)
 - 类型查询 i.(type)
+结构
+type iface struct {
+    tab  *itab
+    data unsafe.Pointer
+}
+type itab struct {
+    inter  *interfacetype
+    _type  *_type
+    link   *itab
+    hash   uint32 // copy of _type.hash. Used for type switches.
+    bad    bool   // type does not implement interface
+    inhash bool   // has this itab been added to hash?
+    unused [2]byte
+    fun    [1]uintptr // variable sized
+}
+type eface struct {
+    _type *_type
+    data  unsafe.Pointer
+}
 
 pointer
 使用
@@ -273,9 +293,9 @@ pointer
 - 指针地址  uintptr
 比较
 - unsafe.Pointer只是单纯的通用指针类型，用于转换不同类型指针，它不可以参与指针运算
+- uintptr是用于指针运算的，GC不把uintptr当指针，也就是说uintptr无法持有对象，uintptr类型的目标会被回收
 - unsafe.Pointer可以和普通指针进行相互转换
 - unsafe.Pointer可以和uintptr进行相互转换
-- uintptr是用于指针运算的，GC不把uintptr当指针，也就是说uintptr无法持有对象，uintptr类型的目标会被回收
 
 reflect
 作用 
