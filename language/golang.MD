@@ -324,11 +324,94 @@ make & new
 - new 为任意类型分配内存，返回引用类型
 
 内存分配(TCMalloc)
-- page
-- mspan
-- mcache
-- mcentral
-- mheap
+*核心思想*
+把内存分为多级管理，从而降低锁的粒度  
+它将可用的堆内存采用二级分配的方式进行管理：每个线程都会自行维护一个独立的内存池，进行内存分配时优先从该内存池中分配，当内存池不足时才会向全局内存池申请，以避免不同线程对全局内存池的频繁竞争。
+*内存划分*
+- arena  512G 把内存分割成8KB大小的页
+- bitmap  16G  标识arena区域哪些地址保存了对象 一个byte大小的内存对应arena区域中4个指针大小(指针大小为8B)的内存
+- spans  512M  存放mspan指针，每个指针对应一页
+内存管理单元
+mspan
+*作用*
+由一片连续的8KB的页组成的大块内存
+*结构*
+type mspan struct {
+    //链表前向指针，用于将span链接起来
+    next *mspan 
+    //链表前向指针，用于将span链接起来
+    prev *mspan 
+    // 起始地址，也即所管理页的地址
+    startAddr uintptr 
+    // 管理的页数
+    npages uintptr 
+    // 块个数，表示有多少个块可供分配
+    nelems uintptr 
+    //分配位图，每一位代表一个块是否已分配
+    allocBits *gcBits 
+    // 已分配块的个数
+    allocCount uint16 
+    // class表中的class ID，和Size Classs相关
+    spanclass spanClass  
+    // class表中的对象大小，也即块大小
+    elemsize uintptr 
+}
+内存管理组件
+mcache
+*作用*
+每个工作线程都会绑定一个mcache，本地缓存可用的mspan资源，这样就可以直接给Goroutine分配，因为不存在多个Goroutine竞争的情况，所以不会消耗锁资源
+*结构*
+type mcache struct {
+    alloc [numSpanClasses]*mspan
+}
+mcentral
+*作用*
+为所有mcache提供切分好的mspan资源  
+每个central保存一种特定大小的全局mspan列表，包括已分配出去的和未分配出去的。每个mcentral对应一种mspan，而mspan的种类导致它分割的object大小不同。当工作线程的mcache中没有合适(也就是特定大小的)的mspan时就会从mcentral获取  
+mcentral被所有的工作线程共同享有，存在多个Goroutine竞争的情况，因此会消耗锁资源  
+*mcache从mcentral获取和归还mspan的流程*
+获取 加锁，从nonempty链表找到一个可用的mspan；并将其从nonempty链表删除；将取出的mspan加入到empty链表；将mspan返回给工作线程；解锁
+归还 加锁，将mspan从empty链表删除；将mspan加入到nonempty链表；解锁
+*结构*
+type mcentral struct {
+    // 互斥锁
+    lock mutex 
+    // 规格
+    sizeclass int32 
+    // 尚有空闲object的mspan链表
+    nonempty mSpanList 
+    // 没有空闲object的mspan链表，或者是已被mcache取走的msapn链表
+    empty mSpanList 
+    // 已累计分配的对象个数
+    nmalloc uint64 
+}
+mheap
+*作用*
+代表Go程序持有的所有堆空间，Go程序使用一个mheap的全局对象_mheap来管理堆内存  
+当mcentral没有空闲的mspan时，会向mheap申请。而mheap没有资源时，会向操作系统申请新内存。  
+mheap主要用于大对象的内存分配，以及管理未切割的mspan，用于给mcentral切割成小对象
+分配流程
+*对象分类*
+- 小对象(小于等于16B)
+- 一般对象(大于16B，小于等于32KB)
+- 大对象(大于32KB)
+*分配流程*  
+- >32KB的对象，直接从mheap上分配  
+- <=16B的对象使用mcache的tiny分配器分配  
+- (16B,32KB)的对象，首先计算对象的规格大小，然后使用mcache中相应规格大小的mspan分配
+- 如果mcache没有相应规格大小的mspan，则向mcentral申请
+- 如果mcentral没有相应规格大小的mspan，则向mheap申请
+- 如果mheap中也没有合适大小的mspan，则向操作系统申请
+
+逃逸分析
+*现象*
+分析内存分配地址是栈还是堆
+*场景*
+- 返回地址
+- 返回引用(引用变量的底层是指针)
+- 返回值类型不确定
+- 变量大小不确定(如slice长度或容量不定)
+- 变量较大(栈空间不足)
 
 垃圾回收
 标记清除法
