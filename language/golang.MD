@@ -475,31 +475,18 @@ channel
 | 关闭 close(ch) | panic | 成功 | panic |
 结构
 type hchan struct {
-    // chan 里元素数量
-    qcount   uint
-    // chan 底层循环数组的长度
-    dataqsiz uint
-    // 指向底层循环数组的指针
-    // 只针对有缓冲的 channel
-    buf      unsafe.Pointer
-    // chan 中元素大小
-    elemsize uint16
-    // chan 是否被关闭的标志
-    closed   uint32
-    // chan 中元素类型
-    elemtype *_type // element type
-    // 已发送元素在循环数组中的索引
-    sendx    uint   // send index
-    // 已接收元素在循环数组中的索引
-    recvx    uint   // receive index
-    // 等待接收的 goroutine 队列
-    recvq    waitq  // list of recv waiters
-    // 等待发送的 goroutine 队列
-    sendq    waitq  // list of send waiters
-    // 保护 hchan 中所有字段
-    lock mutex
+	qcount   uint           // total data in the queue
+	dataqsiz uint           // size of the circular queue
+	buf      unsafe.Pointer // points to an array of dataqsiz elements
+	elemsize uint16
+	closed   uint32
+	elemtype *_type // element type
+	sendx    uint   // send index
+	recvx    uint   // receive index
+	recvq    waitq  // list of recv waiters
+	sendq    waitq  // list of send waiters
+	lock mutex
 }
-
 选择
 select
 监听多个channel
@@ -524,9 +511,27 @@ type Context interface {
 }
 分类
 - emptyCtx
+type emptyCtx int
 - valueCtx
+type valueCtx struct {
+	Context
+	key, val any
+}
 - cancelCtx
+type cancelCtx struct {
+	Context
+	mu       sync.Mutex         
+	done     atomic.Value          
+	children map[canceler]struct{} 
+	err      error                 
+	cause    error                
+}
 - timerCtx
+type timerCtx struct {
+	*cancelCtx
+	timer *time.Timer
+	deadline time.Time
+}
 
 GMP
 - G  协程
