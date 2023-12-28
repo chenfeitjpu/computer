@@ -29,7 +29,7 @@
   - 504 服务器作为网关或代理，服务器超时
 
 常见字段
-- Host 服务器域名
+- Host 服务器主机
 - Connection 使用持久连接
 - Accept 客户端接受的数据格式
 - Accept-Encoding 客户端接受的数据压缩方式
