@@ -55,7 +55,7 @@
 - 服务端(CLOSED_WAIT状态)发送FIN报文(LAST_ACK状态)    
 - 客户端(FIN_WAIT_2状态)发送ACK报文(TIME_WAIT状态)  
 - 服务端(LAST_ACK状态)接收ACK报文(CLOSED状态)  
-- 客户端(TIME_WAIT状态)经过2MSL(CLOSED状态)  
+- 客户端(TIME_WAIT状态)经过2MSL报文最大生存时间(CLOSED状态)  
 
 为什么是四次  
 四次可以确保客户端和服务端正确关闭连接
