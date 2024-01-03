@@ -23,7 +23,6 @@
   - 404 Not Found 请求资源不存在
 - 5xx 服务端错误，服务器在处理请求时内部发生了错误
   - 500 服务器错误 
-  - 501 客户端请求的功能不支持
   - 502 服务器作为网关或代理，后端服务器发生了错误
   - 503 服务器忙，暂时无法响应
   - 504 服务器作为网关或代理，服务器超时
@@ -52,11 +51,13 @@
 
 - 协商缓存  
   - 基于时间  
-    - 响应头部中的Last-Modified：标示这个响应资源的最后修改时间
-    - 请求头部中的If-Modified-Since：当资源过期了，发现响应头中具有Last-Modified声明，则再次发起请求的时候带上Last-Modified的时间  
+    - 响应头部中的Last-Modified
+      标示资源的最后修改时间
+    - 请求头部中的If-Modified-Since 
   - 基于内容
-    - 响应头部中Etag：唯一标识响应资源
-    - 请求头部中的If-None-Match：当资源过期时，浏览器发现响应头里有Etag，则再次向服务器发起请求时，会将请求头If-None-Match值设置为Etag的值  
+    - 响应头部中Etag  
+      唯一标识资源
+    - 请求头部中的If-None-Match
     Etag的优先级更高  
 
 HTTP1.1特性
@@ -73,7 +74,7 @@ HTTP1.1特性
 性能  
 HTTP协议是基于TCP/IP，并且使用了「请求-应答」的通信模式  
 - 长连接 减少了TCP连接的重复建立和断开所造成的额外开销，减轻了服务器端的负载
-- 请求队头阻塞
+- HTTP队头阻塞
 优化    
 - 尽量避免发送HTTP请求(缓存)
 - 在需要发送HTTP请求时，考虑如何减少请求次数(减少重定向、合并、延迟)
@@ -89,15 +90,15 @@ SSL/TLS通信流程
   - 双方协商生成会话秘钥
   - 双方采用会话秘钥进行通信
 RSA握手流程  
-  - 客户端发送Client Hello(SSL/TLS协议版本&随机数&密码套件列表)
-  - 服务端发送Server Hello(SSL/TLS协议版本&随机数&密码套件列表)、Certificate(CA证书)、Server HelloDone请求
+  - 客户端发送Client Hello(客户端使用的SSL/TLS协议版本&随机数&可用密码套件列表)
+  - 服务端发送Server Hello(服务端支持的SSL/TLS协议版本&随机数&选定的密码套件)、Certificate(CA证书)、Server Hello Done请求
   - 客户端发情Client Key Exchange(随机数)、Change Cipher Spec(加密算法改变通知)、Encrypted Handshake Message(摘要信息)
   - 服务端发送Change Cipher Spec(加密算法改变通知)、Encrypted Handshake Message(服务端握手结束通知)
   缺点
   不支持前向保密
 ECDHE握手流程 
-  - 客户端发送Client Hello(SSL/TLS协议版本&随机数&密码套件列表)
-  - 服务端发送Server Hello(SSL/TLS协议版本&随机数&密码套件列表)、Certificate(CA证书)、Server Key Exchange(服务端的椭圆曲线公钥)、Server HelloDone请求
+  - 客户端发送Client Hello(客户端使用的SSL/TLS协议版本&随机数&可用密码套件列表)
+  - 服务端发送Server Hello(服务端支持的SSL/TLS协议版本&随机数&密码套件列表)、Certificate(CA证书)、Server Key Exchange(服务端的椭圆曲线公钥)、Server Hello Done请求
   - 客户端发情Client Key Exchange(客户端的椭圆曲线公钥)、Change Cipher Spec(加密算法改变通知)、Encrypted Handshake Message(摘要信息)
   - 服务端发送Change Cipher Spec(加密算法改变通知)、Encrypted Handshake Message(服务端握手结束通知)
 
