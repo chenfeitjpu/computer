@@ -106,7 +106,9 @@ create table 表名 (列的信息)
 
 查询过程
 - 连接管理
+  连接器
 - 解析与优化
+  解析器、优化器、执行器
 - 存储引擎
 ```
 [查询流程图](https://raw.githubusercontent.com/chenfeitjpu/computer/master/store/images/mysql/flow_query.webp)
