@@ -215,9 +215,120 @@ epoll
 
 # 应用 #
 ```
+快捷键
+- `ctrl c`  终止当前命令
+- `ctrl z`  暂停当前命令
+- `fg`  继续前台执行
+- `bg`  继续后台执行
+- `ctrl l`  清屏
+- `ctrl a`  跳转到输入首部
+- `ctrl e`  跳转到输入尾部
+
+关机&重启
+- `shutdown -h time`  关机
+- `shutdown -r time`  重启
+- `reboot`  重启
+
+目录
+- `cd path`  切换
+  cd ~|cd -
+- `ls path`  查看
+  ls | la -a | ls -l
+- `mkdir`  创建目录
+  mkdir -m | mkdir -p 
+- `rm -rf`  删除目录
+- `rmdir`  删除空目录
+  rmdir -p  
+- `mv`  剪切目录
+- `cp`  拷贝目录
+- `find directory option pattern command`  文件查找
+- `touch file file`  创建文件
+- `rm file`  删除文件
+- `vim file`  修改文件
+- `cat file`  查看文件 
+- `tac file`  查看文件
+- `head option pattern file file`  查看文件开头部分
+- `tail option pattern file file`  查看文件结尾部分
+- `chmod [u|g|o|a] [+|-|=] [r|w|x] directory|file`
+- `tar -zcvf *.tar.gz directory|file`  打包文件
+- `tar -zxvf *.tar.gz -C directory`  解包文件
+
+查找
+- `grep option pattern file`  文本搜索工具，它能使用正则表达式搜索文本，并把匹配的行打印出来
+  -A x  除了显示符合样式的那一列之外，并显示该行之后的x行内容
+  -B x  除了显示符合样式的那一行之外，并显示该行之前的x行内容
+  -C x  除了显示符合样式的那一行之外，并显示该行之前后的x行内容
+  -c  统计匹配的行数
+  -e  实现多个选项间的逻辑or关系
+  -E  扩展的正则表达式
+  -f file  从文件获取PATTERN匹配
+  -F  相当于fgrep，PATTERN被当作固定字符串
+  -i  忽略字符大小写的差别
+  -n  显示匹配的行号
+  -o  仅显示匹配到的字符串
+  -q  静默模式，不输出任何信息
+  -s  不显示错误信息。
+  -v  显示不被pattern匹配到的行，相当于[^]反向匹配
+  -w  匹配整个单词  
+- `sed [-hnV][-e<script>][-f<script文件>] file`  利用脚本来处理文本文件
+  -e<script>  以选项中指定的script来处理输入的文本文件，这个-e可以省略，直接写表达式
+  -f<script文件>  以选项中指定的script文件来处理输入的文本文件
+  -h  显示帮助
+  -n  仅显示script处理后的结果
+  -V  显示版本信息
+  i  插入  i的后面可以接字串，而这些字串会在新的一行出现(目前的上一行)
+  a  新增  a的后面可以接字串，而这些字串会在新的一行出现(目前的下一行)
+  d  删除  因为是删除啊，所以d后面通常不接任何东西
+  c  取代  c的后面可以接字串，这些字串可以取代n1,n2之间的行
+  s  取代  替换单个字符，通常这个s的动作可以搭配正规表示法，例如1,20s/old/new/g
+  p  打印  将某个选择的数据印出，通常p会与参数sed -n一起运行
+- `awk option [<script>] [-f<scriptfile>] var=value file`  文本分析
+  option
+    -F fs  fs指定输入文件折分隔符，fs是一个字符串或者是一个正则表达式，默认是空格或者tab键
+  变量
+    FILENAM  当前文件名
+    FS  字段分隔符，默认是空格和制表符
+    RS  行分隔符，用于分割每一行，默认是换行符
+    OFS  输出字段的分隔符，用于打印时分隔字段，默认为空格
+    ORS  输出记录的分隔符，用于打印时分隔记录，默认为换行符
+    NF  总字段数量
+    NR  当前行
+  函数
+    toupper()  字符转为大写
+    tolower()  字符转为小写
+    length()  返回字符串长度
+    substr()  返回子字符串
+
+排序
+- `sort option` 
+  -n 按数字进行排序 
+  -d 按字典序进行排序
+  -r 逆序排序
+  -k N 指定按第N列排序
+
+去重
+- `uniq`
+  -c  统计各行在文件中出现的次数
+  -d  找出重复行
+
+统计
+- `wc`
+  -l  统计行数
+  -w  统计单词数
+  -c  统计字符数
+
+命令行参数转换
+- `xargs options command`
+  -d  定义定界符(默认为空格 多行的定界符为n)
+  -L  从标准输入一次读取num行送给command命令
+  -n  表示命令在执行的时候一次用的argument的个数，默认是用所有的
+  -I  将xargs的每项名称赋值给{}，可以用{}代替
+  
+其它
 - `ssh username@ip`  远程登录
 - `ping domain|ip`  网络检测
 - `wget url`  文件下载
-- `find path option pattern command`  文件查找
-- `grep option pattern file...`  文本查找
+- `su -username`  切换用户
+- `netstat -tln | grep port`  查看端口使用情况
+- `lsof -i :port`  查看端口属于程序
 ```
