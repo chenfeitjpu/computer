@@ -23,7 +23,6 @@
 - 求一维数组区间值
 - 求二维数组区间值
 - 查找指定区间值
-
 应用
 LeetCode  
 - 303.区域和检索-数组不可变
@@ -35,20 +34,20 @@ LeetCode
 <summary>模版</summary>
 <pre>
 <code>
-type NumArray struct {
+type PrefixSum struct {
 	sumArray []int
 }
-func Constructor(nums []int) *NumArray {
+func Constructor(nums []int) *PrefixSum {
 	length := len(nums)
 	sumArray := make([]int, length+1)
 	for i := 1; i <= length; i++ {
 		sumArray[i] = sumArray[i-1] + nums[i-1]
 	}
-	return &NumArray{
+	return &PrefixSum{
 		sumArray: sumArray,
 	}
 }
-func (this *NumArray) GetRange(start, end int) int {
+func (this *PrefixSum) GetRange(start, end int) int {
 	return this.sumArray[end+1] - this.sumArray[start]
 }
 </code>
@@ -59,7 +58,6 @@ func (this *NumArray) GetRange(start, end int) int {
 ```
 定义
 频繁对原始数组的某个区间的元素进行增减
-
 应用
 LeetCode 
 - 370.区间加法
@@ -109,7 +107,6 @@ func (this *Difference) GetResult() []int {
 定义
 - 左右指针 两个指针相向而行或者相背而行
 - 快慢指针 两个指针同向而行，一快一慢
-
 应用
 LeetCode  
 - 26.删除有序数组中的重复项
@@ -122,7 +119,6 @@ LeetCode
 ```
 定义
 通过快慢指针，不停滑动搜索区间
-
 应用
 LeetCode  
 - 76.最小覆盖子串
@@ -130,23 +126,3 @@ LeetCode
 - 438.找到字符串中所有字母异位词
 - 3.无重复字符的最长子串
 ```
-
-<details>
-<summary>模版</summary>
-<pre>
-<code>
-func SlideWindow(s string) {
-	length := len(s)
-	left, right := 0, 0
-	for right < length {
-		//扩大窗口
-		right++
-		//缩小窗口
-		for {
-			left++
-		}
-	}
-}
-</code>
-</pre>
-</details>
