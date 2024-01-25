@@ -28,7 +28,7 @@
 - 递归
 
 学习资料
-[labuladong]()
-[宫水三叶]()
-[托尼学长]()
+[labuladong](https://mp.weixin.qq.com/s/GOOgO5Wp48jM9jSPzqJwOQ)
+[托尼学长](http://)
+[宫水三叶](http://)
 ```

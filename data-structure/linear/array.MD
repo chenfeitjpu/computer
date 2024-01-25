@@ -12,7 +12,6 @@
 ```
 定义
 顺序存储元素
-
 特点
 查询快O(1)，增删慢O(n)
 ```
@@ -31,7 +30,6 @@ LeetCode
 - 304.二维区域和检索-矩阵不可变
 - 560.和为K的子数组
 ```
-
 <details>
 <summary>模版</summary>
 <pre>
@@ -66,7 +64,6 @@ LeetCode
 - 1109.航班预订统计
 - 1094.拼车
 ```
-
 <details>
 <summary>模版</summary>
 <pre>
