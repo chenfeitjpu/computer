@@ -26,9 +26,8 @@
 遍历方式
 - 迭代
 - 递归
-
-学习资料
-[labuladong](https://mp.weixin.qq.com/s/GOOgO5Wp48jM9jSPzqJwOQ)
-[托尼学长](http://)
-[宫水三叶](http://)
 ```
+学习资料
+[labuladong]()
+[托尼学长]()
+[宫水三叶]()
