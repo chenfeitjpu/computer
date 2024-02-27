@@ -43,6 +43,9 @@
 常见字段
 - Host 服务器主机
 - Connection 使用持久连接
+  超时控制
+  - 服务端可以设置keep-alive timeout
+  - 设置头信息keep-alive:timeout={time}
 - Accept 客户端接受的数据格式
 - Accept-Encoding 客户端接受的数据压缩方式
 - Content-Length 服务器返回的数据长度
