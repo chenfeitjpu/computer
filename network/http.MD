@@ -133,6 +133,15 @@ HTTP2特性
 缺点
   - TCP队头阻塞
 
+cookie
+
+session
+分布式session
+- session复制
+- session前端存储
+- session粘滞
+- session后端存储
+
 安全问题
 XSS 
   - 过滤
