@@ -85,6 +85,15 @@ HTTP1.1特性
 - 跨平台
 缺点  
 - 无状态
+  - 目的
+    高效
+  - 保持状态
+    - cookie
+    - session
+      分布式session 
+      - session复制
+      - session粘滞
+      - session集中存储 
 - 不安全
   - 明文传输，内容可能会被窃听
   - 不验证通信身份，可能会被冒充
@@ -132,15 +141,6 @@ HTTP2特性
   - 服务器推送  
 缺点
   - TCP队头阻塞
-
-cookie
-
-session
-分布式session
-- session复制
-- session前端存储
-- session粘滞
-- session后端存储
 
 安全问题
 XSS 
