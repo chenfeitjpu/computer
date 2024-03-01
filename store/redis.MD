@@ -133,7 +133,7 @@ sorted set
 - `ZCOUNT key min max`  获取分数区间的成员数量
 - `ZLEXCOUNT key min max`  获取字典区间的成员数量
 
-bit
+bitmap
 - `SETBIT key offset value`  设置bit位
 - `GETBIT key offset`  获取bit位
 - `BITPOS key bit [start] [end] [BYTE|BIT]` 在指定字节区间查找bit出现的位置
