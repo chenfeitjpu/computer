@@ -69,6 +69,7 @@
     - GET  请求参数放在URL中，只能是字符串，且长度受客户端限制
     - POST  请求参数放在请求体，可以是各种数据格式
 - RESTFUL API 
+  https://domain/version/resource?filter(key=value)
   对于资源的具体操作类型，由HTTP动词表示
 
 缓存技术
