@@ -7,7 +7,6 @@
   - [持久化](#持久化)
   - [内存管理](#内存管理)
   - [高可用](#高可用)
-- [高频面试题](#高频面试题)
   
 # 定义 #
 键值数据库
@@ -189,10 +188,13 @@ stream
 **字符串(string)**
 ```
 内部实现
-- int(整数) 字符串对象保存的是整数值，并且这个整数值可以用long类型来表示
-- embstr(sds) 字符串的长度小于等于44字节
+- int(整数) 
+  存储8个字节的长整型(-2^63到12^63-1)
+- embstr(sds) 
+  字符串的长度小于等于44字节
+  redisObject和SDS内存是连续分配的
 - raw(sds)
-
+  redisObject和SDS内存是随机分配的
 应用
 - 缓存对象
 - 计数
@@ -202,8 +204,9 @@ stream
 **列表(list)**
 ```
 内部实现
-- listpack(list_max_listpack_size正数表示数量，负数表示大小)
-- quicklist
+- listpack  
+  list_max_listpack_size正数表示数量，负数表示大小  
+- quicklist  
 
 应用
 - 消息队列
@@ -212,8 +215,9 @@ stream
 **哈希(hash)**
 ```
 内部实现
-- listpack(元素个数(hash_max_listpack_entries)小于等于512个且元素值(hash_max_listpack_value)小于等于64字节)
-- 哈希表
+- listpack  
+  元素个数(hash_max_listpack_entries)小于等于512个且元素值(hash_max_listpack_value)小于等于64字节
+- hashtable
 
 应用  
 - 缓存对象
@@ -222,7 +226,8 @@ stream
 **集合(set)**
 ```
 内部实现  
-- intset(元素个数(set-max-intset-entries)小于等于512个且元素都是整数)
+- intset  
+  元素个数(set-max-intset-entries)小于等于512个且元素都是整数
 - hashtable
   
 应用  
@@ -234,7 +239,8 @@ stream
 **有序集合(sorted set)**
 ```
 内部实现
-- listpack(元素个数(zset_max_listpack_entries)小于等于128个且元素值(zset_max_listpack_value)小于等于64字节)
+- listpack
+  元素个数(zset_max_listpack_entries)小于等于128个且元素值(zset_max_listpack_value)小于等于64字节
 - skiplist
 
 应用 
@@ -249,7 +255,7 @@ stream
   
 应用  
 - 签到
-- 登陆
+- 登录
 ```
 
 **基数统计(hyperloglog)**
@@ -294,6 +300,10 @@ stream
 
 **sds**
 ```
+c语言字符串的不足
+- 获取字符串长度的时间复杂度为O(N)
+- 字符串的结尾是以"\0"字符标识，字符串里面不能包含有"\0"字符，因此不能保存二进制数据；
+- 字符串操作函数不高效且不安全，比如有缓冲区溢出的风险，有可能会造成程序运行终止
 结构
 struct __attribute__ ((__packed__)) sdshdr16 {
     uint16_t len;
@@ -759,9 +769,4 @@ sentinel monitor <master-name> <ip> <redis-port> <quorum>
 **分布式**
 ```
 
-```
-
-# 高频面试题 #
-```
-Redis数据类型
 ```
