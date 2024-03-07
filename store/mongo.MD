@@ -18,20 +18,20 @@ MongoDb
 
 集合
 - `show collections`  查看集合
-- `db.createCollection(name, option)`  显示创建集合
+- `db.createCollection(name, options)`  显示创建集合
 - `db.COLLECTION_NAME.drop()`  删除集合
 
 文档
-- `db.COLLECTION_NAME.insert()`  添加文档
-- `db.COLLECTION_NAME.update()`  修改文档
-- `db.COLLECTION_NAME.remove()`  删除文档
-- `db.COLLECTION_NAME.find()`  查询文档
+- `db.COLLECTION_NAME.insert(document)`  添加文档
+- `db.COLLECTION_NAME.update(query, update)`  修改文档
+- `db.COLLECTION_NAME.remove(query)`  删除文档
+- `db.COLLECTION_NAME.find(query)`  查询文档
 
 索引
-- `db.COLLECTION_NAME.getIndexes`  查询索引
-- `db.COLLECTION_NAME.createIndex`  添加索引
-- `db.COLLECTION_NAME.dropIndex`  删除索引
-- `db.COLLECTION_NAME.dropIndexes`  删除所有索引
+- `db.COLLECTION_NAME.getIndexes()`  查询索引
+- `db.COLLECTION_NAME.createIndex(keys, options)`  添加索引
+- `db.COLLECTION_NAME.dropIndex(name)`  删除索引
+- `db.COLLECTION_NAME.dropIndexes()`  删除所有索引
 ```
 
 ## 查询 ##
@@ -57,17 +57,19 @@ MongoDb
 - $regex
 
 结果集
-- sort
-- limit
-- skip
+- sort(keys)
+- limit(number)
+- skip(number)
 
 聚合
-单一命令
-- count
-- distinct
-分解
-- mapReduce 
-管道
-- aggregate
+- 单一命令
+  - count
+    db.COLLECTION_NAME.countDocuments(query, options)
+  - distinct
+    db.collection_name.distinct(field, query, options)    
+- 分组
+  - group
+  - mapReduce 
+- 管道
+  - aggregate
 ```
-  
