@@ -70,8 +70,9 @@ MongoDb
   - count
     db.COLLECTION_NAME.countDocuments(query, options)
   - distinct
-    db.collection_name.distinct(field, query, options)    
+    db.COLLECTION_NAME.distinct(field, query, options)    
 - 分组
+  - group
   - mapReduce 
 - 管道
   - aggregate
