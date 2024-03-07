@@ -3,6 +3,10 @@ MongoDb
 - [内容](#内容)
   - [基本命令](#基本命令)
   - [查询](#查询)
+  - [存储引擎](#存储引擎)
+  - [集群](#集群)
+    - [复制集群](#复制集群)
+    - [分片集群](#分片集群)
 
 # 定义 #
 文档数据库
@@ -68,8 +72,18 @@ MongoDb
   - distinct
     db.collection_name.distinct(field, query, options)    
 - 分组
-  - group
   - mapReduce 
 - 管道
   - aggregate
 ```
+
+## 存储引擎 ##
+```
+MMAPv1
+WiredTiger
+In-Memory
+```
+
+## 集群 ##
+### 复制集群 ###
+### 分片集群 ###
