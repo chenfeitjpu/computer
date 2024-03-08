@@ -293,9 +293,13 @@ stream
 **redis对象** 
 ![avatar](./images/redis/redis-object-struct.png) 
 ``` 
-- type  标识该对象是什么类型的对象（String对象、List对象、Hash对象、Set对象和Zset对象） 
-- encoding  标识该对象使用了哪种底层的数据结构  
-- ptr  指向底层数据结构的指针  
+- type  
+  标识该对象是什么类型的对象（string、list、hash、set、zset） 
+- encoding  
+  标识该对象使用了哪种底层的数据结构  
+  `object encoding key` 查看命令
+- ptr
+  指向底层数据结构的指针  
 ```
 
 **sds**
@@ -517,43 +521,43 @@ typedef struct quicklistNode {
 **aof**
 ```
 开启
-redis.conf
-appendonly yes //是否开启aof持久化(默认no:关闭)
-appendfilename "appendonly.aof" //aof持久化文件名称
+- redis.conf
+  appendonly yes //是否开启aof持久化(默认no:关闭)
+  appendfilename "appendonly.aof" //aof持久化文件名称
 
-执行过程
-- 执行写命令
-- 记录命令到日志
-优点
-- 避免额外检查开销
-- 不会阻塞当前操作命令
-缺点
-- 写命令和写日志是两个过程，有丢失数据的风险
-- 阻塞下一个命令的执行
+执行
+- 过程
+  - 执行写命令
+  - 记录命令到日志
+- 优点
+  - 避免额外检查开销
+  - 不会阻塞当前操作命令
+- 缺点
+  - 写命令和写日志是两个过程，有丢失数据的风险
+  - 阻塞下一个命令的执行
 
 写回策略
-- Always  每次写操作命令执行完后，同步将AOF日志数据写回硬盘(同步将AOF日志数据写回硬盘)
-- Everysec  每次写操作命令执行完后，先将命令写入到AOF文件的内核缓冲区，然后每隔一秒将缓冲区里的内容写回到硬盘(异步)
-- No  每次写操作命令执行完后，先将命令写入到AOF文件的内核缓冲区，再由操作系统决定何时将缓冲区内容写回硬盘(异步)
-
-fsync()函数的调用时机
-- Always  每次写入AOF文件数据后，就执行fsync()函数；
-- Everysec  创建一个异步任务来执行fsync()函数；
-- No  永不执行fsync()函数
+  - Always  
+    每次写操作命令执行完后，同步将AOF日志数据写回硬盘(同步将AOF日志数据写回硬盘)
+  - Everysec  
+    每次写操作命令执行完后，先将命令写入到AOF文件的内核缓冲区，然后每隔一秒将缓冲区里的内容写回到硬盘(异步)
+  - No  
+    每次写操作命令执行完后，先将命令写入到AOF文件的内核缓冲区，再由操作系统决定何时将缓冲区内容写回硬盘(异步)
 
 AOF重写机制
-自动重写
-`auto-aof-rewrite-min-size`  aof文件大小阀值
-`auto-aof-rewrite-percentage`  aof文件扩展比例
-`no-appendfsync-on-rewrite`  在执行AOF文件重写时是否禁用同步
-手动重写
-bgrewriteaof(异步)
-重写过程
-- 主进程在通过fork系统调用生成bgrewriteaof子进程(会阻塞主进程)
-- 子进程进行aof文件重写(异步执行)
-- 主进程修改了已经存在key-value，发生写时复制(会阻塞主进程)
-- 子进程完成AOF重写工作，会向主进程发送一条信号
-- 主进程收到信号后，将AOF重写缓冲区中的所有内容追加到新的AOF的文件中，新的AOF的文件进行改名，覆盖现有的AOF文件(会阻塞主进程)
+读取当前数据库中的所有键值对，然后将每一个键值对用一条命令记录到新的AOF文件
+- 自动重写
+  `auto-aof-rewrite-min-size`  aof文件大小阀值
+  `auto-aof-rewrite-percentage`  aof文件扩展比例
+  `no-appendfsync-on-rewrite`  在执行AOF文件重写时是否禁用同步
+- 手动重写
+  bgrewriteaof(异步)
+- 重写过程
+  - 主进程在通过fork系统调用生成bgrewriteaof子进程(会阻塞主进程)
+  - 子进程进行aof文件重写(异步执行)
+  - 主进程修改了已经存在key-value，发生写时复制(会阻塞主进程)
+  - 子进程完成AOF重写工作，会向主进程发送一条信号
+  - 主进程收到信号后，将AOF重写缓冲区中的所有内容追加到新的AOF的文件中，新的AOF的文件进行改名，覆盖现有的AOF文件(会阻塞主进程)
 ```
 
 **rdb**
@@ -768,5 +772,4 @@ sentinel monitor <master-name> <ip> <redis-port> <quorum>
 
 **分布式**
 ```
-
 ```
