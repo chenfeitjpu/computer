@@ -255,8 +255,8 @@ DCL
   - 为列的基数大的列创建索引
   - 索引列的类型尽量小
   - 可以只对字符串值的前缀建立索引
+  - 只有索引列在比较表达式中单独出现才可以使用索引
   - 为了尽可能少的让聚簇索引发生页面分裂和记录移位的情况，建议让主键拥有AUTO_INCREMENT属性
-  - 只有索引列在比较表达式中单独出现才可以适用索引
   - 定位并删除表中的重复和冗余索引
   - 尽量使用覆盖索引进行查询，避免回表带来的性能损耗
 - 代价  
@@ -294,41 +294,41 @@ DCL
 - 通配  `_, %`
 
 函数
-文本  
-- `left` 从左边取指定长度的子串
-- `right` 从右边取指定长度的子串
-- `length` 获取字符串长度
-- `upper` 大写格式
-- `lower` 小写格式
-- `ltrim` 去掉字符串左边空格
-- `rtrim` 去掉字符串右边空格
-- `substring` 字符串截取
-- `concat` 字符串拼接
-时间  
-- `now` 获取当前日期和时间
-- `curdate` 获取当前日期
-- `curtime` 获取当前时间
-- `date(datetime)` 提取日期
-- `date_add(datetime, interval value type)` 添加指定的时间间隔
-- `date_sub(datetime, interval value type)` 减去指定的时间间隔
-- `datediff(date, date)` 返回两个日期之间的天数
-- `date_format(datetime, format)` 格式化显示日期和时间
-算术  
-- `rand` 随机数
-- `mod` 取余
-- `abs` 绝对值
-- `pi` 圆周率
-- `exp` e的指定次方
-- `sqrt` 平方根
-- `sin` 正弦
-- `cos` 余弦
-- `tan` 正切
-聚集  
-- `count` 总数
-- `max` 最大值
-- `min` 最小值
-- `sum` 求和
-- `avg` 平均值
+- 文本  
+  - `left` 从左边取指定长度的子串
+  - `right` 从右边取指定长度的子串
+  - `length` 获取字符串长度
+  - `upper` 大写格式
+  - `lower` 小写格式
+  - `ltrim` 去掉字符串左边空格
+  - `rtrim` 去掉字符串右边空格
+  - `substring` 字符串截取
+  - `concat` 字符串拼接
+- 时间  
+  - `now` 获取当前日期和时间
+  - `curdate` 获取当前日期
+  - `curtime` 获取当前时间
+  - `date(datetime)` 提取日期
+  - `date_add(datetime, interval value type)` 添加指定的时间间隔
+  - `date_sub(datetime, interval value type)` 减去指定的时间间隔
+  - `datediff(date, date)` 返回两个日期之间的天数
+  - `date_format(datetime, format)` 格式化显示日期和时间
+- 算术  
+  - `rand` 随机数
+  - `mod` 取余
+  - `abs` 绝对值
+  - `pi` 圆周率
+  - `exp` e的指定次方
+  - `sqrt` 平方根
+  - `sin` 正弦
+  - `cos` 余弦
+  - `tan` 正切
+- 聚集  
+  - `count` 总数
+  - `max` 最大值
+  - `min` 最小值
+  - `sum` 求和
+  - `avg` 平均值
 ```
 
 ### 优化 ###
