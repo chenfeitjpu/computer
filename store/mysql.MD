@@ -178,39 +178,38 @@
 ## SQL ##
 ```
 DDL
-数据库    
-- `show databases` 查看所有库
-- `create database [if not exists] 库名` 创建库
-- `drop database [if exists] 库名` 删除库
-- `use 库名` 选择库
-表    
-- `show tables [from 库名]` 查看所有表
-- `show create table [库名.]表名` 查看表定义
-- `[describe|desc|explain|show columns from|show fields form] 表名` 查看表描述
-- `create table [if not exists] 表名` 创建表
-- `drop table [if exists ]表名` 删除表
-- `rename table 旧表名 to 新表名` 修改表名
-- `alter table 旧表名 rename to 新表名` 修改表名
-- `alter table 表名 add [column] 列名 数据类型 [列的属性] [first|after 列名]` 增加列
-- `alter table 表名 drop [column] 列名` 删除列
-- `alter table 表名 modify [column] 列名 新数据类型 [新属性] [first|after 列名]` 修改列
-- `alter table 表名 change [column] 列名 新列名 新数据类型 [新属性]` 修改列
-列    
-- `default` 默认值
-- `not null` 非空
-- `comment` 注释
-- `auto_increament` 自增
-  - 一个表中最多有一个具有AUTO_INCREMENT属性的列
-  - 拥有AUTO_INCREMENT属性的列就不能再通过指定DEFAULT属性来指定默认值
-  - 具有AUTO_INCREMENT属性的列必须建立索引  
-- `zerofill` 零填充
-  - 该列必须是整数类型的
-  - 该列必须有unsigned zerofill的属性
-  - 该列的实际值的位数必须小于显示宽度  
-- `primary key` 主键
-- `unique [key] [约束名] (列名)` 唯一键
-- `constraint [约束名] foreign key [索引名](列1, 列2, ...) references 父表名 (父列1, 父列2, ...)` 外键
-
+- 数据库    
+  - `show databases` 查看所有库
+  - `create database [if not exists] 库名` 创建库
+  - `drop database [if exists] 库名` 删除库
+  - `use 库名` 选择库
+- 表    
+  - `show tables [from 库名]` 查看所有表
+  - `show create table [库名.]表名` 查看表定义
+  - `[describe|desc|explain|show columns from|show fields form] 表名` 查看表描述
+  - `create table [if not exists] 表名` 创建表
+  - `drop table [if exists ]表名` 删除表
+  - `rename table 旧表名 to 新表名` 修改表名
+  - `alter table 旧表名 rename to 新表名` 修改表名
+  - `alter table 表名 add [column] 列名 数据类型 [列的属性] [first|after 列名]` 增加列
+  - `alter table 表名 drop [column] 列名` 删除列
+  - `alter table 表名 modify [column] 列名 新数据类型 [新属性] [first|after 列名]` 修改列
+  - `alter table 表名 change [column] 列名 新列名 新数据类型 [新属性]` 修改列
+- 列    
+  - `default` 默认值
+  - `not null` 非空
+  - `comment` 注释
+  - `auto_increament` 自增
+    - 一个表中最多有一个具有AUTO_INCREMENT属性的列
+    - 拥有AUTO_INCREMENT属性的列就不能再通过指定DEFAULT属性来指定默认值
+    - 具有AUTO_INCREMENT属性的列必须建立索引  
+  - `zerofill` 零填充
+    - 该列必须是整数类型的
+    - 该列必须有unsigned zerofill的属性
+    - 该列的实际值的位数必须小于显示宽度  
+  - `primary key` 主键
+  - `unique [key] [约束名] (列名)` 唯一键
+  - `constraint [约束名] foreign key [索引名](列1, 列2, ...) references 父表名 (父列1, 父列2, ...)` 外键
 
 DML
 - `insert into 表名 [(列名, 列名)] values (值, 值) [,(值, 值)]` 插入单条|多条数据
