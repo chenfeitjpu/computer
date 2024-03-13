@@ -494,7 +494,7 @@ explain
   驱动表扇出值  
 - Extra  
   额外信息  
-  - No tables used  
+  - No tables used
     查询语句的没有FROM子句  
   - Impossible WHERE  
     查询语句的WHERE子句永远为FALSE  
@@ -524,6 +524,7 @@ explain
     在将In子查询转为semi-join时，如果采用的是LooseScan执行策略，则在驱动表执行计划的Extra列就是显示LooseScan提示  
   - FirstMatch  
     在将In子查询转为semi-join时，如果采用的是FirstMatch执行策略，则在被驱动表执行计划的Extra列就是显示FirstMatch(tbl_name)提示  
+
 
 optimizer trace
 - 开启    
@@ -825,170 +826,173 @@ INSUFFICIENT_PRIVILEGES: 1
 </details>
 
 ## 事务 ##
-[状态转移](https://raw.githubusercontent.com/chenfeitjpu/computer/master/store/images/mysql/transaction-state.awebp)
 ```
-特性  
-- 原子性（Atomicity）
-- 隔离性（Isolation）
-- 一致性（Consistency）
-- 持久性（Durability）
-
-状态  
-- 活动的(active)
-- 部分提交的(partially committed)
-- 失败的(failed)
-- 中止的(aborted)
-- 提交的(committed)
- 
-操作
-- `BEGIN [WORK]`  开启事务   
-- `START TRANSACTION [READ ONLY|READ WRITE] [WITH CONSISTENT SNAPSHOT]`  开启事务  
-- `COMMIT [WORK]`  提交事务
-- `ROLLBACK [WORK]`  手动中止事务 
-- `AUTOCOMMIT` 自动提交
-   
-保存点
-- `SAVEPOINT 保存点名称`  定义
-- `ROLLBACK [WORK] TO [SAVEPOINT] 保存点名称` 回滚
-- `RELEASE SAVEPOINT 保存点名称` 删除 
+概念
+- 特性  
+  - 原子性（Atomicity）
+  - 隔离性（Isolation）
+  - 一致性（Consistency）
+  - 持久性（Durability）
+- 状态  
+  - 活动的(active)
+  - 部分提交的(partially committed)
+  - 失败的(failed)
+  - 中止的(aborted)
+  - 提交的(committed)
+- 操作
+  - `BEGIN [WORK]`  开启事务   
+  - `START TRANSACTION [READ ONLY|READ WRITE] [WITH CONSISTENT SNAPSHOT]`  开启事务  
+  - `COMMIT [WORK]`  提交事务
+  - `ROLLBACK [WORK]`  手动中止事务 
+  - `AUTOCOMMIT` 自动提交 
+- 保存点
+  - `SAVEPOINT 保存点名称`  定义
+  - `ROLLBACK [WORK] TO [SAVEPOINT] 保存点名称` 回滚
+  - `RELEASE SAVEPOINT 保存点名称` 删除 
 
 并发
-问题  
-- 脏写 一个事务修改了另一个未提交事务修改过的数据，那就意味着发生了脏写  
-- 脏读 一个事务读到了另一个未提交事务修改过的数据，那就意味着发生了脏读   
-- 不可重复读 一个事务读到另一个已经提交的事务修改过的数据，并且其他事务每对该数据进行一次修改并提交后，该事务都能查询得到最新值，那就意味着发生了不可重复读  
-- 幻读 一个事务先根据某些条件查询出一些记录，之后另一个事务又向表中插入了符合这些条件的记录，原先的事务再次按照该条件查询时，能把另一个事务插入的记录也读出来，那就意味着发生了幻读
-
-隔离级别  
-- READ UNCOMMITTED 未提交读
-- READ COMMITTED 已提交读   
-- REPEATABLE READ 可重复读
-- SERIALIZABLE 可串行化
-
-| 隔离级别 | 脏读 | 不可重复读 | 幻读 |  
-| :---: | :---: | :---: | :---: |
-| READ UNCOMMITTED | Possible | Possible | Possible |
-| READ COMMITTED | Not | Possible | Possible | Possible |
-| REPEATABLE READ | Not Possible | Not Possible | Possible |
-| SERIALIZABLE | Not Possible | Not Possible | Not Possible |
-
-设置隔离级别  
-`SET [GLOBAL|SESSION] TRANSACTION ISOLATION LEVEL level`
-level: {
-    REPEATABLE READ
-    READ COMMITTED
+- 问题  
+  - 脏写  
+    一个事务修改了另一个未提交事务修改过的数据，那就意味着发生了脏写  
+  - 脏读  
+    一个事务读到了另一个未提交事务修改过的数据，那就意味着发生了脏读   
+  - 不可重复读  
+    一个事务读到另一个已经提交的事务修改过的数据，并且其他事务每对该数据进行一次修改并提交后，该事务都能查询得到最新值，那就意味着发生了不可重复读  
+  - 幻读  
+    一个事务先根据某些条件查询出一些记录，之后另一个事务又向表中插入了符合这些条件的记录，原先的事务再次按照该条件查询时，能把另一个事务插入的记录也读出来，那就意味着发生了幻读
+- 隔离级别  
+  - READ UNCOMMITTED 未提交读
+  - READ COMMITTED 已提交读   
+  - REPEATABLE READ 可重复读
+  - SERIALIZABLE 可串行化
+  | 隔离级别 | 脏读 | 不可重复读 | 幻读 |  
+  | :---: | :---: | :---: | :---: |
+  | READ UNCOMMITTED | Possible | Possible | Possible |
+  | READ COMMITTED | Not Possible | Possible | Possible |
+  | REPEATABLE READ | Not Possible | Not Possible | Possible |
+  | SERIALIZABLE | Not Possible | Not Possible | Not Possible |
+- 设置隔离级别  
+  `show variables like 'transaction_isolation`  
+  `SET [GLOBAL|SESSION] TRANSACTION ISOLATION LEVEL level`
+  level: {
     READ UNCOMMITTED
+    READ COMMITTED
+    REPEATABLE READ
     SERIALIZABLE
-}
+  }
 
 MVCC
-版本链    
-记录中包含两个必要的隐藏列  
-- trx_id 每次一个事务对某条聚簇索引记录进行改动时，都会把该事务的事务id赋值给trx_id隐藏列
-- roll_pointer 每次对某条聚簇索引记录进行改动时，都会把旧的版本写入到undo日志中，然后这个隐藏列就相当于一个指针，可以通过它来找到该记录修改前的信息  
-记录每次更新后，都会将旧值放到一条undo日志中，就算是该记录的一个旧版本，随着更新次数的增多，所有的版本都会被roll_pointer属性连接成一个链表，我们把这个链表称之为版本链
-
-ReadView    
-- m_ids  表示在生成ReadView时当前系统中活跃的读写事务的事务id列表  
-- min_trx_id  表示在生成ReadView时当前系统中活跃的读写事务中最小的事务id，也就是m_ids中的最小值
-- max_trx_id  表示生成ReadView时系统中应该分配给下一个事务的id值
-- creator_trx_id  表示生成该ReadView的事务的事务id  
-
-访问过程
-- 如果被访问版本的trx_id属性值与ReadView中的creator_trx_id值相同，意味着当前事务在访问它自己修改过的记录，所以该版本可以被当前事务访问  
-- 如果被访问版本的trx_id属性值小于ReadView中的min_trx_id值，表明生成该版本的事务在当前事务生成ReadView前已经提交，所以该版本可以被当前事务访问  
-- 如果被访问版本的trx_id属性值大于或等于ReadView中的max_trx_id值，表明生成该版本的事务在当前事务生成ReadView后才开启，所以该版本不可以被当前事务访问
-- 如果被访问版本的trx_id属性值在ReadView的min_trx_id和max_trx_id之间，那就需要判断一下trx_id属性值是不是在m_ids列表中，如果在，说明创建ReadView时生成该版本的事务还是活跃的，该版本不可以被访问；如果不在，说明创建ReadView时生成该版本的事务已经被提交，该版本可以被访问  
-
-生成时机  
-- READ COMMITTED  每次读取数据前都生成一个ReadView  
-- REPEATABLE READ  在第一次读取数据时生成一个ReadView  
+- 版本链    
+  记录中包含两个必要的隐藏列  
+  - trx_id 
+    每次一个事务对某条聚簇索引记录进行改动时，都会把该事务的事务id赋值给trx_id隐藏列
+  - roll_pointer 
+    每次对某条聚簇索引记录进行改动时，都会把旧的版本写入到undo日志中，然后这个隐藏列就相当于一个指针，可以通过它来找到该记录修改前的信息  
+    记录每次更新后，都会将旧值放到一条undo日志中，就算是该记录的一个旧版本，随着更新次数的增多，所有的版本都会被roll_pointer属性连接成一个链表，我们把这个链表称之为版本链
+- ReadView    
+  - m_ids  表示在生成ReadView时当前系统中活跃的读写事务的事务id列表  
+  - min_trx_id  表示在生成ReadView时当前系统中活跃的读写事务中最小的事务id，也就是m_ids中的最小值
+  - max_trx_id  表示生成ReadView时系统中应该分配给下一个事务的id值
+  - creator_trx_id  表示生成该ReadView的事务的事务id  
+- 访问过程
+  - 如果被访问版本的trx_id属性值与ReadView中的creator_trx_id值相同，意味着当前事务在访问它自己修改过的记录，所以该版本可以被当前事务访问  
+  - 如果被访问版本的trx_id属性值小于ReadView中的min_trx_id值，表明生成该版本的事务在当前事务生成ReadView前已经提交，所以该版本可以被当前事务访问  
+  - 如果被访问版本的trx_id属性值大于或等于ReadView中的max_trx_id值，表明生成该版本的事务在当前事务生成ReadView后才开启，所以该版本不可以被当前事务访问
+  - 如果被访问版本的trx_id属性值在ReadView的min_trx_id和max_trx_id之间，那就需要判断一下trx_id属性值是不是在m_ids列表中，如果在，说明创建ReadView时生成该版本的事务还是活跃的，该版本不可以被访问；如果不在，说明创建ReadView时生成该版本的事务已经被提交，该版本可以被访问  
+- 生成时机  
+  - READ COMMITTED  每次读取数据前都生成一个ReadView  
+  - REPEATABLE READ  在第一次读取数据时生成一个ReadView  
 ```
 
 ## 存储程序 ##
 ``` 
-语法 
-- `declare 变量名 数据类型 [default value]` 定义局部变量
-- `set name=value` 变量赋值
-- `into name, name` 多个变量赋值
-- `delimiter` 结束分隔符
+语法
+- 变量 
+  - `declare 变量名 数据类型 [default value]` 定义局部变量
+  - `set name=value` 变量赋值
+  - `into name, name` 多个变量赋值
+  - `delimiter` 结束分隔符
+- 分支
+  - if
+    if 表达式 then  
+    elseif 表达式 then  
+    else  
+    end if
+  - case  
+    case 变量
+    when 值 then
+    else
+    end
 
-if 表达式 then  
-elseif 表达式 then  
-else  
-end if
-
-case 变量
-when 值 then
-else
-end
-
-
-case
-when 布尔表达式 then
-else
-end
-
-
-while 表达式 do  
-end while
-
-repeat  
-until 表达式 end repeat
-
-loop  
-end loop
+    case
+    when 布尔表达式 then
+    else
+    end
+  - while
+    while 表达式 do  
+    end while
+  - repeat
+    repeat  
+    until 表达式 end repeat
+  - loop
+    loop  
+    end loop
 
 游标
-- `declare 游标名 cursor for select` 创建游标 
-- `declare continue handler for not found` 事件响应
-- `open 游标名` 打开游标  
-- `fetch 游标名 into` 移动游标
-- `close 游标名` 关闭游标
+- 定义
+  - `declare 游标名 cursor for select` 创建游标 
+  - `declare continue handler for not found` 事件响应
+  - `open 游标名` 打开游标  
+  - `fetch 游标名 into` 移动游标
+  - `close 游标名` 关闭游标
 
 存储函数
-- `show function status [like 函数名]` 查看所有函数
-- `show create function 函数名` 查看函数定义
-- `create function 函数名(参数名 数据类型, 参数名 数据类型)  
-  returns 返回值类型  
-  begin  
+- 定义
+  - `show function status [like 函数名]` 查看所有函数
+  - `show create function 函数名` 查看函数定义
+  - `create function 函数名(参数名 数据类型, 参数名 数据类型)  
+    returns 返回值类型  
+    begin  
       函数体内容  
       return
-  end`
-- `drop function 函数名` 删除函数
+    end`
+  - `drop function 函数名` 删除函数
 
 存储过程
-- `show procedure status [like 存储过程名]` 查看所有存储过程
-- `show create procedure 存储过程名` 查看存储过程定义
-- `create procedure 存储过程名([in|out|inout]参数名 数据类型)  
-  begin  
-  end`
-- `drop procedure 存储过程名` 删除存储过程
+- 定义
+  - `show procedure status [like 存储过程名]` 查看所有存储过程 
+  - `show create procedure 存储过程名` 查看存储过程定义
+  - `create procedure 存储过程名([in|out|inout]参数名 数据类型)  
+    begin  
+    end`
+  - `drop procedure 存储过程名` 删除存储过程
 
 触发器
-- `show triggers` 查看所有触发器
-- `show create trigger 触发器名` 查看触发器定义
-- `create trigger 触发器名  
-  {before|after} on {insert|update|delete} on 表名  
-  for each row  
-  begin  
-    {old|new}  
-  end` 
-- `drop trigger 触发器名` 删除触发器
+- 定义
+  - `show triggers` 查看所有触发器
+  - `show create trigger 触发器名` 查看触发器定义
+  - `create trigger 触发器名  
+    {before|after} on {insert|update|delete} on 表名  
+    for each row  
+    begin  
+      {old|new}  
+    end` 
+  - `drop trigger 触发器名` 删除触发器
 
 事件
-- `show events` 查看所有事件
-- `show create event 事件名` 查看事件定义
-- `create event 事件名  
-  on schedual  
-  {  
-    at 某个确定的时间点  
-    every 期望的时间间隔 [STARTS datetime][END datetime]  
-  }  
-  do  
-  begin  
-  end `
-- `drop event 事件名` 删除事件
+- 定义
+  - `show events` 查看所有事件
+  - `show create event 事件名` 查看事件定义
+  - `create event 事件名  
+    on schedual  
+    {  
+      at 某个确定的时间点  
+      every 期望的时间间隔 [STARTS datetime][END datetime]  
+    }  
+    do  
+    begin  
+    end `
+  - `drop event 事件名` 删除事件
 ```
 
 ## 存储结构 ##
