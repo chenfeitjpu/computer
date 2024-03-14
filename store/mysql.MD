@@ -8,9 +8,6 @@
   - [事务](#事务)
   - [存储程序](#存储程序)
   - [存储结构](#存储结构)
-    - [数据目录](#数据目录)
-    - [InnoDB表空间](#innodb表空间)
-    - [InnoDB的Buffer Pool](#innodb的buffer-pool)
   - [日志](#日志)
     - [redo日志](#redo日志)
     - [undo日志](#undo日志)
@@ -1072,7 +1069,7 @@ MyISAM
   - 把索引信息另外存储到一个称为索引文件的另一个文件中
 ```
 
-### 数据目录 ###
+**数据目录**
 ```
 基本操作    
 `show variables like 'datadir'` 查看数据目录
@@ -1093,7 +1090,7 @@ myisam
 索引 表名.MYI
 ```
 
-### InnoDB表空间 ###
+**InnoDB表空间**
 [区](https://raw.githubusercontent.com/chenfeitjpu/computer/master/store/images/mysql/extent_xdes_entry.webp)  
 [段](https://raw.githubusercontent.com/chenfeitjpu/computer/master/store/images/mysql/segment_inode_entry.webp)  
 [独立表空间](https://raw.githubusercontent.com/chenfeitjpu/computer/master/store/images/mysql/table_space_per.webp)  
@@ -1137,46 +1134,54 @@ myisam
 ```
 
 
-### InnoDB的Buffer Pool ###
-[buffer poll](https://raw.githubusercontent.com/chenfeitjpu/computer/master/store/images/mysql/innodb-buffer-pool.awebp)
+**InnoDB的Buffer Pool**
+[buffer poll](./images/mysql/innodb-buffer-pool.awebp)
 
 ```
 定义   
 InnoDB为了缓存磁盘中的页，在MySQL服务器启动的时候就向操作系统申请了一片连续的内存，他们给这片内存起了个名，叫做Buffer Pool  
 
 管理  
-- 缓存页的哈希处理 表空间号+页号作为key，缓存页作为value创建一个哈希表  
-- free链表的管理 把所有空闲的缓存页对应的控制块作为一个节点放到一个链表中  
-- flush链表的管理 凡是修改过的缓存页对应的控制块都会作为一个节点加入到一个链表中  
-
-LRU链表  
-问题
-- 预读，InnoDB认为执行当前的请求可能之后会读取某些页面，就预先把它们加载到Buffer Pool中  
-  - 线性预读，顺序访问了某个区的页面超过系统变量（innodb_read_ahead_threshold）的值，就会触发一次异步读取下一个区中全部的页面到Buffer Pool的请求  
-  - 随机预读，如果Buffer Pool中已经缓存了某个区的13个连续的页面，不论这些页面是不是顺序读取的，都会触发一次异步读取本区中所有其的页面到Buffer Pool的请求   
-- 全表扫描的查询语句
-
-解决 把LRU链表按照一定比例分成两截  
-- 一部分存储使用频率非常高的缓存页，所以这一部分链表也叫做热数据，或者称young区域  
-- 另一部分存储使用频率不是很高的缓存页，所以这一部分链表也叫做冷数据，或者称old区域  
-
-优化
-- 针对预读的页面可能不进行后续访问情况的优化 
-  当磁盘上的某个页面在初次加载到Buffer Pool中的某个缓存页时，该缓存页对应的控制块会被放到old区域的头部  
-- 针对全表扫描时，短时间内访问大量使用频率非常低的页面情况的优化
-  在对某个处在old区域的缓存页进行第一次访问时就在它对应的控制块中记录下来这个访问时间，如果后续的访问时间与第一次访问的时间在某个时间间隔内，那么该页面就不会被从old区域移动到young区域的头部
-
-- young区域节点频繁移动
-  只有被访问的缓存页位于young区域的1/4的后边，才会被移动到LRU链表头部  
+- 查找  
+  表空间号+页号作为key，缓存页对应的控制块作为value创建一个哈希表  
+- 空闲页管理
+  free链表  把所有空闲的缓存页对应的控制块作为一个节点放到一个链表中  
+- 脏页管理 
+  flush链表  凡是修改过的缓存页对应的控制块都会作为一个节点加入到一个链表中  
+- 内存管理
+  - 淘汰管理
+    LRU链表  
+    使用到某个缓存页，就把该缓存页调整到LRU链表的头部
+    - 缓存命中率降低
+      - 预读，InnoDB认为执行当前的请求可能之后会读取某些页面，就预先把它们加载到Buffer Pool中  
+        - 线性预读  
+          顺序访问了某个区的页面超过系统变量（innodb_read_ahead_threshold）的值，就会触发一次异步读取下一个区中全部的页面到Buffer Pool的请求  
+        - 随机预读
+          如果Buffer Pool中已经缓存了某个区的13个连续的页面，不论这些页面是不是顺序读取的，都会触发一次异步读取本区中所有其的页面到Buffer Pool的请求   
+      - 全表扫描的查询语句
+    - 解决 
+      把LRU链表按照一定比例分成两截  
+      - 一部分存储使用频率非常高的缓存页，所以这一部分链表也叫做热数据，或者称young区域  
+      - 另一部分存储使用频率不是很高的缓存页，所以这一部分链表也叫做冷数据，或者称old区域  
+    - 优化
+      - 针对预读的页面可能不进行后续访问情况的优化 
+        当磁盘上的某个页面在初次加载到Buffer Pool中的某个缓存页时，该缓存页对应的控制块会被放到old区域的头部  
+      - 针对全表扫描时，短时间内访问大量使用频率非常低的页面情况的优化
+        在对某个处在old区域的缓存页进行第一次访问时就在它对应的控制块中记录下来这个访问时间，如果后续的访问时间与第一次访问的时间在某个时间间隔内，那么该页面就不会被从old区域移动到young区域的头部
+      - young区域节点频繁移动
+        只有被访问的缓存页位于young区域的1/4的后边，才会被移动到LRU链表头部  
 
 刷新脏页到磁盘  
-- 从LRU链表的冷数据中刷新一部分页面到磁盘（BUF_FLUSH_LRU）
+- 从lru链表的尾部扫描脏页刷新到磁盘（BUF_FLUSH_LRU）
 - 从flush链表中刷新一部分页面到磁盘（BUF_FLUSH_LIST）
-- 将LRU链表尾部的一个脏页同步刷新到磁盘（BUF_FLUSH_SINGLE_PAGE）
+- 将lru链表尾部的一个脏页同步刷新到磁盘（BUF_FLUSH_SINGLE_PAGE）
   
-多个Buffer Pool实例  
-`innodb_buffer_pool_instances`  设置Buffer Pool实例的个数  
-`innodb_buffer_pool_chunk_size`  一个Buffer Pool实例其实是由若干个chunk组成的  
+Buffer Pool实例
+- 目的
+  减少锁，提高并发处理能力  
+- 设置
+  `innodb_buffer_pool_instances`  设置Buffer Pool实例的个数  
+  `innodb_buffer_pool_chunk_size`  一个Buffer Pool实例其实是由若干个chunk组成的  
 ```
 
 ## 日志 ##
