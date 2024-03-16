@@ -497,7 +497,7 @@ typedef struct quicklistNode {
 ## 持久化 ##
 ```
 aof
-- 开启
+- 配置
   - redis.conf
     appendonly yes //是否开启aof持久化(默认no:关闭)
     appendfilename "appendonly.aof" //aof持久化文件名称
@@ -520,7 +520,7 @@ aof
     每次写操作命令执行完后，先将命令写入到AOF文件的内核缓冲区，再由操作系统决定何时将缓冲区内容写回硬盘(异步)
 - AOF重写机制
   读取当前数据库中的所有键值对，然后将每一个键值对用一条命令记录到新的AOF文件
-  - 自动重写
+  - 配置
     `auto-aof-rewrite-min-size`  aof文件大小阀值
     `auto-aof-rewrite-percentage`  aof文件扩展比例
     `no-appendfsync-on-rewrite`  在执行AOF文件重写时是否禁用同步
@@ -544,7 +544,7 @@ rdb
 - 过程
   - 主进程在通过fork系统调用生成bgsave子进程(会阻塞主进程)
   - 子进程进行全量快照
- - 主进程修改了已经存在key-value，发生写时复制(会阻塞主进程)
+  - 主进程修改了已经存在key-value，发生写时复制(会阻塞主进程)
 
 rdb&aof
 - 配置
