@@ -132,7 +132,7 @@ map
 	  B         uint8
 	  // overflow 的 bucket 近似数
 	  noverflow uint16
-	  // 计算 key 的哈希的时候会传入哈希函数
+      // 计算 key 的哈希的时候会传入哈希函数
 	  hash0     uint32
       // 指向 buckets 数组，大小为 2^B
       // 如果元素个数为0，就为 nil
@@ -164,7 +164,7 @@ map
     - 当B<15 时，overflow的bucket数量超过2^B
     - 当B>=15 时，overflow的bucket数量超过2^15
   - 双倍扩容(桶不够用了)
-    装载因子>6.5 双倍扩容
+    装载因子>6.5
     装载因子=count/(2^B) map中元素的个数/map中当前桶的个数
   - minTopHash
     当一个cell的tophash值小于minTopHash时，标志这个cell的迁移状态
@@ -238,107 +238,107 @@ sync.map
       - read中没有这个key，且amended为fase，说明dirty为空，那直接返回空和false
 
 func 
-声明  
-func name(parameter type, parameter type) ([output] type, [output] type) {
-    return value, value
-}
-闭包
-- 在函数外部访问函数内部变量成为可能
-- 函数内部变量离开其作用域后始终保持在内存中而不被销毁
-
-defer
-- 延迟函数的参数在defer声明时就决定了
-- 多个defer语句，按照先进后出的方式执行
-- return赋值 执行defer return返回
+- 声明  
+  func name(parameter type, parameter type) ([output] type, [output] type) {
+      return value, value
+  }
+- 闭包
+  - 在函数外部访问函数内部变量成为可能
+  - 函数内部变量离开其作用域后始终保持在内存中而不被销毁
+- defer
+  - 延迟函数的参数在defer声明时就决定了
+  - 多个defer语句，按照先进后出的方式执行
+  - return赋值 执行defer return返回
 
 error&panic&recover
 
 struct
-声明
-type name struct {  
-    name type 
-    name type  
-}
-嵌套结构体
-- 匿名结构体
+- 声明
+  type name struct {  
+      name type 
+      name type  
+ }
+- 嵌套结构体
+  - 匿名结构体
 
 method
-声明
-func (name type) name(parameter type, parameter type) ([output] type, [output] type) {
-    return value, value
-}
-使用
-- object.method()
-- 方法变量
-- 方法表达式 
-注意事项
-- 类型T只有接受者是T的方法；而类型*T拥有接受者是T和*T的方法
+- 声明
+  func (name type) name(parameter type, parameter type) ([output] type, [output] type) {
+      return value, value
+  }
+- 使用
+  - object.method()
+  - 方法变量
+  - 方法表达式 
+- 注意事项
+  - 类型T只有接受者是T的方法
+  - 类型*T拥有接受者是T和*T的方法
 
 interface
-声明
-type name interface {  
-    name(name type) type  
-    name(name type) type  
-}
-使用
-对于值接收者实现的接口，无论使用值类型还是指针类型都没有问题
-对于指针接收者实现的接口，只能使用指针类型
-类型断言
-- i.(T)
-- i.(type)
-结构
-// 非空接口
-type iface struct {
-    tab  *itab
-    data unsafe.Pointer
-}
-type itab struct {
-    inter  *interfacetype
-    _type  *_type
-    link   *itab
-    hash   uint32 // copy of _type.hash. Used for type switches.
-    bad    bool   // type does not implement interface
-    inhash bool   // has this itab been added to hash?
-    unused [2]byte
-    fun    [1]uintptr // variable sized
-}
-// 空接口
-type eface struct {
-    _type *_type
-    data  unsafe.Pointer
-}
+- 声明
+  type name interface {  
+      name(name type) type  
+      name(name type) type  
+  }
+- 使用
+  - 对于T接收者实现的接口，无论使用T还是*T都没有问题
+  - 对于*T接收者实现的接口，只能使用*T类型
+- 类型断言
+  - i.(T)
+  - i.(type)
+- 结构
+  //非空接口
+  type iface struct {
+      tab  *itab
+      data unsafe.Pointer
+  }
+  type itab struct {
+      inter  *interfacetype // 接口类型
+      _type  *_type  //实体类型
+      link   *itab
+      hash   uint32 // copy of _type.hash. Used for type switches.
+      bad    bool   // type does not implement interface
+      inhash bool   // has this itab been added to hash?
+      unused [2]byte
+      fun    [1]uintptr // variable sized
+  }
+  //空接口
+  type eface struct {
+      _type *_type  // 实体类型
+      data  unsafe.Pointer
+  }
 
 pointer
-使用
-- &取址
-- *取值
-分类 
-- 普通指针  *T
-- 通用指针  unsafe.Pointer
-- 指针地址  uintptr
-比较
-- unsafe.Pointer只是单纯的通用指针类型，用于转换不同类型指针，它不可以参与指针运算
-- uintptr是用于指针运算的，GC不把uintptr当指针，也就是说uintptr无法持有对象，uintptr类型的目标会被回收
-- unsafe.Pointer可以和普通指针进行相互转换
-- unsafe.Pointer可以和uintptr进行相互转换
+- 使用
+  - &取址
+  - *取值
+- 分类 
+  - 普通指针  *T
+  - 通用指针  unsafe.Pointer
+  - 指针地址  uintptr
+- 比较
+  - unsafe.Pointer只是单纯的通用指针类型，用于转换不同类型指针，它不可以参与指针运算
+  - uintptr是用于指针运算的，GC不把uintptr当指针，也就是说uintptr无法持有对象，uintptr类型的目标会被回收
+  - unsafe.Pointer可以和普通指针进行相互转换
+  - unsafe.Pointer可以和uintptr进行相互转换
 
 reflect
-作用 
-程序在运行的时候能够观察并且修改自己的行为
-使用
-- reflect.TypeOf()
-- reflect.Type.Field()
-- reflect.Type.Method()
-- reflect.ValueOf()
-- reflect.Value.Field()
-- reflect.Value.Method()
-- reflect.Value.MethodByName()
-- reflect.Value.Call()
-reflect慢的主要原因
-- 涉及到内存分配以及后续的GC
-- reflect实现里面有大量的枚举，也就是for循环，比如类型之类的
-
+- 作用 
+  - 程序在运行的时候能够观察并且修改自己的行为
+- 使用
+  - reflect.TypeOf()
+  - reflect.Type.Field()
+  - reflect.Type.Method()
+  - reflect.ValueOf()
+  - reflect.Value.Field()
+  - reflect.Value.Method()
+  - reflect.Value.MethodByName()
+  - reflect.Value.Call()
+- reflect慢的主要原因
+  - 涉及到内存分配以及后续的GC
+  - reflect实现里面有大量的枚举，也就是for循环，比如类型之类的
 ```
+
 ## 内存管理 ##
 ```
 make & new
@@ -479,43 +479,68 @@ mheap主要用于大对象的内存分配，以及管理未切割的mspan，用�
 
 ## 并发 ##
 ```
-goroutine
-- go func
-
-waitGroup
-- wg := &sync.WaitGroup{}
-- wg.Add()
-- wg.Done()
-- wg.Wait()
-
-channel
-操作
-| 操作 | nil的channel | 正常channel | 已关闭的channel |
-| :--: | :--: | :--: | :--: |
-| 读 <-ch | 阻塞 | 成功或阻塞 | 读到零值 |
-| 写 ch<- | 阻塞 | 成功或阻塞 | panic |
-| 关闭 close(ch) | panic | 成功 | panic |
-结构
-type hchan struct {
-	qcount   uint           // total data in the queue
-	dataqsiz uint           // size of the circular queue
-	buf      unsafe.Pointer // points to an array of dataqsiz elements
-	elemsize uint16
-	closed   uint32
-	elemtype *_type // element type
-	sendx    uint   // send index
-	recvx    uint   // receive index
-	recvq    waitq  // list of recv waiters
-	sendq    waitq  // list of send waiters
-	lock mutex
-}
-选择
-select
-监听多个channel
-
-mutex
-- 互斥锁  sync.Mutex
-- 读写互斥锁  sync.RWMutex
+组件
+- goroutine
+  - 使用
+    - go func(){}
+- waitGroup
+  - wg := &sync.WaitGroup{}
+  - wg.Add()
+  - wg.Done()
+  - wg.Wait()
+- channel
+  - 结构
+    type hchan struct {
+  	    qcount   uint           // total data in the queue
+  	    dataqsiz uint           // size of the circular queue
+  	    buf      unsafe.Pointer // points to an array of dataqsiz elements
+  	    elemsize uint16
+  	    closed   uint32
+  	    elemtype *_type // element type
+	    sendx    uint   // send index
+ 	    recvx    uint   // receive index
+	    recvq    waitq  // list of recv waiters
+	    sendq    waitq  // list of send waiters
+	    lock mutex
+    }
+    - buf  指向一个数组，用来实现循环队列
+    - sendx  循环队列的队尾指针
+    - recvx  循环队列的队头指针
+    - recvq  等待从通道中接收数据的goroutine
+    - sendq  等待发送数据到通道的goroutine
+  - 操作
+    - 发送
+      - 空通道，阻塞
+      - 加锁
+      - 已关闭通道，直接panic
+      - recvq不为空，移出第一个协程接收数据
+      - 循环队列未满，数据添加到buf中
+      - 当前队列阻塞，并放入sendq中
+    - 接收
+      - 空通道，阻塞
+      - 加锁
+      - 通道关闭且缓冲为空，返回空值
+      - 发送队列不为空，通道非缓冲类型通道，直接将发送者数据传送给接收者
+      - 发送队列不为空，通道是缓冲类型通道，从通道缓冲取出一条数据， 将发送者数据传递至通道
+      - 通道缓冲无数据，当前协程阻塞，并放入recvq中
+      - 通道缓冲有数据，从buf中取出值
+    - 关闭
+      - 空通道，直接panic
+      - 加锁
+      - 已关闭通道，直接panic
+      - 唤醒接收者队列中所有接受者
+      - 唤起发送者队列中所有发送者
+    | 操作 | nil的channel | 正常channel | 已关闭的channel |
+    | :--: | :--: | :--: | :--: |
+    | 读 <-ch | 阻塞 | 成功或阻塞 | 读到零值 |
+    | 写 ch<- | 阻塞 | 成功或阻塞 | panic |
+    | 关闭 close(ch) | panic | 成功 | panic | 
+  - 选择
+    - select
+      监听多个channel
+- mutex
+  - 互斥锁  sync.Mutex
+  - 读写互斥锁  sync.RWMutex
 
 context
 作用
@@ -602,8 +627,10 @@ slice
 map  
 [深度解密Go语言之map](https://zhuanlan.zhihu.com/p/66676224)  
 [深度解密Go语言之sync.map](https://zhuanlan.zhihu.com/p/344834329)
-
-![Golang修养之路](https://github.com/aceld/golang)  GMP讲解较为清楚  
+channel  
+context
+gmp
+[Golang修养之路](https://github.com/aceld/golang)  GMP讲解较为清楚  
 https://github.com/yongxinz/gopher  
 https://www.zhihu.com/people/raoquancheng
 https://www.zhihu.com/column/c_1131869478647238656
