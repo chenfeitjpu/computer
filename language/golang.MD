@@ -193,13 +193,14 @@ map
   - sync.Map
     - sync.Map适用于读多、更新多、删多、写少的场景  
     - 倘若写操作过多，sync.Map基本等价于互斥锁+map  
-    
+
 sync.map
 - 使用
   - Store()  写入
   - Load()  读取
+  - Delete()  删除
   - Range()  遍历
-  - LoadOrStore()  读取或写入
+  - LoadOrStore()  key存在，就读取，否则写入
 - 结构
   type Map struct {
       mu Mutex
@@ -207,22 +208,33 @@ sync.map
       dirty map[any]*entry
       misses int
   }
+  value的值
+  - 当p == nil时，说明这个键值对已被删除，并且m.dirty == nil，或m.dirty[k]指向该entry
+  - 当p == expunged时，说明这条键值对已被删除，并且m.dirty != nil，且m.dirty中没有这个key
+  - 正常值
 - 实现
-  sync.Map设置了两个map(dirty map和read map)，read map通过原子方式访问，dirty map的访问需要加锁
+  sync.Map设置了两个map(read map和dirty map)，read map通过原子方式访问，dirty map通过加锁访问，两个map的key指向同一个value
   - 操作
     - 写入
-      - 如果在read里能够找到待存储的key，并且对应的entry的p值不为expunged，也就是没被删除时，直接更新对应的entry即可
+      - 如果在read里能够找到待存储的key，并且对应的entry的值不为expunged，也就是没被删除时，直接更新对应的entry即可
       - 第一步没有成功，要么read中没有这个key，要么key被标记为删除。则先加锁，再进行后续的操作
-      - 再次在read中查找是否存在这个key，也就是double check一下，这也是lock-free编程里的常见套路。如果read中存在该 key，但 p == expunged，说明 m.dirty != nil 并且 m.dirty 中不存在该key值 此时: a. 将p的状态由 expunged更改为nil；b. dirty map插入 key。然后，直接更新对应的value
-      - 如果 read 中没有此 key，那就查看 dirty 中是否有此 key，如果有，则直接更新对应的 value，这时 read 中还是没有此 key
-      - 最后一步，如果 read 和 dirty 中都不存在该 key，则：a. 如果 dirty 为空，则需要创建 dirty，并从 read 中拷贝未被删除的元素；b. 更新 amended 字段，标识 dirty map 中存在 read map 中没有的 key；c. 将 k-v 写入 dirty map 中，read.m 不变。最后，更新此 key 对应的 value
+      - 再次在read中查找是否存在这个key，也就是double check一下，这也是lock-free编程里的常见套路。如果read中存在该key，但p == expunged，说明m.dirty != nil并且m.dirty中不存在该key值
+        - 将p的状态由expunged更改为nil
+        - dirty map插入key
+        - 直接更新对应的value
+      - 如果read中没有此key，那就查看dirty中是否有此key，如果有，则直接更新对应的value，这时read中还是没有此key
+      - 最后一步，如果read和dirty中都不存在该key
+        - 如果dirty为空，则需要创建dirty，并从read中拷贝未被删除的元素
+        - 更新amended字段，标识dirty map中存在read map中没有的key
+        - 将k-v写入dirty map中
     - 读取
       - 直接在read中找，如果找到了直接调用entry的load方法，取出其中的值
-      - 如果read中没有这个key，且amended为true，说明dirty中可能存在我们要找的key。当然要先上锁，再尝试去dirty中查找。在这之前，仍然有一个double check的操作。若还是没有在read中找到，那么就从dirty中找。不管 dirty 中有没有找到，都要"记一笔"，因为在dirty被提升为read之前，都会进入这条路径
+      - 如果read中没有这个key，且amended为true，说明dirty中可能存在我们要找的key。当然要先上锁，再尝试去dirty中查找。在这之前，仍然有一个double check的操作。若还是没有在read中找到，那么就从dirty中找。不管dirty中有没有找到，都要"记一笔"，因为在dirty被提升为read之前，都会进入这条路径
+        直接将misses的值加1，表示一次未命中，如果misses值小于m.dirty 的长度，就直接返回。否则，将m.dirty晋升为read，并清空dirty，清空misses计数值
       - read中没有这个key，且amended为fase，说明dirty为空，那直接返回空和false
     - 删除
       - 先从read里查是否有这个key，如果有则执行entry.delete方法，将p置为nil，这样read和dirty都能看到这个变化
-      - 如果没在read中找到这个key，并且dirty不为空，那么就要操作dirty了，操作之前，还是要先上锁。然后进行double check，如果仍然没有在read里找到此ke，则从 dirty中删掉这个key。但不是真正地从 dirty 中删除，而是更新 entry 的状态
+      - 如果没在read中找到这个key，并且dirty不为空，那么就要操作dirty了，操作之前，还是要先上锁。然后进行double check，如果仍然没有在read里找到此key，则从dirty中删掉这个key。
       - read中没有这个key，且amended为fase，说明dirty为空，那直接返回空和false
 
 func 
@@ -589,6 +601,7 @@ slice
 [Go slice新的扩容机制-你背的八股文过时啦](https://juejin.cn/post/7136774425415794719)  
 map  
 [深度解密Go语言之map](https://zhuanlan.zhihu.com/p/66676224)  
+[深度解密Go语言之sync.map](https://zhuanlan.zhihu.com/p/344834329)
 
 ![Golang修养之路](https://github.com/aceld/golang)  GMP讲解较为清楚  
 https://github.com/yongxinz/gopher  
