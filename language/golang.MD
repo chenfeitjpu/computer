@@ -64,156 +64,166 @@
 ## 数据结构 ##
 ```
 array
-声明
-- var name [size]type
-- var name = [...]type{value}
-- var name = [...]type{index:value}
-遍历  
-- for index
-- for range
-多维数组   
-var name [size][size]type
-注意事项
-- 多维数组只有第一层可以使用...来让编译器推导数组长度
-- 数组是值类型，赋值和传参会复制整个数组
+- 声明
+  - var name [size]type
+  - var name = [...]type{value}
+  - var name = [...]type{index:value}
+- 遍历  
+  - for index
+  - for range
+- 多维数组   
+  - var name [size][size]type
+- 注意事项
+  - 多维数组只有第一层可以使用...来让编译器推导数组长度
+  - 数组是值类型，赋值和传参会复制整个数组
 
 slice
-使用
-- 声明  
-  - var name []type
-  - name := make([]type, length, capacity)
-- 切片表达式
-  - a[low : high : max]  
-    0 <= low <= high <= max <= cap(a)
-- append
-- copy
-结构
-type slice struct {
-    array unsafe.Pointer
-    len   int
-    cap   int
-}
-slice占用24个字节  
-- array 指向底层数组的指针，占用8个字节  
-- len 切片的长度，占用8个字节  
-- cap 切片的容量，cap 总是大于等于 len 的，占用8个字节  
-扩容
-- 1.18以前
-  - 如果新申请容量比两倍原有容量大，那么扩容后容量大小为新申请容量
-  - 如果原有slice长度小于1024，那么就扩容为原来的2倍
-  - 如果原有slice长度大于等于1024，那么每次扩容就扩为原来的1.25倍，直到新容量大于期望容量
-  - 内存对齐(size_to_class&class_to_size)
-- 1.18及以后
-  - 如果新申请容量比两倍原有容量大，那么扩容后容量大小为新申请容量
-  - 如果原有slice长度小于256，那么就扩容为原来的2倍
-  - 如果原有slice长度大于等于256，那么每次扩容就扩为原来的1.25倍+3/4*256，直到新容量大于期望容量
-  - 内存对齐(size_to_class&class_to_size)
+- 使用
+  - 声明  
+    - var name []type
+    - name := make([]type, length, capacity)
+  - 切片表达式
+    - a[low : high : max]  
+      0 <= low <= high <= max <= cap(a)   
+  - append
+  - copy
+- 结构
+  type slice struct {
+      array unsafe.Pointer
+      len   int
+      cap   int
+  }
+  slice占用24个字节  
+  - array 指向底层数组的指针，占用8个字节  
+  - len 切片的长度，占用8个字节  
+  - cap 切片的容量，cap 总是大于等于 len 的，占用8个字节  
+- 扩容
+  - 1.18以前
+    - 如果新申请容量比两倍原有容量大，那么扩容后容量大小为新申请容量
+    - 如果原有slice长度小于1024，那么就扩容为原来的2倍
+    - 如果原有slice长度大于等于1024，那么每次扩容就扩为原来的1.25倍，直到新容量大于期望容量
+    - 内存对齐(size_to_class&class_to_size)
+      CPU始终以字长访问内存，如果不进行内存对齐，很可能增加CPU访问内存的次数
+  - 1.18及以后
+    - 如果新申请容量比两倍原有容量大，那么扩容后容量大小为新申请容量
+    - 如果原有slice长度小于256，那么就扩容为原来的2倍
+    - 如果原有slice长度大于等于256，那么每次扩容就扩为原来的1.25倍+3/4*256，直到新容量大于期望容量
+    - 内存对齐(size_to_class&class_to_size)
+      CPU始终以字长访问内存，如果不进行内存对齐，很可能增加CPU访问内存的次数
 
 map
-使用
-- 声明  
-  - var name map[type]type 
-  - name := make(map[type]type, [cap])  
-- 删除
-  - delete(map, key)
-特点
-- 无序
-  - 扩容时发生key的搬迁
-  - 读取时从一个随机序号的bucket开始遍历，并且是从这个bucket的一个随机序号的cell开始遍历
-结构
-type hmap struct {
-    // 元素个数，调用 len(map) 时，直接返回此值
-	count     int
-	flags     uint8
-	// buckets 的对数 log_2
-	B         uint8
-	// overflow 的 bucket 近似数
-	noverflow uint16
-	// 计算 key 的哈希的时候会传入哈希函数
-	hash0     uint32
-    // 指向 buckets 数组，大小为 2^B
-    // 如果元素个数为0，就为 nil
-	buckets    unsafe.Pointer
-	// 等量扩容的时候，buckets 长度和 oldbuckets 相等
-	// 双倍扩容的时候，buckets 长度会是 oldbuckets 的两倍
-	oldbuckets unsafe.Pointer
-	// 指示扩容进度，小于此地址的 buckets 迁移完成
-	nevacuate  uintptr
-	extra *mapextra // optional fields
-}
-type bmap struct {
-    topbits  [8]uint8
-    keys     [8]keytype
-    values   [8]valuetype
-    pad      uintptr
-    overflow uintptr
-}
-type mapextra struct {
-    // overflow[0] contains overflow buckets for hmap.buckets.
-    // overflow[1] contains overflow buckets for hmap.oldbuckets.
-    overflow [2]*[]*bmap
+- 使用
+  - 声明  
+    - var name map[type]type 
+    - name := make(map[type]type, [cap])  
+  - 删除
+    - delete(map, key)
+- 特点
+  - 无序
+    - 添加时无序
+    - 扩容时发生key的搬迁
+    - 读取时从一个随机序号的bucket开始遍历，并且是从这个bucket的一个随机序号的cell开始遍历
+- 结构
+  type hmap struct {
+      // 元素个数，调用 len(map) 时，直接返回此值
+	  count     int
+	  flags     uint8
+	  // buckets 的对数 log_2
+	  B         uint8
+	  // overflow 的 bucket 近似数
+	  noverflow uint16
+	  // 计算 key 的哈希的时候会传入哈希函数
+	  hash0     uint32
+      // 指向 buckets 数组，大小为 2^B
+      // 如果元素个数为0，就为 nil
+	  buckets    unsafe.Pointer
+	  // 等量扩容的时候，buckets 长度和 oldbuckets 相等
+	  // 双倍扩容的时候，buckets 长度会是 oldbuckets 的两倍
+	  oldbuckets unsafe.Pointer
+	  // 指示扩容进度，小于此地址的 buckets 迁移完成
+	  nevacuate  uintptr
+	  extra *mapextra // optional fields
+  }
+  type bmap struct {
+      topbits  [8]uint8
+      keys     [8]keytype
+      values   [8]valuetype
+      pad      uintptr
+      overflow uintptr
+  }
+  type mapextra struct {
+      // overflow[0] contains overflow buckets for hmap.buckets.
+      // overflow[1] contains overflow buckets for hmap.oldbuckets.
+      overflow [2]*[]*bmap
 
-    // nextOverflow 包含空闲的 overflow bucket，这是预分配的 bucket
-    nextOverflow *bmap
-}
-扩容
-- 等量扩容(桶中空位过多)
-  - 当B<15 时，overflow的bucket数量超过2^B
-  - 当B>=15 时，overflow的bucket数量超过2^15
-- 双倍扩容( 桶不够用了)
-  装载因子>6.5 双倍扩容
-  装载因子=count/(2^B) map中元素的个数/map中当前桶的个数
-操作
-- 查找
-  - 计算key的hash值
-  - 通过最后的B位来确定桶号
-  - 根据key对应的hash值前8位快速确定是在这个桶的哪个位置
-  - 对比key是否匹配
-  - 如果都没有找到，就去连接的下一个溢出桶中找
-  扩容期间需要通过新桶找旧桶
-- 遍历
-  双重循环
-- 赋值
-  查找key，进行修改或者新增
-- 删除  
-  查找key，对key和value进行清空
-线程安全
-- map+sync.RWMutex
-- sync.Map
-  - sync.Map适用于读多、更新多、删多、写少的场景  
-  - 倘若写操作过多，sync.Map基本等价于互斥锁+map  
-  - sync.Map可能存在性能抖动问题
-
+      // nextOverflow 包含空闲的 overflow bucket，这是预分配的 bucket
+      nextOverflow *bmap
+  }
+- 扩容
+  - 等量扩容(桶中空位过多)
+    - 当B<15 时，overflow的bucket数量超过2^B
+    - 当B>=15 时，overflow的bucket数量超过2^15
+  - 双倍扩容(桶不够用了)
+    装载因子>6.5 双倍扩容
+    装载因子=count/(2^B) map中元素的个数/map中当前桶的个数
+  - minTopHash
+    当一个cell的tophash值小于minTopHash时，标志这个cell的迁移状态
+  - 遍历
+    通过新桶找旧桶，旧桶已经迁移，直接遍历新桶，旧桶没有迁移，遍历旧桶中会分到新桶中的元素
+  - 新增｜修改
+    如果map处在扩容的过程中，那么当key定位到了某个bucket后，直接触发一次搬迁操作
+  - 删除  
+    如果map处在扩容的过程中，那么当key定位到了某个bucket后，直接触发一次搬迁操作
+- 操作
+  - 查找
+    - 计算key的hash值
+    - 通过最后的B位来确定桶号
+    - 根据key对应的hash值前8位快速确定是在这个桶的哪个位置
+    - 对比key是否匹配
+    - 如果都没有找到，就去连接的下一个溢出桶中找
+  - 遍历
+    - 遍历所有的bucket以及它后面挂的overflow bucket  
+    - 遍历bucket中的所有cell  
+  - 赋值
+    查找key，进行修改或者新增
+  - 删除  
+    查找key，对key和value进行清空
+- 线程安全
+  - map+sync.RWMutex
+  - sync.Map
+    - sync.Map适用于读多、更新多、删多、写少的场景  
+    - 倘若写操作过多，sync.Map基本等价于互斥锁+map  
+    
 sync.map
-使用
-- Store()  写入
-- Load()  读取
-- Range()  遍历
-- LoadOrStore()  读取或写入
-结构
-type Map struct {
-    mu Mutex
-    read atomic.Value
-    dirty map[any]*entry
-    misses int
-}
-实现
-sync.Map设置了两个map(dirty map和read map)，read map通过原子方式访问，dirty map的访问需要加锁
-操作
-- 写入
-  - 如果在read里能够找到待存储的key，并且对应的entry的p值不为expunged，也就是没被删除时，直接更新对应的entry即可
-  - 第一步没有成功，要么read中没有这个key，要么key被标记为删除。则先加锁，再进行后续的操作
-  - 再次在read中查找是否存在这个key，也就是double check一下，这也是lock-free编程里的常见套路。如果read中存在该 key，但 p == expunged，说明 m.dirty != nil 并且 m.dirty 中不存在该key值 此时: a. 将p的状态由 expunged更改为nil；b. dirty map插入 key。然后，直接更新对应的value
-  - 如果 read 中没有此 key，那就查看 dirty 中是否有此 key，如果有，则直接更新对应的 value，这时 read 中还是没有此 key
-  - 最后一步，如果 read 和 dirty 中都不存在该 key，则：a. 如果 dirty 为空，则需要创建 dirty，并从 read 中拷贝未被删除的元素；b. 更新 amended 字段，标识 dirty map 中存在 read map 中没有的 key；c. 将 k-v 写入 dirty map 中，read.m 不变。最后，更新此 key 对应的 value
-- 读取
-  - 直接在read中找，如果找到了直接调用entry的load方法，取出其中的值
-  - 如果read中没有这个key，且amended为true，说明dirty中可能存在我们要找的key。当然要先上锁，再尝试去dirty中查找。在这之前，仍然有一个double check的操作。若还是没有在read中找到，那么就从dirty中找。不管 dirty 中有没有找到，都要"记一笔"，因为在dirty被提升为read之前，都会进入这条路径
-  - read中没有这个key，且amended为fase，说明dirty为空，那直接返回空和false
-- 删除
-  - 先从read里查是否有这个key，如果有则执行entry.delete方法，将p置为nil，这样read和dirty都能看到这个变化
-  - 如果没在read中找到这个key，并且dirty不为空，那么就要操作dirty了，操作之前，还是要先上锁。然后进行double check，如果仍然没有在read里找到此ke，则从 dirty中删掉这个key。但不是真正地从 dirty 中删除，而是更新 entry 的状态
-  - read中没有这个key，且amended为fase，说明dirty为空，那直接返回空和false
+- 使用
+  - Store()  写入
+  - Load()  读取
+  - Range()  遍历
+  - LoadOrStore()  读取或写入
+- 结构
+  type Map struct {
+      mu Mutex
+      read atomic.Value
+      dirty map[any]*entry
+      misses int
+  }
+- 实现
+  sync.Map设置了两个map(dirty map和read map)，read map通过原子方式访问，dirty map的访问需要加锁
+  - 操作
+    - 写入
+      - 如果在read里能够找到待存储的key，并且对应的entry的p值不为expunged，也就是没被删除时，直接更新对应的entry即可
+      - 第一步没有成功，要么read中没有这个key，要么key被标记为删除。则先加锁，再进行后续的操作
+      - 再次在read中查找是否存在这个key，也就是double check一下，这也是lock-free编程里的常见套路。如果read中存在该 key，但 p == expunged，说明 m.dirty != nil 并且 m.dirty 中不存在该key值 此时: a. 将p的状态由 expunged更改为nil；b. dirty map插入 key。然后，直接更新对应的value
+      - 如果 read 中没有此 key，那就查看 dirty 中是否有此 key，如果有，则直接更新对应的 value，这时 read 中还是没有此 key
+      - 最后一步，如果 read 和 dirty 中都不存在该 key，则：a. 如果 dirty 为空，则需要创建 dirty，并从 read 中拷贝未被删除的元素；b. 更新 amended 字段，标识 dirty map 中存在 read map 中没有的 key；c. 将 k-v 写入 dirty map 中，read.m 不变。最后，更新此 key 对应的 value
+    - 读取
+      - 直接在read中找，如果找到了直接调用entry的load方法，取出其中的值
+      - 如果read中没有这个key，且amended为true，说明dirty中可能存在我们要找的key。当然要先上锁，再尝试去dirty中查找。在这之前，仍然有一个double check的操作。若还是没有在read中找到，那么就从dirty中找。不管 dirty 中有没有找到，都要"记一笔"，因为在dirty被提升为read之前，都会进入这条路径
+      - read中没有这个key，且amended为fase，说明dirty为空，那直接返回空和false
+    - 删除
+      - 先从read里查是否有这个key，如果有则执行entry.delete方法，将p置为nil，这样read和dirty都能看到这个变化
+      - 如果没在read中找到这个key，并且dirty不为空，那么就要操作dirty了，操作之前，还是要先上锁。然后进行double check，如果仍然没有在read里找到此ke，则从 dirty中删掉这个key。但不是真正地从 dirty 中删除，而是更新 entry 的状态
+      - read中没有这个key，且amended为fase，说明dirty为空，那直接返回空和false
 
 func 
 声明  
@@ -575,6 +585,11 @@ GO的协程调度模型(GMP)
 ```
 
 # 学习资料 #
+slice  
+[Go slice新的扩容机制-你背的八股文过时啦](https://juejin.cn/post/7136774425415794719)  
+map  
+[深度解密Go语言之map](https://zhuanlan.zhihu.com/p/66676224)  
+
 ![Golang修养之路](https://github.com/aceld/golang)  GMP讲解较为清楚  
 https://github.com/yongxinz/gopher  
 https://www.zhihu.com/people/raoquancheng
