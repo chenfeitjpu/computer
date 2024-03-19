@@ -234,7 +234,7 @@ sync.map
       - read中没有这个key，且amended为fase，说明dirty为空，那直接返回空和false
     - 删除
       - 先从read里查是否有这个key，如果有则执行entry.delete方法，将p置为nil，这样read和dirty都能看到这个变化
-      - 如果没在read中找到这个key，并且dirty不为空，那么就要操作dirty了，操作之前，还是要先上锁。然后进行double check，如果仍然没有在read里找到此key，则从dirty中删掉这个key。
+      - 如果没在read中找到这个key，并且dirty不为空，那么就要操作dirty了，操作之前，还是要先上锁。然后进行double check，如果仍然没有在read里找到此key，则从dirty中直接删掉这个key。
       - read中没有这个key，且amended为fase，说明dirty为空，那直接返回空和false
 
 func 
@@ -243,7 +243,6 @@ func
       return value, value
   }
 - 闭包
-  - 在函数外部访问函数内部变量成为可能
   - 函数内部变量离开其作用域后始终保持在内存中而不被销毁
 - defer
   - 延迟函数的参数在defer声明时就决定了
@@ -342,44 +341,48 @@ reflect
 ## 内存管理 ##
 ```
 make & new
-- make 为slice、map、channel分配内存并初始化，返回值类型
-- new 为任意类型分配内存，返回引用类型
+- make 
+  - 为slice、map、channel分配内存并初始化
+  - 返回值类型
+- new 
+  - 为任意类型分配内存
+  - 返回引用类型
 
 内存分配(TCMalloc)
-*核心思想*
-把内存分为多级管理，从而降低锁的粒度  
-它将可用的堆内存采用二级分配的方式进行管理：每个线程都会自行维护一个独立的内存池，进行内存分配时优先从该内存池中分配，当内存池不足时才会向全局内存池申请，以避免不同线程对全局内存池的频繁竞争。
-*内存划分*
-- arena  512G 把内存分割成8KB大小的页
-- bitmap  16G  标识arena区域哪些地址保存了对象 一个byte大小的内存对应arena区域中4个指针大小(指针大小为8B)的内存
-- spans  512M  存放mspan指针，每个指针对应一页
-内存管理单元
-mspan
-*作用*
-由一片连续的8KB的页组成的大块内存
-*结构*
-type mspan struct {
-    //链表前向指针，用于将span链接起来
-    next *mspan 
-    //链表前向指针，用于将span链接起来
-    prev *mspan 
-    // 起始地址，也即所管理页的地址
-    startAddr uintptr 
-    // 管理的页数
-    npages uintptr 
-    // 块个数，表示有多少个块可供分配
-    nelems uintptr 
-    //分配位图，每一位代表一个块是否已分配
-    allocBits *gcBits 
-    // 已分配块的个数
-    allocCount uint16 
-    // class表中的class ID，和Size Classs相关
-    spanclass spanClass  
-    // class表中的对象大小，也即块大小
-    elemsize uintptr 
-}
-内存管理组件
-mcache
+- 核心思想
+  - 把内存分为多级管理，从而降低锁的粒度  
+    它将可用的堆内存采用二级分配的方式进行管理，每个线程都会自行维护一个独立的内存池，进行内存分配时优先从该内存池中分配，当内存池不足时才会向全局内存池申请，以避免不同线程对全局内存池的频繁竞争
+- 内存划分
+  - arena  512G 把内存分割成8KB大小的页
+  - bitmap  16G  标识arena区域哪些地址保存了对象 一个byte大小的内存对应arena区域中4个指针大小(指针大小为8B)的内存
+  - spans  512M  存放mspan指针，每个指针对应一页
+- 内存管理单元
+  - mspan
+    - 作用 
+      由一片连续的8KB的页组成的大块内存
+    - 结构
+      type mspan struct {
+          //链表前向指针，用于将span链接起来
+          next *mspan 
+          //链表前向指针，用于将span链接起来
+          prev *mspan 
+          // 起始地址，也即所管理页的地址
+          startAddr uintptr 
+          // 管理的页数
+          npages uintptr 
+          // 块个数，表示有多少个块可供分配
+          nelems uintptr 
+          //分配位图，每一位代表一个块是否已分配
+          allocBits *gcBits 
+          // 已分配块的个数
+          allocCount uint16 
+          // class表中的class ID，和Size Classs相关
+          spanclass spanClass  
+          // class表中的对象大小，也即块大小
+          elemsize uintptr 
+      }
+- 内存管理组件
+  - mcache
 *作用*
 每个工作线程都会绑定一个mcache，本地缓存可用的mspan资源，这样就可以直接给Goroutine分配，因为不存在多个Goroutine竞争的情况，所以不会消耗锁资源
 *结构*
@@ -520,8 +523,8 @@ mheap主要用于大对象的内存分配，以及管理未切割的mspan，用�
       - 空通道，阻塞
       - 加锁
       - 通道关闭且缓冲为空，返回空值
-      - 发送队列不为空，通道非缓冲类型通道，直接将发送者数据传送给接收者
-      - 发送队列不为空，通道是缓冲类型通道，从通道缓冲取出一条数据， 将发送者数据传递至通道
+      - 发送队列不为空，发送者出队，通道是非缓冲类型通道，直接将发送者数据传送给接收者
+      - 发送队列不为空，发送者出队，通道是缓冲类型通道，从循环队列取出一条数据，将发送者数据传递至循环队列
       - 通道缓冲无数据，当前协程阻塞，并放入recvq中
       - 通道缓冲有数据，从buf中取出值
     - 关闭
@@ -529,7 +532,7 @@ mheap主要用于大对象的内存分配，以及管理未切割的mspan，用�
       - 加锁
       - 已关闭通道，直接panic
       - 唤醒接收者队列中所有接受者
-      - 唤起发送者队列中所有发送者
+      - 唤醒发送者队列中所有发送者
     | 操作 | nil的channel | 正常channel | 已关闭的channel |
     | :--: | :--: | :--: | :--: |
     | 读 <-ch | 阻塞 | 成功或阻塞 | 读到零值 |
@@ -543,96 +546,95 @@ mheap主要用于大对象的内存分配，以及管理未切割的mspan，用�
   - 读写互斥锁  sync.RWMutex
 
 context
-作用
-并发控制和超时控制
-结构
-type Context interface {
-    // 当 context 被取消或者到了 deadline，返回一个被关闭的 channel
-    Done() <-chan struct{}
-    // 在 channel Done 关闭后，返回 context 取消原因
-    Err() error
-    // 返回 context 是否会被取消以及自动取消时间（即 deadline）
-    Deadline() (deadline time.Time, ok bool)
-    // 获取 key 对应的 value
-    Value(key interface{}) interface{}
-}
-分类
-- emptyCtx
-type emptyCtx int
-- valueCtx
-type valueCtx struct {
-	Context
-	key, val any
-}
-- cancelCtx
-type cancelCtx struct {
-	Context
-	mu       sync.Mutex         
-	done     atomic.Value          
-	children map[canceler]struct{} 
-	err      error                 
-	cause    error                
-}
-- timerCtx
-type timerCtx struct {
-	*cancelCtx
-	timer *time.Timer
-	deadline time.Time
-}
+- 作用
+  - 解决goroutine之间退出通知、元数据传递
+- 结构
+  type Context interface {
+      // 当context被取消或者到了 deadline，返回一个被关闭的 channel
+      Done() <-chan struct{}
+      // 在 channel Done 关闭后，返回 context 取消原因
+      Err() error
+      // 返回context是否会被取消以及自动取消时间
+      Deadline() (deadline time.Time, ok bool)
+      // 获取 key 对应的 value
+      Value(key interface{}) interface{}
+  }
+- 分类
+  - emptyCtx
+    type emptyCtx int
+  - valueCtx
+    type valueCtx struct {
+        Context
+        key, val any
+    }
+  - cancelCtx
+    type cancelCtx struct {
+        Context
+        mu       sync.Mutex         
+        done     atomic.Value          
+        children map[canceler]struct{} 
+        err      error                 
+        cause    error                
+    }
+  - timerCtx
+    type timerCtx struct {
+        *cancelCtx
+        timer *time.Timer
+        deadline time.Time
+    }
 
-GO的协程调度模型(GMP)
-线程是运行goroutine的实体，调度器的功能是把可运行的goroutine分配到工作线程上
-概念
-- G  协程
-- P  处理器
-- M  线程
-流程
-- 全局队列  
-  存放等待运行的G  
-- 本地队列  
-  存放等待运行的G，存的数量有限，不超过256个。新建G'时，G'优先加入到P的本地队列，如果队列满了，则会把本地队列中一半的G移动到全局队列  
-- P列表  
-  所有的P都在程序启动时创建，并保存在数组中，最多有GOMAXPROCS(可配置)个  
-- M 
-  线程想运行任务就得获取P，从P的本地队列获取G，P队列为空时，M也会尝试从全局队列拿一批G放到P的本地队列，或从其他P的本地队列偷一半放到自己P的本地队列。M运行G，G执行之后，M会从P获取下一个G，不断重复下去  
-关系
-- Goroutine调度器和OS调度器是通过M结合起来的，每个M都代表了1个内核线程，OS调度器负责把内核线程分配到CPU上执行
-- 数量
-  - P的数量
-    由启动时环境变量$GOMAXPROCS或者是由runtime的方法GOMAXPROCS()决定。这意味着在程序执行的任意时刻都只有$GOMAXPROCS个goroutine在同时运行
-  - M的数量
-    - go语言本身的限制：go程序启动时，会设置M的最大数量，默认10000.但是内核很难支持这么多的线程数，所以这个限制可以忽略
-    - runtime/debug中的SetMaxThreads函数，设置M的最大数量
-  - M与P的数量没有绝对关系，一个M阻塞，P就会去创建或者切换另一个M，所以，即使P的默认数量是1，也有可能会创建很多个M出来
-- 创建
-  - P何时创建
-    在确定了P的最大数量n后，运行时系统会根据这个数量创建n个P
-  - M何时创建
-    没有足够的M来关联P并运行其中的可运行的G。比如所有的M此时都阻塞住了，而P中还有很多就绪任务，就会去寻找空闲的M，而没有空闲的，就会去创建新的M
-策略
-- 复用线程
-  - work stealing机制
-    当本线程无可运行的G时，尝试从其他线程绑定的P偷取G，而不是销毁线程
-  - hand off机制
-    当本线程因为G进行系统调用阻塞时，线程释放绑定的P，把P转移给其他空闲的线程执行
-阻塞
-- M执行G发生了阻塞操作，M和P立即解绑，如果P本地队列有G、全局队列有G或有空闲的M，P都会立马唤醒1个M和它绑定，否则P则会加入到空闲P列表，等待M来获取可用的P
-- 当M系统调用结束时候，这个G会尝试获取一个空闲的P执行，优先获取之前绑定的P，并放入到这个P的本地队列。如果获取不到P，那么这个线程M变成休眠状态，加入到空闲线程中，然后这个G会被放入全局队列中
-
+GMP
+- 思想
+  把大量的goroutine分配到少量线程上去执行
+- 概念
+  - G  goroutine协程
+  - P  processor处理器
+  - M  thread线程
+- 流程
+  - 全局队列  
+    - 存放等待运行的G  
+  - 本地队列  
+    - 存放等待运行的G
+    - 数量有限，不超过256个
+    - 新创建的G优先放在P的本地队列中，如果队列满了，会把本地队列中一半的G移动到全局队列  
+      - 在创建G时，有自旋状态的M，不做处理；如果没有，会寻找空闲的P，和M进行绑定
+  - P列表  
+    - 程序启动时创建
+    - 有GOMAXPROCS个
+    - 手动设置
+      - 环境变量$GOMAXPROCS
+      - 在程序中通过runtime.GOMAXPROCS来设置
+  - M 
+    - 线程想运行任务就得获取P，从P的本地队列获取G，P队列为空时，M也会尝试从全局队列拿一批G放到P的本地队列，或从其他P的本地队列偷一半放到自己P的本地队列。M运行G，G执行之后，M会从P获取下一个G，不断重复下去  
+    - 数量限制
+      - go语言本身的限制M的最大数量10000.
+      - runtime/debug中的SetMaxThreads来设置
+    - 系统中最多有GOMAXPROCS个自旋的线程，多余的线程会让它们休眠，长时间休眠等待GC回收销毁
+- 策略  
+  - 复用线程
+    - work stealing机制
+      当本线程无可运行的G时，尝试从其他线程绑定的P偷取G，而不是销毁线程
+    - hand off机制
+      当本线程因为G进行系统调用阻塞时，线程释放绑定的P，把P转移给其他空闲的线程执行
+- 阻塞
+  - M执行G发生了阻塞操作，M和P立即解绑，如果P本地队列有G，全局队列有G，P会绑定M，否则P则会加入到空闲列表
+  - 当M系统调用结束时候，这个G会尝试获取一个空闲的P执行(非阻塞调用会优先获取之前绑定的P)，并放入到这个P的本地队列。如果获取不到P，那么这个线程M变成休眠状态，加入到空闲线程中，然后这个G会被放入全局队列中
 ```
 
 # 学习资料 #
 slice  
 [Go slice新的扩容机制-你背的八股文过时啦](https://juejin.cn/post/7136774425415794719)  
 map  
-[深度解密Go语言之map](https://zhuanlan.zhihu.com/p/66676224)  
+[深度解密Go语言之map](https://zhuanlan.zhihu.com/p/66676224) 
+sync.map  
 [深度解密Go语言之sync.map](https://zhuanlan.zhihu.com/p/344834329)
 channel  
+[深度解密Go语言之channel](https://zhuanlan.zhihu.com/p/74613114)
 context
+[深度解密Go语言之context](https://zhuanlan.zhihu.com/p/68792989)
 gmp
-[Golang修养之路](https://github.com/aceld/golang)  GMP讲解较为清楚  
-https://github.com/yongxinz/gopher  
-https://www.zhihu.com/people/raoquancheng
-https://www.zhihu.com/column/c_1131869478647238656
-https://blog.csdn.net/xiaodaoge_it/article/details/121890145
-https://zhuanlan.zhihu.com/p/586236582
+[Golang的协程调度器原理及GMP设计思想](https://github.com/aceld/golang/blob/main/2%E3%80%81Golang%E7%9A%84%E5%8D%8F%E7%A8%8B%E8%B0%83%E5%BA%A6%E5%99%A8%E5%8E%9F%E7%90%86%E5%8F%8AGMP%E8%AE%BE%E8%AE%A1%E6%80%9D%E6%83%B3%EF%BC%9F.md)
+[GMP原理与调度](https://www.topgoer.com/%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B/GMP%E5%8E%9F%E7%90%86%E4%B8%8E%E8%B0%83%E5%BA%A6.html)  
+[深入golang runtime的调度](https://zboya.github.io/post/go_scheduler/)
+内存管理
+[图解Go语言内存分配](https://juejin.cn/post/6844903795739082760)
