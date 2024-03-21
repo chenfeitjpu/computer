@@ -498,10 +498,12 @@ make & new
           - 弱三色不变式
             白色对象可以被黑色对象引用，但要从某个灰对象出发仍然可达该白对象  
 - 混合写屏障
-  - GC开始时将栈上可达对象全部标记为黑色
-  - GC期间，任何栈上创建的新对象均为黑色
+  - GC开始时栈上的对象并标记为黑色(逐个暂停,逐个扫描,每个栈单独扫描, 无需STW整个程序)
+  - GC期间，栈上创建的新对象标记为黑色，堆上创建的新对象标记为灰色，堆上删除的对象标记为灰色
   - 堆对象正常启用插入写屏障
   - 堆对象正常启用删除写屏障
+  - 回收未标记对象
+  - 标记过程中不再需要STW，标记准备和标记结束 还是需要STW的
 ```
 
 ## 并发 ##
@@ -649,18 +651,21 @@ GMP
 slice  
 [Go slice新的扩容机制-你背的八股文过时啦](https://juejin.cn/post/7136774425415794719)  
 map  
-[深度解密Go语言之map](https://zhuanlan.zhihu.com/p/66676224) 
+[深度解密Go语言之map](https://zhuanlan.zhihu.com/p/66676224)  
 sync.map  
-[深度解密Go语言之sync.map](https://zhuanlan.zhihu.com/p/344834329)
+[深度解密Go语言之sync.map](https://zhuanlan.zhihu.com/p/344834329)  
 channel  
-[深度解密Go语言之channel](https://zhuanlan.zhihu.com/p/74613114)
-context
-[深度解密Go语言之context](https://zhuanlan.zhihu.com/p/68792989)
-gmp
-[Golang的协程调度器原理及GMP设计思想](https://github.com/aceld/golang/blob/main/2%E3%80%81Golang%E7%9A%84%E5%8D%8F%E7%A8%8B%E8%B0%83%E5%BA%A6%E5%99%A8%E5%8E%9F%E7%90%86%E5%8F%8AGMP%E8%AE%BE%E8%AE%A1%E6%80%9D%E6%83%B3%EF%BC%9F.md)
+[深度解密Go语言之channel](https://zhuanlan.zhihu.com/p/74613114)  
+context  
+[深度解密Go语言之context](https://zhuanlan.zhihu.com/p/68792989)  
+gmp  
+[Golang的协程调度器原理及GMP设计思想](https://github.com/aceld/golang/blob/main/2%E3%80%81Golang%E7%9A%84%E5%8D%8F%E7%A8%8B%E8%B0%83%E5%BA%A6%E5%99%A8%E5%8E%9F%E7%90%86%E5%8F%8AGMP%E8%AE%BE%E8%AE%A1%E6%80%9D%E6%83%B3%EF%BC%9F.md)  
 [GMP原理与调度](https://www.topgoer.com/%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B/GMP%E5%8E%9F%E7%90%86%E4%B8%8E%E8%B0%83%E5%BA%A6.html)  
-[深入golang runtime的调度](https://zboya.github.io/post/go_scheduler/)
-内存管理
-[图解Go语言内存分配](https://juejin.cn/post/6844903795739082760)
-[Golang内存模型与分配机制](https://zhuanlan.zhihu.com/p/603335718)
-[https://eddycjy.gitbook.io/golang/di-1-ke-za-tan/stack-heap](https://eddycjy.gitbook.io/golang/di-1-ke-za-tan/stack-heap)
+[深入golang runtime的调度](https://zboya.github.io/post/go_scheduler/)  
+内存管理  
+[图解Go语言内存分配](https://juejin.cn/post/6844903795739082760)  
+[Golang内存模型与分配机制](https://zhuanlan.zhihu.com/p/603335718)  
+[https://eddycjy.gitbook.io/golang/di-1-ke-za-tan/stack-heap](https://eddycjy.gitbook.io/golang/di-1-ke-za-tan/stack-heap)  
+垃圾回收  
+[Golang 垃圾回收原理分析](https://zhuanlan.zhihu.com/p/605315127)  
+[golang 垃圾回收（五）混合写屏障](https://liqingqiya.github.io/golang/gc/%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6/%E5%86%99%E5%B1%8F%E9%9A%9C/2020/07/24/gc5.html)  
