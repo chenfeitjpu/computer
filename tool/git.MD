@@ -1,9 +1,24 @@
-# GIT #
+**GIT**
+- [定义](#定义)
+- [使用](#使用)
 
-## 定义 ##
-版本控制系统
 
-## 命令 ##
+# 定义 #
+版本控制工具
+
+# 使用 #
+```
+仓库
+- 中央仓库
+  标准版本
+- 本地仓库
+  副本
+  - 工作区(workspace)
+  - 暂存区(stage)
+  - 仓库(repository)
+
+
+```
   - create & clone
     - git init
     - git clone path
@@ -38,3 +53,8 @@
   - diff
     - git diff
 
+
+参考资料  
+[官网](https://git-scm.com/)  
+[git版本控制原理解析及实战分享](https://zhuanlan.zhihu.com/p/670878449)
+[git深入理解(一)：暂存区(Stage)，索引(index)](https://blog.csdn.net/raoxiaoya/article/details/110824019)
