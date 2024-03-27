@@ -66,6 +66,9 @@
   - git reflog
 - diff
   - git diff
+- merge
+  git merge <branch>
+  git rebase <branch>  
 ```
 
 参考资料  
