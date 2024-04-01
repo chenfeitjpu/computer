@@ -93,7 +93,6 @@ kafka是一种分布式消息系统
         - 轮询(RoundRobin)  
         - 随机(Rand)
         - 哈希(Hash)
-        - 自定义
 - 副本
   - 目的
     实现故障自动转移
@@ -109,11 +108,14 @@ kafka是一种分布式消息系统
   - -1 
     producer等待broker的ack，partition的leader和follower全部落盘成功后才返回ack
     如果在follower同步完成后，broker发送Ack之前，leader发生故障，那么就会造成数据重复
-- 精确一次
-  - 幂等性发送者
-    - 单一会话单一分区
-  - 事务性发送者
-    - 跨会话跨分区
+- 语义
+  - 至多一次  
+  - 至少一次  
+  - 精确一次  
+    - 幂等性发送者
+      - 单一会话单一分区
+    - 事务性发送者
+      - 跨会话跨分区
 - 故障处理
   - 概念
     - LEO
@@ -157,6 +159,7 @@ kafka是一种分布式消息系统
     消费者组内的消费者消费的消息数量相差可能较大
     - 实现
       计算每个consumer可以消费的分区个数，然后按照顺序将指定个数范围的分区分配给各个consumer
+  - Sticky
 - 提交消费偏移量
   - 自动
   - 手动
@@ -190,8 +193,8 @@ log结构
       `log.segment.ms`  
 - 消息结构
   - record
-  - record header
   - record batch
+  - record header
 
 过期数据清理
 - 启用清理
@@ -211,5 +214,6 @@ log结构
 ```
 
 学习资料  
+[官网](https://kafka.apache.org/)  
 [真的，Kafka入门一篇文章就够了](https://juejin.cn/post/6844903495670169607)  
 [kafka是怎么实现顺序写磁盘的](https://www.zhihu.com/question/63408317/answer/3058280249)  
