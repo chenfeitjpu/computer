@@ -13,36 +13,36 @@ kafka是一种分布式消息系统
 ```
 概念
 - 术语
-  - 消息(Record)  
-    Kafka中的数据单元
-  - 批次
-    为了提高效率，消息会分批次写入Kafka，批次就代指的是一组消息
-  - 主题(Topic)  
+  - 消息(record)  
+    kafka中的数据单元
+  - 批次(batch)
+    为了提高效率，消息会分批次写入kafka，批次就代指的是一组消息
+  - 主题(topic)  
     消息分类  
-  - 分区(Partition) 
-    一个Topic可以包含多个Partition，Topic消息保存在各个Partition上  
+  - 分区(partition) 
+    一个topic可以包含多个partition，topic消息保存在各个partition上  
     单一主题中的分区有序，但是无法保证主题中所有的分区有序  
-  - 生产者(Producer)
+  - 生产者(producer)
     向主题发送消息
-  - 消费者(Consumer)
+  - 消费者(consumer)
     处理生产者产生的消息
-  - 消费者组(Consumer Group)  
-    每个Consumer必须属于一个group
-  - 偏移量(Consumer Offset)  
+  - 消费者组(consumer group)  
+    每个consumer必须属于一个group
+  - 偏移量(offset)  
     消息在分区的唯一标识  
-  - 服务节点(Broker)  
-    一个独立的Kafka服务器就被称为Broker，Broker接收来自生产者的消息，为消息设置偏移量，并提交消息到磁盘保存
-  - Broker集群
-    Broker是集群的组成部分，Broker集群由一个或多个Broker组成，每个集群都有一个Broker同时充当了集群控制器的角色
-  - Zookeeper  
-    保存着集群Broker、Topic、Partition等meta数据；负责Broker故障发现，Partition Leader选举，负载均衡等功能
-  - 副本(Replication)  
-    同一partition的数据可以在多Broker上存在多个副本
-  - Leader  
+  - 服务节点(broker)  
+    一个独立的kafka服务器就被称为broker，broker接收来自生产者的消息，为消息设置偏移量，并提交消息到磁盘保存
+  - broker集群
+    broker是集群的组成部分，broker集群由一个或多个Broker组成，每个集群都有一个broker同时充当了集群控制器的角色
+  - zookeeper  
+    保存着集群broker、topic、partition等meta数据；负责broker故障发现，partition leader选举，负载均衡等功能
+  - 副本(replication)  
+    同一partition的数据可以在多broker上存在多个副本
+  - leader  
     消费者消费数据的对象都是Leader
-  - Follower  
-    实时从Leader中同步数据，Leader发生故障时，某个Follow会成为新的Leader
-  - 重平衡(Rebalance)
+  - follower  
+    实时从leader中同步数据，leader发生故障时，某个follow会成为新的leader
+  - 重平衡(rebalance)
     消费者组内某个消费者实例挂掉后，其他消费者实例自动重新分配订阅主题分区的过程
 
 特点
@@ -52,13 +52,14 @@ kafka是一种分布式消息系统
   - 基于磁盘存储  
     无需担心消息丢失
   - 伸缩性  
-    每个主题(Topic)包含多个分区(Partition)，主题中的分区可以分布在不同的主机(Broker)中
+    每个主题(topic)包含多个分区(partition)，主题中的分区可以分布在不同的主机(broker)中
   - 高可用
-    某个节点宕机，Kafka集群能够正常工作
+    某个节点宕机，kafka集群能够正常工作
 
 - 高性能的实现
   - 分批发送
-  - 磁盘顺序读写
+  - 消息压缩
+  - 顺序读写
   - 页缓存  
     数据先写入page cache，后写入磁盘
   - 零拷贝
@@ -73,40 +74,46 @@ kafka是一种分布式消息系统
 ```
 生产
 - 写入消息流程
-  - Producer先从Zookeeper找到该Partition的Leader
-  - Producer将消息发送给该Leader
-  - Leader将消息写入本地log
-  - Followers从Leader Pull消息，写入本地Log后向Leader发送ACK
-  - Leader收到所有ISR中的Replication的ACK后，增加HW并向Producer发送ACK
+  - producer先从zookeeper找到该partition的leader
+  - producer将消息发送给该leader
+  - leader将消息写入本地log
+  - followers从leader中pull消息，写入本地log后向leader发送ack
+  - leader收到所有ISR中的replication的ack后，增加HW并向producer发送ACK
 - 分区
   - 目的
     - 方便扩展
-      一个topic可以有多个Partition，可以适应任意大小的数据
+      一个topic可以有多个partition，可以适应任意大小的数据
     - 提高并发  
-      可以以Partition为单位读写
+      可以以partition为单位读写
   - 原则
-    - 指明Partition的情况下，直接将指明的值作为Partition值
-    - 没有指明Partition值但有Key的情况下，将Key的Hash值与Topic的Partition数进行取余得到Partition值  
-    - 既没有Partition值又没有Key值的情况下，第一次调用时随机生成一个整数(后面每次调用在这个整数上自增)，将这个值与Topic可用的Partition总数取余得到Partition值，也就是常说的RoundRobin算法  
+    - 指明partition的情况下，直接将指明的值作为partition值
+    - 没有指明partition值但有key的情况下，将key的hash值与topic的partition数进行取余得到partition值  
+    - 既没有partition值又没有key值的情况下，第一次调用时随机生成一个整数(后面每次调用在这个整数上自增)，将这个值与topic可用的partition总数取余得到partition值，也就是常说的RoundRobin算法  
       - 策略
         - 轮询(RoundRobin)  
         - 随机(Rand)
         - 哈希(Hash)
         - 自定义
 - 副本
-  实现故障自动转移
+  - 目的
+    实现故障自动转移
   - ISR
-    和Leader保持同步的Follower
+    和leader保持同步进度的follower
 - 应答机制
   - 0  
-    Producer不等待Broker的Ack
-    Broker一接收到还没有写入磁盘就已经返回，当Broker故障时有可能丢失数据
+    producer不等待broker的ack
+    broker一接收到还没有写入磁盘就已经返回，当broker故障时有可能丢失数据
   - 1  
-    Producer等待Broker的Ack，Partition的Leader落盘成功后返回Ack  
-    如果在Follower同步成功之前Leader故障，那么将会丢失数据
+    producer等待broker的ack，partition的leader落盘成功后返回ack  
+    如果在follower同步成功之前leader故障，那么将会丢失数据
   - -1 
-    Producer等待Broker的Ack，Partition的Leader和Follower全部落盘成功后才返回Ack
-    如果在Follower同步完成后，Broker发送Ack之前，Leader发生故障，那么就会造成数据重复
+    producer等待broker的ack，partition的leader和follower全部落盘成功后才返回ack
+    如果在follower同步完成后，broker发送Ack之前，leader发生故障，那么就会造成数据重复
+- 精确一次
+  - 幂等性发送者
+    - 单一会话单一分区
+  - 事务性发送者
+    - 跨会话跨分区
 - 故障处理
   - 概念
     - LEO
@@ -115,9 +122,18 @@ kafka是一种分布式消息系统
       消费者能见到的最大的offset，ISR队列中最小的LEO
   - 规则
     - follower故障
-      follower发生故障后会被临时踢出ISR，待该Follower恢复后，Follower会读取本地磁盘记录的上次的HW，并将log文件高于HW的部分截取掉，从HW开始向Leader进行同步。等该Follower的LEO大于等于该Partition的HW，即Follower追上Leader之后，就可以重新加入ISR了  
+      follower发生故障后会被临时踢出ISR，待该follower恢复后，follower会读取本地磁盘记录的上次的HW，并将log文件高于HW的部分截取掉，从HW开始向leader进行同步。等该follower的LEO大于等于该Partition的HW，即follower追上leader之后，就可以重新加入ISR了  
     - leader故障
       leader发生故障之后，会从ISR中选出一个新的leader，之后为保证多个副本之间的数据一致性，其余的follower会先将各自的log文件高于HW的部分截掉，然后从新的leader同步数据  
+- 刷盘机制
+  - 配置
+    - log.flush.interval.messages  
+      //多少条消息，刷盘1次 默认值 LONG.MAX_VALUE
+    - log.flush.interval.ms  
+      //多长时间，刷盘1次 LONG.MAX_VALUE
+    - log.flush.scheduler.interval.ms   
+      //周期性的刷盘，缺省3000，即3s
+  - 操作系统刷新page cache
 
 消费
 - 模式
@@ -141,6 +157,11 @@ kafka是一种分布式消息系统
     消费者组内的消费者消费的消息数量相差可能较大
     - 实现
       计算每个consumer可以消费的分区个数，然后按照顺序将指定个数范围的分区分配给各个consumer
+- 提交消费偏移量
+  - 自动
+  - 手动
+    - 同步
+    - 异步
 - 再平衡
   - 发生条件
     - 组成员数发生变更
@@ -190,5 +211,5 @@ log结构
 ```
 
 学习资料  
-[真的，Kafka 入门一篇文章就够了](https://juejin.cn/post/6844903495670169607)
-[kafka是怎么实现顺序写磁盘的](https://www.zhihu.com/question/63408317/answer/3058280249)
+[真的，Kafka入门一篇文章就够了](https://juejin.cn/post/6844903495670169607)  
+[kafka是怎么实现顺序写磁盘的](https://www.zhihu.com/question/63408317/answer/3058280249)  
