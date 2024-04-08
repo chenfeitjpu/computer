@@ -63,7 +63,9 @@
   - git pull --tags
 - log
   - git log
+    显示版本链
   - git reflog
+    显示操作日志
 - diff
   - git diff
 - merge

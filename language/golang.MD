@@ -13,6 +13,24 @@
 # 使用 #
 ## 基础语法 ##
 ```
+常用命令
+- go build
+  编译包和依赖
+- go run
+  编译和运行程序
+- go install
+  编译和安装包和依赖
+- go get
+  下载和安装包和依赖
+- go clean
+  移除对象文件和缓存文件
+- go fmt
+  格式化源码包
+- go test
+  运行测试包
+- go vet
+  报告代码错误
+  
 变量  
 - var name [type] [= expression]  
 - var name, name [type] [= expression, expression]  

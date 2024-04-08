@@ -484,3 +484,6 @@ IO多路复用
 - `netstat -tln | grep port`  查看端口使用情况
 - `lsof -i :port`  查看端口属于程序
 ```
+
+学习资料
+[文件随机或顺序读写原理深入浅出](https://www.cnblogs.com/liuche/p/15455808.html)
