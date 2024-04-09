@@ -35,63 +35,73 @@
 - var name [type] [= expression]  
 - var name, name [type] [= expression, expression]  
 - var (  
-    name [type] [= expression]  
-    name [type] [= expression]  
+      name [type] [= expression]  
+      name [type] [= expression]  
   )
-  type、恶性 
+  type expression 至少有一个  
 - name := value
 - _ 不会分配内存
 
 常量
-常量数据类型只能是布尔型、数字型（整数型、浮点型和复数）和字符串型  
+常量数据类型只能是数值型（整数型、浮点型和复数）、字符串型、布尔型  
 - const name [type] = expression
+- const name [type], [type] = expression, expression
 - const (  
-    name [type] = expression  
-    name [type] = expression    
+      name [type] = expression  
+      name [type] = expression    
   )  
 - iota    
 
 数据类型
 - uint8 uint16 uint32 uint64 uint int8 int16 int32 int64 int
-- byte rune
-- uintptr
 - float32 float64 
 - complex64 complex128
-- bool
+- byte rune
 - string
-- array struct 
-- slice map channel func pointer
-- interface
+- bool
+- array slice map channel 
+- struct interface
+- func 
+- pointer uintptr
 
 运算符
-- 算术运算符  + - * / % variable++ variable--
-- 关系运算符  > >= < <= == != 
-- 逻辑运算符  && || !
-- 位运算符  & | ^  << >>
-- 赋值运算符  =
+- 算术运算符  
+  + - * / % ++ --
+- 关系运算符
+  > >= < <= == != 
+- 逻辑运算符 
+  && || !
+- 位运算符
+  & | ^  << >>
+- 赋值运算符 
+  =
 
 流程控制 
-- if else if else
-- switch case fallthrough
-- for range break continue
-- goto
-  - 只能在函数内跳转，需要配合标签一起使用
-  - 不能跳过内部变量声明语句
-  - 只能跳到同级作用域或者上层作用域内，不能跳到内部作用域内
+- 选择
+  - if else if else
+  - switch case fallthrough
+- 循环
+  - for range break continue
+- 跳转
+  - goto
+    - 只能在函数内跳转，需要配合标签一起使用
+    - 不能跳过内部变量声明语句
+    - 只能跳到同级作用域或者上层作用域内，不能跳到内部作用域内
 ```
 
 ## 数据结构 ##
 ```
 array
-- 声明
-  - var name [size]type
-  - var name = [...]type{value}
-  - var name = [...]type{index:value}
-- 遍历  
-  - for index
-  - for range
-- 多维数组   
-  - var name [size][size]type
+- 使用
+  - 声明
+    - var name = [size]type{}
+    - var name = [...]type{value}
+    - var name = [...]type{index:value}
+  - 遍历  
+    - for index
+    - for range
+  - 多维数组   
+    - var name [size][size]type
 - 注意事项
   - 多维数组只有第一层可以使用...来让编译器推导数组长度
   - 数组是值类型，赋值和传参会复制整个数组
@@ -99,7 +109,7 @@ array
 slice
 - 使用
   - 声明  
-    - var name []type
+    - var name = []type{}
     - name := make([]type, length, capacity)
   - 切片表达式
     - a[low : high : max]  
@@ -122,13 +132,13 @@ slice
     - 如果原有slice长度小于1024，那么就扩容为原来的2倍
     - 如果原有slice长度大于等于1024，那么每次扩容就扩为原来的1.25倍，直到新容量大于期望容量
     - 内存对齐(size_to_class&class_to_size)
-      CPU始终以字长访问内存，如果不进行内存对齐，很可能增加CPU访问内存的次数
+      CPU以字长访问内存，如果不进行内存对齐，很可能增加CPU访问内存的次数
   - 1.18及以后
     - 如果新申请容量比两倍原有容量大，那么扩容后容量大小为新申请容量
     - 如果原有slice长度小于256，那么就扩容为原来的2倍
     - 如果原有slice长度大于等于256，那么每次扩容就扩为原来的1.25倍+3/4*256，直到新容量大于期望容量
     - 内存对齐(size_to_class&class_to_size)
-      CPU始终以字长访问内存，如果不进行内存对齐，很可能增加CPU访问内存的次数
+      CPU以字长访问内存，如果不进行内存对齐，很可能增加CPU访问内存的次数
 
 map
 - 使用
@@ -145,23 +155,23 @@ map
 - 结构
   type hmap struct {
       // 元素个数，调用 len(map) 时，直接返回此值
-	  count     int
-	  flags     uint8
-	  // buckets 的对数 log_2
-	  B         uint8
-	  // overflow 的 bucket 近似数
-	  noverflow uint16
+      count     int
+      flags     uint8
+      // buckets 的对数 log_2
+      B         uint8
+      // overflow 的 bucket 近似数
+      noverflow uint16
       // 计算 key 的哈希的时候会传入哈希函数
-	  hash0     uint32
+      hash0     uint32
       // 指向 buckets 数组，大小为 2^B
       // 如果元素个数为0，就为 nil
-	  buckets    unsafe.Pointer
-	  // 等量扩容的时候，buckets 长度和 oldbuckets 相等
-	  // 双倍扩容的时候，buckets 长度会是 oldbuckets 的两倍
-	  oldbuckets unsafe.Pointer
-	  // 指示扩容进度，小于此地址的 buckets 迁移完成
-	  nevacuate  uintptr
-	  extra *mapextra // optional fields
+      buckets    unsafe.Pointer
+      // 等量扩容的时候，buckets 长度和 oldbuckets 相等
+      // 双倍扩容的时候，buckets 长度会是 oldbuckets 的两倍
+      oldbuckets unsafe.Pointer
+      // 指示扩容进度，小于此地址的 buckets 迁移完成
+      nevacuate  uintptr
+      extra *mapextra // optional fields
   }
   type bmap struct {
       topbits  [8]uint8
@@ -170,29 +180,31 @@ map
       pad      uintptr
       overflow uintptr
   }
-  type mapextra struct {
-      // overflow[0] contains overflow buckets for hmap.buckets.
-      // overflow[1] contains overflow buckets for hmap.oldbuckets.
-      overflow [2]*[]*bmap
-
-      // nextOverflow 包含空闲的 overflow bucket，这是预分配的 bucket
-      nextOverflow *bmap
-  }
 - 扩容
-  - 等量扩容(桶中空位过多)
-    - 当B<15 时，overflow的bucket数量超过2^B
-    - 当B>=15 时，overflow的bucket数量超过2^15
-  - 双倍扩容(桶不够用了)
-    装载因子>6.5
-    装载因子=count/(2^B) map中元素的个数/map中当前桶的个数
-  - minTopHash
-    当一个cell的tophash值小于minTopHash时，标志这个cell的迁移状态
-  - 遍历
-    通过新桶找旧桶，旧桶已经迁移，直接遍历新桶，旧桶没有迁移，遍历旧桶中会分到新桶中的元素
-  - 新增｜修改
-    如果map处在扩容的过程中，那么当key定位到了某个bucket后，直接触发一次搬迁操作
-  - 删除  
-    如果map处在扩容的过程中，那么当key定位到了某个bucket后，直接触发一次搬迁操作
+  - 条件
+    - 等量扩容(桶中空位过多)
+      - 当B<15 时，overflow的bucket数量超过2^B
+      - 当B>=15 时，overflow的bucket数量超过2^15
+    - 双倍扩容(桶不够用了)
+      - 装载因子>6.5
+        装载因子=count/(2^B) map中元素的个数/map中当前桶的个数
+  - 过程
+    - minTopHash
+      当一个cell的tophash值小于minTopHash时，标志这个cell的迁移状态
+      - 0
+        空的cell，也是初始时bucket的状态
+      - 1
+        cell已经搬迁完毕，空cell
+      - 2
+        cell已经搬迁完毕，key在新bucket前半部分
+      - 3
+        cell已经搬迁完毕，key在新bucket后半部分
+    - 遍历
+      定位到某个bucket后，通过新桶找旧桶，旧桶已经迁移，直接遍历新桶，旧桶没有迁移，遍历旧桶中会分到新桶中的元素
+    - 新增｜修改
+      定位到了某个bucket后，直接触发一次搬迁操作
+    - 删除  
+      定位到了某个bucket后，直接触发一次搬迁操作
 - 操作
   - 查找
     - 计算key的hash值
