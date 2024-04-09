@@ -188,7 +188,7 @@ map
     - 双倍扩容(桶不够用了)
       - 装载因子>6.5
         装载因子=count/(2^B) map中元素的个数/map中当前桶的个数
-  - 过程
+  - 实现
     - minTopHash
       当一个cell的tophash值小于minTopHash时，标志这个cell的迁移状态
       - 0
@@ -205,7 +205,7 @@ map
       定位到了某个bucket后，直接触发一次搬迁操作
     - 删除  
       定位到了某个bucket后，直接触发一次搬迁操作
-- 操作
+- 实现
   - 查找
     - 计算key的hash值
     - 通过最后的B位来确定桶号
@@ -239,12 +239,15 @@ sync.map
       dirty map[any]*entry
       misses int
   }
-  value的值
-  - 当p == nil时，说明这个键值对已被删除，并且m.dirty == nil，或m.dirty[k]指向该entry
-  - 当p == expunged时，说明这条键值对已被删除，并且m.dirty != nil，且m.dirty中没有这个key
-  - 正常值
+  type entry struct {
+      p unsafe.Pointer // *interface{}
+  }
+  - p的值
+    - 当p == nil时，说明这个键值对已被删除，并且m.dirty == nil，或m.dirty[k]指向该entry
+    - 当p == expunged时，说明这条键值对已被删除，并且m.dirty != nil，且m.dirty中没有这个key
+    - 正常值
 - 实现
-  sync.Map设置了两个map(read map和dirty map)，read map通过原子方式访问，dirty map通过加锁访问，两个map的key指向同一个value
+  sync.Map设置了两个map(read map和dirty map)，read map并发读，dirty map并发读写，两个map的key指向同一个entry，通过CAS原子操作更新entry
   - 操作
     - 写入
       - 如果在read里能够找到待存储的key，并且对应的entry的值不为expunged，也就是没被删除时，直接更新对应的entry即可
@@ -268,11 +271,22 @@ sync.map
       - 如果没在read中找到这个key，并且dirty不为空，那么就要操作dirty了，操作之前，还是要先上锁。然后进行double check，如果仍然没有在read里找到此key，则从dirty中直接删掉这个key。
       - read中没有这个key，且amended为fase，说明dirty为空，那直接返回空和false
 
+struct
+- 使用
+  - 声明
+    type name struct {  
+        name type 
+        name type  
+    }
+  - 嵌套结构体
+    - 匿名结构体
+
 func 
-- 声明  
-  func name(parameter type, parameter type) ([output] type, [output] type) {
-      return value, value
-  }
+- 使用
+  - 声明  
+    func name(parameter type, parameter type) ([output] type, [output] type) {
+        return value, value
+    }
 - 闭包
   - 函数内部变量离开其作用域后始终保持在内存中而不被销毁
 - defer
@@ -280,38 +294,27 @@ func
   - 多个defer语句，按照先进后出的方式执行
   - return赋值 执行defer return返回
 
-error&panic&recover
-
-struct
-- 声明
-  type name struct {  
-      name type 
-      name type  
- }
-- 嵌套结构体
-  - 匿名结构体
-
 method
-- 声明
-  func (name type) name(parameter type, parameter type) ([output] type, [output] type) {
-      return value, value
-  }
 - 使用
-  - object.method()
-  - 方法变量
-  - 方法表达式 
+  - 声明
+    func (name type) name(parameter type, parameter type) ([output] type, [output] type) {
+        return value, value
+    }
+  - 调用
+    - object.method()
 - 注意事项
-  - 类型T只有接受者是T的方法
+  - 类型T拥有接受者是T的方法
   - 类型*T拥有接受者是T和*T的方法
 
 interface
-- 声明
-  type name interface {  
-      name(name type) type  
-      name(name type) type  
-  }
 - 使用
-  - 对于T接收者实现的接口，无论使用T还是*T都没有问题
+  - 声明
+    type name interface {  
+        name(name type) type  
+        name(name type) type  
+   }
+- 注意事项
+  - 对于T接收者实现的接口，可以使用T和*T类型
   - 对于*T接收者实现的接口，只能使用*T类型
 - 类型断言
   - i.(T)
@@ -367,6 +370,8 @@ reflect
 - reflect慢的主要原因
   - 涉及到内存分配以及后续的GC
   - reflect实现里面有大量的枚举，也就是for循环，比如类型之类的
+
+error&panic&recover
 ```
 
 ## 内存管理 ##
