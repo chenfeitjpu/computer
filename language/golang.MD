@@ -30,7 +30,7 @@
   运行测试包
 - go vet
   报告代码错误
-  
+
 变量  
 - var name [type] [= expression]  
 - var name, name [type] [= expression, expression]  
@@ -38,6 +38,7 @@
     name [type] [= expression]  
     name [type] [= expression]  
   )
+  type、恶性 
 - name := value
 - _ 不会分配内存
 
