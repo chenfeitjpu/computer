@@ -199,12 +199,12 @@ map
         cell已经搬迁完毕，key在新bucket前半部分
       - 3
         cell已经搬迁完毕，key在新bucket后半部分
-    - 遍历
-      定位到某个bucket后，通过新桶找旧桶，旧桶已经迁移，直接遍历新桶，旧桶没有迁移，遍历旧桶中会分到新桶中的元素
     - 新增｜修改
       定位到了某个bucket后，直接触发一次搬迁操作
     - 删除  
       定位到了某个bucket后，直接触发一次搬迁操作
+    - 遍历
+      定位到某个bucket后，通过新桶找旧桶，旧桶已经迁移，直接遍历新桶，旧桶没有迁移，遍历旧桶中会分到新桶中的元素
 - 实现
   - 查找
     - 计算key的hash值
@@ -212,13 +212,13 @@ map
     - 根据key对应的hash值前8位快速确定是在这个桶的哪个位置
     - 对比key是否匹配
     - 如果都没有找到，就去连接的下一个溢出桶中找
-  - 遍历
-    - 遍历所有的bucket以及它后面挂的overflow bucket  
-    - 遍历bucket中的所有cell  
   - 赋值
     查找key，进行修改或者新增
   - 删除  
     查找key，对key和value进行清空
+  - 遍历
+    - 遍历所有的bucket以及它后面挂的overflow bucket  
+    - 遍历bucket中的所有cell  
 - 线程安全
   - map+sync.RWMutex
   - sync.Map
@@ -261,15 +261,18 @@ sync.map
         - 如果dirty为空，则需要创建dirty，并从read中拷贝未被删除的元素
         - 更新amended字段，标识dirty map中存在read map中没有的key
         - 将k-v写入dirty map中
+    - 删除
+      - 先从read里查是否有这个key，如果有则执行entry.delete方法，将p置为nil，这样read和dirty都能看到这个变化
+      - 如果没在read中找到这个key，并且dirty不为空，那么就要操作dirty了，操作之前，还是要先上锁。然后进行double check，如果仍然没有在read里找到此key，则从dirty中直接删掉这个key。
+      - read中没有这个key，且amended为fase，说明dirty为空，那直接返回空和false
     - 读取
       - 直接在read中找，如果找到了直接调用entry的load方法，取出其中的值
       - 如果read中没有这个key，且amended为true，说明dirty中可能存在我们要找的key。当然要先上锁，再尝试去dirty中查找。在这之前，仍然有一个double check的操作。若还是没有在read中找到，那么就从dirty中找。不管dirty中有没有找到，都要"记一笔"，因为在dirty被提升为read之前，都会进入这条路径
         直接将misses的值加1，表示一次未命中，如果misses值小于m.dirty 的长度，就直接返回。否则，将m.dirty晋升为read，并清空dirty，清空misses计数值
       - read中没有这个key，且amended为fase，说明dirty为空，那直接返回空和false
-    - 删除
-      - 先从read里查是否有这个key，如果有则执行entry.delete方法，将p置为nil，这样read和dirty都能看到这个变化
-      - 如果没在read中找到这个key，并且dirty不为空，那么就要操作dirty了，操作之前，还是要先上锁。然后进行double check，如果仍然没有在read里找到此key，则从dirty中直接删掉这个key。
-      - read中没有这个key，且amended为fase，说明dirty为空，那直接返回空和false
+    - 遍历
+      - 当amended为true时，说明dirty中含有read中没有的key，将dirty提升为read
+      - 遍历read，取出entry 中的值，调用f(k, v)      
 
 struct
 - 使用
