@@ -13,6 +13,10 @@
 # 使用 #
 ## 基础语法 ##
 ```
+优势
+- 支持高并发
+- 高效的垃圾回收，与程序并发执行
+
 常用命令
 - go build
   编译包和依赖
@@ -87,6 +91,30 @@
     - 只能在函数内跳转，需要配合标签一起使用
     - 不能跳过内部变量声明语句
     - 只能跳到同级作用域或者上层作用域内，不能跳到内部作用域内
+
+包
+- 常用
+  - fmt
+    - 标准输出
+      fmt.Print
+      fmt.Println
+      fmt.Printf
+    - 输出到字符串
+      fmt.Sprint()
+      fmt.Sprintln()
+      fmt.Sprintf()
+    - 输出到文件
+      fmt.Fprint
+      fmt.Fprintln
+      fmt.Fprintf
+  - math 
+  - rand
+  - strings
+  - strconv
+  - sort
+  - sync
+  - net
+  - runtime
 ```
 
 ## 数据结构 ##
@@ -139,6 +167,13 @@ slice
     - 如果原有slice长度大于等于256，那么每次扩容就扩为原来的1.25倍+3/4*256，直到新容量大于期望容量
     - 内存对齐(size_to_class&class_to_size)
       CPU以字长访问内存，如果不进行内存对齐，很可能增加CPU访问内存的次数
+- 注意事项
+  - slice是引用传递
+  - 扩容前后的slice是否相同
+    - 相同 
+      原数组还有容量可以扩容
+    - 不同 
+      原数组容量不够
 
 map
 - 使用
@@ -224,6 +259,8 @@ map
   - sync.Map
     - sync.Map适用于读多、更新多、删多、写少的场景  
     - 倘若写操作过多，sync.Map基本等价于互斥锁+map  
+- 注意事项
+  - 引用传递
 
 sync.map
 - 使用
@@ -273,6 +310,8 @@ sync.map
     - 遍历
       - 当amended为true时，说明dirty中含有read中没有的key，将dirty提升为read
       - 遍历read，取出entry 中的值，调用f(k, v)      
+- 注意事项
+  - 引用传递
 
 struct
 - 使用
@@ -293,6 +332,7 @@ func
 - 闭包
   - 函数内部变量离开其作用域后始终保持在内存中而不被销毁
 - defer
+  延迟函数
   - 延迟函数的参数在defer声明时就决定了
   - 多个defer语句，按照先进后出的方式执行
   - return赋值 执行defer return返回
@@ -375,6 +415,12 @@ reflect
   - reflect实现里面有大量的枚举，也就是for循环，比如类型之类的
 
 error&panic&recover
+
+类型转换
+- 类型转换
+  T(v)
+- 类型检查
+  switch v.(type)
 ```
 
 ## 内存管理 ##
@@ -580,6 +626,9 @@ make & new
 - goroutine
   - 使用
     - go func(){}
+  - 推出
+    通过向goroutine发送一个信号通道来停止它
+告知检查时响应信号，
 - waitGroup
   - wg := &sync.WaitGroup{}
   - wg.Add()
@@ -600,11 +649,11 @@ make & new
 	    sendq    waitq  // list of send waiters
 	    lock mutex
     }
-    - buf  指向一个数组，用来实现循环队列
+    - buf  指向一个环形数组，用来实现循环队列
     - sendx  循环队列的队尾指针
     - recvx  循环队列的队头指针
-    - recvq  等待从通道中接收数据的goroutine
-    - sendq  等待发送数据到通道的goroutine
+    - recvq  等待从通道中接收数据的goroutine  双向链表
+    - sendq  等待发送数据到通道的goroutine  双向链表
   - 操作
     - 发送
       - 空通道，阻塞
