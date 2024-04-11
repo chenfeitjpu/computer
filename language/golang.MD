@@ -53,7 +53,8 @@
 - const (  
       name [type] = expression  
       name [type] = expression    
-  )  
+  )
+  只有一个变量名，可以继承上一个常量的值  
 - iota    
 
 数据类型
@@ -67,6 +68,7 @@
 - struct interface
 - func 
 - pointer uintptr
+引用类型 slice map channel func interface  
 
 运算符
 - 算术运算符  
@@ -112,8 +114,8 @@
   - strings
   - strconv
   - sort
-  - sync
   - net
+  - sync
   - runtime
 ```
 
@@ -139,11 +141,11 @@ slice
   - 声明  
     - var name = []type{}
     - name := make([]type, length, capacity)
+  - append
+  - copy
   - 切片表达式
     - a[low : high : max]  
       0 <= low <= high <= max <= cap(a)   
-  - append
-  - copy
 - 结构
   type slice struct {
       array unsafe.Pointer
@@ -168,7 +170,6 @@ slice
     - 内存对齐(size_to_class&class_to_size)
       CPU以字长访问内存，如果不进行内存对齐，很可能增加CPU访问内存的次数
 - 注意事项
-  - slice是引用传递
   - 扩容前后的slice是否相同
     - 相同 
       原数组还有容量可以扩容
@@ -259,8 +260,6 @@ map
   - sync.Map
     - sync.Map适用于读多、更新多、删多、写少的场景  
     - 倘若写操作过多，sync.Map基本等价于互斥锁+map  
-- 注意事项
-  - 引用传递
 
 sync.map
 - 使用
@@ -310,8 +309,6 @@ sync.map
     - 遍历
       - 当amended为true时，说明dirty中含有read中没有的key，将dirty提升为read
       - 遍历read，取出entry 中的值，调用f(k, v)      
-- 注意事项
-  - 引用传递
 
 struct
 - 使用
