@@ -135,7 +135,7 @@ sorted set
 bitmap
 - `SETBIT key offset value`  设置bit位
 - `GETBIT key offset`  获取bit位
-- `BITPOS key bit [start] [end] [BYTE|BIT]` 在指定字节区间查找bit出现的位置
+- `BITPOS key bit [start] [end] [BYTE|BIT]` 在指定字节区间查找bit第一次出现的位置
 - `BITCOUNT key [start] [end]`  在指定位区间统计1出现的次数
 - `BITOP operation destkey key key`  对key进行位运算
 

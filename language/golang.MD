@@ -56,19 +56,25 @@
   )
   只有一个变量名，可以继承上一个常量的值  
 - iota    
+- 不能取址
 
 数据类型
-- uint8 uint16 uint32 uint64 uint int8 int16 int32 int64 int
-- float32 float64 
-- complex64 complex128
-- byte rune
-- string
-- bool
-- array slice map channel 
-- struct interface
-- func 
-- pointer uintptr
-引用类型 slice map channel func interface  
+- 分类
+  - uint8 uint16 uint32 uint64 uint int8 int16 int32 int64 int
+  - float32 float64 
+  - complex64 complex128
+  - byte rune
+  - string
+  - bool
+  - array slice map channel 
+  - struct interface
+  - func 
+  - pointer uintptr
+- 引用类型 
+  slice map channel func interface  
+- 动态类型比较
+  - 比较静态类型
+  - 动态类型不能是同一个不可比较类型
 
 运算符
 - 算术运算符  
@@ -121,6 +127,18 @@
 
 ## 数据结构 ##
 ```
+string 
+- 结构
+  type StringHeader struct {
+      Data uintptr
+     Len  int
+  }
+- 注意事项
+  - string不能修改
+  - 转换成[]byte会发生内存拷贝
+    - 不发生拷贝
+      *(*[]byte)(unsafe.Pointer(&a))
+
 array
 - 使用
   - 声明
@@ -145,7 +163,10 @@ slice
   - copy
   - 切片表达式
     - a[low : high : max]  
-      0 <= low <= high <= max <= cap(a)   
+      0 <= low <= high <= max <= cap(a) 
+      high默认是len(a)
+  - 遍历
+    for range在循环开始前会获取切片的长度，然后再执行len(切片)次数的循环  
 - 结构
   type slice struct {
       array unsafe.Pointer
@@ -175,6 +196,10 @@ slice
       原数组还有容量可以扩容
     - 不同 
       原数组容量不够
+  - nil切片 & 空切片
+    - nil切片引用数组指针地址为0(无指向任何实际地址)
+    - 空切片引用数组指针地址是有的，且固定为一个值
+  - 拷贝大切片跟小切片的代价是一样的
 
 map
 - 使用
@@ -200,7 +225,6 @@ map
       // 计算 key 的哈希的时候会传入哈希函数
       hash0     uint32
       // 指向 buckets 数组，大小为 2^B
-      // 如果元素个数为0，就为 nil
       buckets    unsafe.Pointer
       // 等量扩容的时候，buckets 长度和 oldbuckets 相等
       // 双倍扩容的时候，buckets 长度会是 oldbuckets 的两倍
@@ -319,6 +343,9 @@ struct
     }
   - 嵌套结构体
     - 匿名结构体
+  - 转json
+    - 小写字段不能转
+    - 大写字段加了tag取别名，不加tag则json内的字段跟结构体字段原名一致
 
 func 
 - 使用
@@ -326,6 +353,7 @@ func
     func name(parameter type, parameter type) ([output] type, [output] type) {
         return value, value
     }
+    - 返回值要么同时命名，要么不命名
 - 闭包
   - 函数内部变量离开其作用域后始终保持在内存中而不被销毁
 - defer
@@ -632,6 +660,14 @@ make & new
   - wg.Done()
   - wg.Wait()
 - channel
+  - 使用
+    - 声明
+      - 只读通道
+        <- ch
+      - 只写通道
+        ch <-
+      - 双向通道
+        ch
   - 结构
     type hchan struct {
   	    qcount   uint           // total data in the queue
@@ -678,9 +714,14 @@ make & new
     | 读 <-ch | 阻塞 | 成功或阻塞 | 读到零值 |
     | 写 ch<- | 阻塞 | 成功或阻塞 | panic |
     | 关闭 close(ch) | panic | 成功 | panic | 
-  - 选择
-    - select
+  - select
+    - 作用
       监听多个channel
+    - 通道关闭
+      如果其中一个case通道已经关闭，则每次都会执行到这个case  
+      如果select里边只有一个case，而这个case被关闭了，则会出现死循环  
+    - 不读关闭后通道
+      将关闭通道置为nil
 - mutex
   - 互斥锁  sync.Mutex
   - 读写互斥锁  sync.RWMutex
