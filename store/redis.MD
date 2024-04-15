@@ -343,82 +343,6 @@ typedef struct list {
 - 保存一个链表节点的值都需要一个链表节点结构头的分配，内存开销较大
 ```
 
-**压缩列表**
-![avatar](./images/redis/redis_ziplist_struct.webp) 
-```
-结构
-- zlbytes  记录整个压缩列表占用内存字节数
-- zltail  记录压缩列表「尾部」节点距离起始地址由多少字节 也就是列表尾的偏移量
-- zllen  记录压缩列表包含的节点数量
-- zlend  标记压缩列表的结束点，固定值0xFF(十进制255)
-
-entry
-- prevlen  记录了「前一个节点」的长度，目的是为了实现从后向前遍历
-- encoding  记录了当前节点实际数据的「类型和长度」，类型主要有两种：字符串和整数
-- data  记录了当前节点的实际数据，类型和长度都由 encoding 决定
-
-优点
-- 占用一块连续的内存空间，可以利用CPU缓存
-缺点
-- 不能保存过多的元素，否则查询效率就会降低
-- 新增或修改某个元素时，压缩列表占用的内存空间需要重新分配，甚至可能引发连锁更新的问题
-```
-
-**哈希表**
-```
-typedef struct dictht {
-    //哈希表数组
-    dictEntry **table;
-    //哈希表大小
-    unsigned long size;  
-    //哈希表大小掩码，用于计算索引值
-    unsigned long sizemask;
-    //该哈希表已有的节点数量
-    unsigned long used;
-}
-
-typedef struct dictEntry {
-    //键值对中的键
-    void *key;
-  
-    //键值对中的值
-    union {
-        void *val;
-        uint64_t u64;
-        int64_t s64;
-        double d;
-    } v;
-    //指向下一个哈希表节点，形成链表
-    struct dictEntry *next;
-}
-
-缺点
-哈希冲突加剧，导致查询性能降低
-
-解决
-rehash
-```
-
-**整数集合**
-```
-结构
-typedef struct intset {
-    //编码方式
-    uint32_t encoding;
-    //集合包含的元素数量
-    uint32_t length;
-    //保存元素的数组
-    int8_t contents[];
-}
-
-整数集合升级
-过程
-- 当我们将一个新元素加入到整数集合里面，如果新元素的类型比整数集合现有所有元素的类型都要长时，整数集合需要先进行升级，也就是按新元素的类型扩展contents数组的空间大小，然后才能将新元素加入到整数集合里，当然升级的过程中，也要维持整数集合的有序性
-- 整数集合升级的过程不会重新分配一个新类型的数组，而是在原本的数组上扩展空间，然后在将每个元素按间隔类型大小分割
-好处
-- 节省内存资源
-```
-
 **跳表**
 ```
 typedef struct zskiplistNode {
@@ -453,6 +377,29 @@ typedef struct zskiplist {
 
 层数设置
 跳表在创建节点时候，会生成范围为[0-1]的一个随机数，如果这个随机数小于等于0.25（相当于概率25%），那么层数就增加1层，然后继续生成下一个随机数，直到随机数的结果大于0.25结束，最终确定该节点的层数
+```
+
+**压缩列表**
+![avatar](./images/redis/redis_ziplist_struct.webp) 
+```
+结构
+- zlbytes  记录整个压缩列表占用内存字节数
+- zltail  记录压缩列表「尾部」节点距离起始地址由多少字节 也就是列表尾的偏移量
+- zllen  记录压缩列表包含的节点数量
+- zlend  标记压缩列表的结束点，固定值0xFF(十进制255)
+
+entry
+- prevlen  记录了「前一个节点」的长度，目的是为了实现从后向前遍历
+  如果前一个节点的长度小于254字节，那么prevlen属性需要用1字节的空间来保存这个长度值  
+  如果前一个节点的长度大于等于254字节，那么prevlen属性需要用5字节的空间来保存这个长度值  
+- encoding  记录了当前节点实际数据的「类型和长度」，类型主要有两种：字符串和整数
+- data  记录了当前节点的实际数据，类型和长度都由 encoding 决定
+
+优点
+- 占用一块连续的内存空间，可以利用CPU缓存
+缺点
+- 不能保存过多的元素，否则查询效率就会降低
+- 新增或修改某个元素时，压缩列表占用的内存空间需要重新分配，甚至可能引发连锁更新的问题
 ```
 
 **listpack**
@@ -491,7 +438,61 @@ typedef struct quicklistNode {
     unsigned int count;
     ....
 }
+```
 
+**整数集合**
+```
+结构
+typedef struct intset {
+    //编码方式
+    uint32_t encoding;
+    //集合包含的元素数量
+    uint32_t length;
+    //保存元素的数组
+    int8_t contents[];
+}
+
+整数集合升级
+过程
+- 当我们将一个新元素加入到整数集合里面，如果新元素的类型比整数集合现有所有元素的类型都要长时，整数集合需要先进行升级，也就是按新元素的类型扩展contents数组的空间大小，然后才能将新元素加入到整数集合里，当然升级的过程中，也要维持整数集合的有序性
+- 整数集合升级的过程不会重新分配一个新类型的数组，而是在原本的数组上扩展空间，然后在将每个元素按间隔类型大小分割
+好处
+- 节省内存资源
+```
+
+**哈希表**
+```
+typedef struct dictht {
+    //哈希表数组
+    dictEntry **table;
+    //哈希表大小
+    unsigned long size;  
+    //哈希表大小掩码，用于计算索引值
+    unsigned long sizemask;
+    //该哈希表已有的节点数量
+    unsigned long used;
+}
+
+typedef struct dictEntry {
+    //键值对中的键
+    void *key;
+  
+    //键值对中的值
+    union {
+        void *val;
+        uint64_t u64;
+        int64_t s64;
+        double d;
+    } v;
+    //指向下一个哈希表节点，形成链表
+    struct dictEntry *next;
+}
+
+缺点
+哈希冲突加剧，导致查询性能降低
+
+解决
+rehash
 ```
 
 ## 持久化 ##
