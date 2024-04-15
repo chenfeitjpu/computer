@@ -651,9 +651,8 @@ make & new
 - goroutine
   - 使用
     - go func(){}
-  - 推出
-    通过向goroutine发送一个信号通道来停止它
-告知检查时响应信号，
+  - 退出
+    通过向goroutine发送一个信号通道来停止它告知检查时响应信号，
 - waitGroup
   - wg := &sync.WaitGroup{}
   - wg.Add()
@@ -726,43 +725,62 @@ make & new
   - 互斥锁  sync.Mutex
   - 读写互斥锁  sync.RWMutex
 
-context
-- 作用
-  - 解决goroutine之间退出通知、元数据传递
-- 结构
-  type Context interface {
-      // 当context被取消或者到了 deadline，返回一个被关闭的 channel
-      Done() <-chan struct{}
-      // 在 channel Done 关闭后，返回 context 取消原因
-      Err() error
-      // 返回context是否会被取消以及自动取消时间
-      Deadline() (deadline time.Time, ok bool)
-      // 获取 key 对应的 value
-      Value(key interface{}) interface{}
-  }
-- 分类
-  - emptyCtx
-    type emptyCtx int
-  - valueCtx
-    type valueCtx struct {
-        Context
-        key, val any
+- context
+  - 作用
+    - 解决goroutine之间退出通知、元数据传递
+  - 结构
+    type Context interface {
+        // 当context被取消或者到了 deadline，返回一个被关闭的 channel
+        Done() <-chan struct{}
+        // 在 channel Done 关闭后，返回 context 取消原因
+        Err() error
+        // 返回context是否会被取消以及自动取消时间
+        Deadline() (deadline time.Time, ok bool)
+        // 获取 key 对应的 value
+        Value(key interface{}) interface{}
     }
-  - cancelCtx
-    type cancelCtx struct {
-        Context
-        mu       sync.Mutex         
-        done     atomic.Value          
-        children map[canceler]struct{} 
-        err      error                 
-        cause    error                
-    }
-  - timerCtx
-    type timerCtx struct {
-        *cancelCtx
-        timer *time.Timer
-        deadline time.Time
-    }
+  - 分类
+    - emptyCtx
+      type emptyCtx int
+    - valueCtx
+      type valueCtx struct {
+          Context
+          key, val any
+      }
+    - cancelCtx
+      type cancelCtx struct {
+          Context
+          mu       sync.Mutex         
+          done     atomic.Value          
+          children map[canceler]struct{} 
+          err      error                 
+          cause    error                
+      }
+    - timerCtx
+      type timerCtx struct {
+          *cancelCtx
+          timer *time.Timer
+          deadline time.Time
+      }
+
+- once
+  - 使用
+    - Do 
+      执行
+  - 结构
+    type Once struct {
+        done uint32
+        m    Mutex
+    } 
+
+- pool
+  - 使用
+    - New
+      初始化
+    - Get
+      获取
+    - Put
+      添加
 
 GMP
 - 思想
