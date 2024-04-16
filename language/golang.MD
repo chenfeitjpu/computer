@@ -361,6 +361,10 @@ func
   - 延迟函数的参数在defer声明时就决定了
   - 多个defer语句，按照先进后出的方式执行
   - return赋值 执行defer return返回
+- init  
+  - 一个包里可以包含多个init函数
+  - 程序运⾏时，先执⾏依赖包的init函数，再执⾏当前包内的init函数
+  - init 函数可以被其他函数调⽤
 
 method
 - 使用
@@ -708,11 +712,11 @@ make & new
       - 已关闭通道，直接panic
       - 唤醒接收者队列中所有接受者
       - 唤醒发送者队列中所有发送者
-    | 操作 | nil的channel | 正常channel | 已关闭的channel |
-    | :--: | :--: | :--: | :--: |
-    | 读 <-ch | 阻塞 | 成功或阻塞 | 读到零值 |
-    | 写 ch<- | 阻塞 | 成功或阻塞 | panic |
-    | 关闭 close(ch) | panic | 成功 | panic | 
+    |      操作      | nil的channel | 正常channel | 已关闭的channel |
+    | :------------: | :----------: | :---------: | :-------------: |
+    |    读 <-ch     |     阻塞     | 成功或阻塞  |    读到零值     |
+    |    写 ch<-     |     阻塞     | 成功或阻塞  |      panic      |
+    | 关闭 close(ch) |    panic     |    成功     |      panic      |
   - select
     - 作用
       监听多个channel
@@ -763,24 +767,37 @@ make & new
           deadline time.Time
       }
 
-- once
+- Cond
   - 使用
-    - Do 
-      执行
+    - 初始化
+      cond := &sync.Cond
+    - 等待
+      cond.L.Lock()
+      cond.wait()
+      cond.L.Unlock()
+    - 唤醒
+      cond.BroadCast()
+
+- Once
+  - 使用
+    - 初始化
+      once := &sync.Once
+    - 执行
+      once.Do(f func())
   - 结构
     type Once struct {
         done uint32
         m    Mutex
     } 
 
-- pool
+- Pool
   - 使用
-    - New
-      初始化
-    - Get
-      获取
-    - Put
-      添加
+    - 初始化
+      New
+    - 获取
+      Get
+    - 添加
+      Put
 
 GMP
 - 思想
@@ -818,6 +835,12 @@ GMP
 - 阻塞
   - M执行G发生了阻塞操作，M和P立即解绑，如果P本地队列有G，全局队列有G，P会绑定M，否则P则会加入到空闲列表
   - 当M系统调用结束时候，这个G会尝试获取一个空闲的P执行，并放入到这个P的本地队列。如果获取不到P，那么这个线程M变成休眠状态，加入到空闲线程中，然后这个G会被放入全局队列中
+
+框架
+- gin 
+
+- beego
+
 ```
 
 # 学习资料 #
@@ -832,6 +855,7 @@ channel
 context  
 [深度解密Go语言之context](https://zhuanlan.zhihu.com/p/68792989)  
 gmp  
+[你不知道的runtime.GOMAXPROCS(1)](https://zhuanlan.zhihu.com/p/258759046)
 [Golang的协程调度器原理及GMP设计思想](https://github.com/aceld/golang/blob/main/2%E3%80%81Golang%E7%9A%84%E5%8D%8F%E7%A8%8B%E8%B0%83%E5%BA%A6%E5%99%A8%E5%8E%9F%E7%90%86%E5%8F%8AGMP%E8%AE%BE%E8%AE%A1%E6%80%9D%E6%83%B3%EF%BC%9F.md)  
 [GMP原理与调度](https://www.topgoer.com/%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B/GMP%E5%8E%9F%E7%90%86%E4%B8%8E%E8%B0%83%E5%BA%A6.html)  
 [深入golang runtime的调度](https://zboya.github.io/post/go_scheduler/)  
