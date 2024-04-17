@@ -54,7 +54,8 @@
       name [type] = expression  
       name [type] = expression    
   )
-  只有一个变量名，可以继承上一个常量的值  
+  常量定义与前一行的定义一致，则可以省略类型和值
+  无类型常量可通过字面量转换为对应类型的变量
 - iota    
 - 不能取址
 
@@ -72,9 +73,12 @@
   - pointer uintptr
 - 引用类型 
   slice map channel func interface  
-- 动态类型比较
-  - 比较静态类型
-  - 动态类型不能是同一个不可比较类型
+- 类型比较
+  - 静态类型
+    - 不同类型不能比较
+    - 不可比较类型不能比较
+  - 动态类型
+    - 一个接口覆盖另一个接口的所有方法，且不是同一种不可比较类型
 
 运算符
 - 算术运算符  
@@ -104,17 +108,21 @@
 - 常用
   - fmt
     - 标准输出
-      fmt.Print
-      fmt.Println
-      fmt.Printf
+      - fmt.Print
+      - fmt.Println
+      - fmt.Printf
+        - %v  
+          对于结构体，只打印值
+        - %+v  
+          对于结构体，打印属性和值
     - 输出到字符串
-      fmt.Sprint()
-      fmt.Sprintln()
-      fmt.Sprintf()
+      - fmt.Sprint()
+      - fmt.Sprintln()
+      - fmt.Sprintf()
     - 输出到文件
-      fmt.Fprint
-      fmt.Fprintln
-      fmt.Fprintf
+      - fmt.Fprint
+      - fmt.Fprintln
+      - fmt.Fprintf
   - math 
   - rand
   - strings
@@ -123,6 +131,9 @@
   - net
   - sync
   - runtime
+  - unsafe
+    - unsafe.SizeOf
+      获取变量占用内存大小
 ```
 
 ## 数据结构 ##
@@ -342,10 +353,14 @@ struct
         name type  
     }
   - 嵌套结构体
-    - 匿名结构体
-  - 转json
-    - 小写字段不能转
-    - 大写字段加了tag取别名，不加tag则json内的字段跟结构体字段原名一致
+  - 匿名结构体
+  - 空结构体
+    不占内存，占位使用
+  - tag  
+    丰富语义
+    - 转json
+      - 小写字段不能转
+      - 大写字段加了tag取别名，不加tag则json内的字段跟结构体字段原名一致
 
 func 
 - 使用
@@ -362,6 +377,7 @@ func
   - 多个defer语句，按照先进后出的方式执行
   - return赋值 执行defer return返回
 - init  
+  import->const->var->init->main
   - 一个包里可以包含多个init函数
   - 程序运⾏时，先执⾏依赖包的init函数，再执⾏当前包内的init函数
   - init 函数可以被其他函数调⽤
@@ -375,8 +391,11 @@ method
   - 调用
     - object.method()
 - 注意事项
-  - 类型T拥有接受者是T的方法
-  - 类型*T拥有接受者是T和*T的方法
+  - 类型T不能调用*T的方法
+    不可寻址
+    - 常量
+    - 字符串中的直接
+    - map对象中的元素
 
 interface
 - 使用
@@ -386,8 +405,9 @@ interface
         name(name type) type  
    }
 - 注意事项
-  - 对于T接收者实现的接口，可以使用T和*T类型
-  - 对于*T接收者实现的接口，只能使用*T类型
+  - 对于T类型的接口，可以使用T类型的方法
+  - 对于*T类型的接口，可以使用T和*T类型的方法
+
 - 类型断言
   - i.(T)
   - i.(type)
@@ -844,6 +864,8 @@ GMP
 ```
 
 # 学习资料 #
+rune
+[深究字符串——从byte rune string到Unicode与UTF-8](http://www.randyfield.cn/post/2022-01-14-rune-unicode-utf8/)
 slice  
 [Go slice新的扩容机制-你背的八股文过时啦](https://juejin.cn/post/7136774425415794719)  
 map  
