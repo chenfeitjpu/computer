@@ -169,19 +169,19 @@ stream
 - `XINFO GROUPS key`  查看组状态
 - `XINFO CONSUMERS key group`  查看消费者状态
 
-事务
-- MULTI  开始事务
-- EXEC  执行事务
-- DISCARD  取消事务
-- WATCH key [key]  监视key
-- UNWATCH  取消监视
-
 发布&订阅
 - SUBSCRIBE channel [channel]  订阅频道
 - PSUBSCRIBE pattern [pattern]  订阅指定模式的频道
 - UNSUBSCRIBE channel [channel]  退订频道
 - PUNSUBSCRIBE pattern [pattern]  退订指定模式的频道
 - PUBLISH channel message  发送消息
+
+事务
+- MULTI  开始事务
+- EXEC  执行事务
+- DISCARD  取消事务
+- WATCH key [key]  监视key
+- UNWATCH  取消监视
 ```
 
 ## 数据类型 ##
@@ -255,6 +255,9 @@ stream
 流(stream)
 - 应用
   - 消息队列
+
+注意事项
+- key、value上限是512M
 ```
 
 ## 数据结构 ##

@@ -35,29 +35,36 @@
 - go vet
   报告代码错误
 
-变量  
-- var name [type] [= expression]  
-- var name, name [type] [= expression, expression]  
-- var (  
-      name [type] [= expression]  
-      name [type] [= expression]  
-  )
-  type expression 至少有一个  
-- name := value
-- _ 不会分配内存
+变量
+- 使用
+  - 声明  
+    - var name [type] [= expression]  
+    - var name, name [type] [= expression, expression]  
+    - var (  
+          name [type] [= expression]  
+          name [type] [= expression]  
+      )
+    - name := value
+- 注意事项
+  - _不会分配内存
+  - 变量类型转换时允许溢出
 
 常量
 常量数据类型只能是数值型（整数型、浮点型和复数）、字符串型、布尔型  
-- const name [type] = expression
-- const name [type], [type] = expression, expression
-- const (  
-      name [type] = expression  
-      name [type] = expression    
-  )
-  常量定义与前一行的定义一致，则可以省略类型和值
-  无类型常量可通过字面量转换为对应类型的变量
-- iota    
-- 不能取址
+- 使用
+  - 声明
+    - const name [type] = expression
+    - const name [type], [type] = expression, expression
+    - const (  
+          name [type] = expression  
+          name [type] = expression    
+      )
+      常量定义与前一行的定义一致，则可以省略类型和值
+    - iota    
+- 注意事项
+  - 不能取址
+  - 无类型常量可通过字面量转换为对应类型的变量
+  - 常量类型转换时不允许溢出
 
 数据类型
 - 分类
@@ -673,10 +680,12 @@ make & new
 ```
 组件
 - goroutine
+  同时运行的函数
   - 使用
     - go func(){}
   - 退出
     通过向goroutine发送一个信号通道来停止它告知检查时响应信号，
+
 - waitGroup
   - wg := &sync.WaitGroup{}
   - wg.Add()
