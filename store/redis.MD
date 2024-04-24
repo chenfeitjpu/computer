@@ -1,7 +1,7 @@
 **Redis**
 - [定义](#定义)
 - [使用](#使用)
-  - [基础命令](#基础命令)
+  - [基础](#基础)
   - [数据类型](#数据类型)
   - [数据结构](#数据结构)
   - [持久化](#持久化)
@@ -12,7 +12,7 @@
 键值数据库
 
 # 使用 #
-## 基础命令 ##
+## 基础 ##
 ```
 key 
 - `KEYS pattern`  查找所有符合给定模式的键  ?|*|[]|^|-
@@ -137,6 +137,7 @@ bitmap
 - `GETBIT key offset`  获取bit位
 - `BITPOS key bit [start] [end] [BYTE|BIT]` 在指定字节区间查找bit第一次出现的位置
 - `BITCOUNT key [start] [end]`  在指定位区间统计1出现的次数
+- `BITFIELD key`  对多个二进制位进行操作
 - `BITOP operation destkey key key`  对key进行位运算
 
 hyperloglog
@@ -151,23 +152,6 @@ geo
 - `GEORADIUS key longitude latitude radius [M|KM|FT|MI] [WITHCOORD] [WITHDIST] [WITHHASH] [COUNT count] [AES|DESC] [STORE key]`  以给定的经纬度为中心， 返回指定范围内的元素
 - `GEORADIUSBYMEMBER key member radius [M|KM|FT|MI] [WITHCOORD] [WITHDIST] [WITHHASH] [COUNT count] [AES|DESC] [STORE key]`  以给定的位置为中心， 返回指定范围内的元素
 - `GEOHASH key member [member]`  获取坐标的hash位置
-
-stream
-- `XADD key id field value [field value]`  添加消息
-- `XDEL key id [id]`  删除消息
-- `XTRIM key <MAXLEN|MINID> [=|~] threshold [LIMIT count]`  裁剪为指定数量的项目
-- `XRANGE key start end [COUNT count]`  获取消息列表
-- `XREVRANGE key end start [COUNT count]` 反向获取消息列表
-- `XREAD [COUNT count] [BLOCK milliseconds] STREAMS key [key] id [id]` 获取消息
-- `XLEN key`  获取消息长度
-- `XGROUP CREATE key group <id|$> [MKSTREAM]`  创建消费组
-- `XREADGROUP GROUP group consumer [COUNT count] [BLOCK milliseconds] STREAMS key [key ...] id [id ...]`  创建消费者
-- `XPENDING key group [[IDLE min-idle-time] start end count [consumer]]`  查看消费情况
-- `XACK key group id [id ...]`  确认消息
-- `XCLAIM key group consumer min-idle-time id [id ...]`  转移消息
-- `XINFO STREAM key`  查看队列状态
-- `XINFO GROUPS key`  查看组状态
-- `XINFO CONSUMERS key group`  查看消费者状态
 
 发布&订阅
 - SUBSCRIBE channel [channel]  订阅频道
