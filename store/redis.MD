@@ -746,6 +746,6 @@ Cluster
   - 对键的CRC16值取模2^14计算出哈希槽，根据哈希槽找到节点
 ```
 
-学习资料
+学习资料  
 [图解Redis](https://xiaolincoding.com/redis/)  
 [面试官：介绍一下 Redis 三种集群模式](https://xie.infoq.cn/article/762492568e1b35f7227bcc115)
