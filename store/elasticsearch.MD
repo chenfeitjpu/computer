@@ -24,7 +24,7 @@
   - _update /index/type/id/_update
     数据相同则不更新
 - 查询
-   - get /index/type/id  查询文档
+  - get /index/type/id  查询文档
 - 删除
   - delete /index/type/id  删除文档
   - delete /index  删除索引
