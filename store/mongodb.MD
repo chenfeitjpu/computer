@@ -67,12 +67,10 @@ MongoDb
 
 聚合
 - 单一命令
-  - count
-    db.COLLECTION_NAME.countDocuments(query, options)
-  - distinct
-    db.COLLECTION_NAME.distinct(field, query, options)    
+  - db.COLLECTION_NAME.countDocuments(query, options)
+  - db.COLLECTION_NAME.distinct(field, query, options)    
 - 管道
-  - aggregate   
+  - db.COLLECTION_NAME.aggregate   
 ```
 
 ## 存储引擎 ##

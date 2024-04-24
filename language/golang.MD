@@ -471,6 +471,8 @@ reflect
   - reflect实现里面有大量的枚举，也就是for循环，比如类型之类的
 
 error&panic&recover
+- panic
+  - 无法捕获的panic
 
 类型转换
 - 类型转换
