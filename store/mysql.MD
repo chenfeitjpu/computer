@@ -524,79 +524,74 @@ explain
 ```
 概念
 - 特性  
-  - 原子性（Atomicity）
-  - 隔离性（Isolation）
-  - 一致性（Consistency）
-  - 持久性（Durability）
-- 状态  
-  - 活动的(active)
-  - 部分提交的(partially committed)
-  - 失败的(failed)
-  - 中止的(aborted)
-  - 提交的(committed)
-- 操作
-  - `BEGIN [WORK]`  开启事务   
+  - 原子性(Atomicity)
+  - 一致性(Consistency)
+  - 隔离性(Isolation)
+  - 持久性(Durability)
+  InnoDB使用回滚日志保证原子性，使用MVCC和锁来保证隔离性，重做日志保证持久性，通过原子性、隔离性、持久性来保证一致性
+- 使用
+  - `BEGIN`  开启事务   
+  - `COMMIT`  提交事务
+  - `ROLLBACK`  手动中止事务 
   - `START TRANSACTION [READ ONLY|READ WRITE] [WITH CONSISTENT SNAPSHOT]`  开启事务  
-  - `COMMIT [WORK]`  提交事务
-  - `ROLLBACK [WORK]`  手动中止事务 
   - `AUTOCOMMIT` 自动提交 
-- 保存点
-  - `SAVEPOINT 保存点名称`  定义
-  - `ROLLBACK [WORK] TO [SAVEPOINT] 保存点名称` 回滚
-  - `RELEASE SAVEPOINT 保存点名称` 删除 
-
-并发
-- 问题  
-  - 脏写  
-    一个事务修改了另一个未提交事务修改过的数据，那就意味着发生了脏写  
-  - 脏读  
-    一个事务读到了另一个未提交事务修改过的数据，那就意味着发生了脏读   
-  - 不可重复读  
-    一个事务读到另一个已经提交的事务修改过的数据，并且其他事务每对该数据进行一次修改并提交后，该事务都能查询得到最新值，那就意味着发生了不可重复读  
-  - 幻读  
-    一个事务先根据某些条件查询出一些记录，之后另一个事务又向表中插入了符合这些条件的记录，原先的事务再次按照该条件查询时，能把另一个事务插入的记录也读出来，那就意味着发生了幻读
-- 隔离级别  
-  - READ UNCOMMITTED 未提交读
-  - READ COMMITTED 已提交读   
-  - REPEATABLE READ 可重复读
-  - SERIALIZABLE 可串行化
-  | 隔离级别 | 脏读 | 不可重复读 | 幻读 |  
-  | :---: | :---: | :---: | :---: |
-  | READ UNCOMMITTED | Possible | Possible | Possible |
-  | READ COMMITTED | Not Possible | Possible | Possible |
-  | REPEATABLE READ | Not Possible | Not Possible | Possible |
-  | SERIALIZABLE | Not Possible | Not Possible | Not Possible |
-- 设置隔离级别  
-  `show variables like 'transaction_isolation`  
-  `SET [GLOBAL|SESSION] TRANSACTION ISOLATION LEVEL level`
-  level: {
-    READ UNCOMMITTED
-    READ COMMITTED
-    REPEATABLE READ
-    SERIALIZABLE
-  }
-
-MVCC
-- 版本链    
-  记录中包含两个必要的隐藏列  
-  - trx_id 
-    每次一个事务对某条聚簇索引记录进行改动时，都会把该事务的事务id赋值给trx_id隐藏列
-  - roll_pointer 
-    每次对某条聚簇索引记录进行改动时，都会把旧的版本写入到undo日志中，然后这个隐藏列就相当于一个指针，可以通过它来找到该记录修改前的信息  
-    记录每次更新后，都会将旧值放到一条undo日志中，就算是该记录的一个旧版本，随着更新次数的增多，所有的版本都会被roll_pointer属性连接成一个链表，我们把这个链表称之为版本链
-- ReadView    
-  - m_ids  表示在生成ReadView时当前系统中活跃的读写事务的事务id列表  
-  - min_trx_id  表示在生成ReadView时当前系统中活跃的读写事务中最小的事务id，也就是m_ids中的最小值
-  - max_trx_id  表示生成ReadView时系统中应该分配给下一个事务的id值
-  - creator_trx_id  表示生成该ReadView的事务的事务id  
-- 访问过程
-  - 如果被访问版本的trx_id属性值与ReadView中的creator_trx_id值相同，意味着当前事务在访问它自己修改过的记录，所以该版本可以被当前事务访问  
-  - 如果被访问版本的trx_id属性值小于ReadView中的min_trx_id值，表明生成该版本的事务在当前事务生成ReadView前已经提交，所以该版本可以被当前事务访问  
-  - 如果被访问版本的trx_id属性值大于或等于ReadView中的max_trx_id值，表明生成该版本的事务在当前事务生成ReadView后才开启，所以该版本不可以被当前事务访问
-  - 如果被访问版本的trx_id属性值在ReadView的min_trx_id和max_trx_id之间，那就需要判断一下trx_id属性值是不是在m_ids列表中，如果在，说明创建ReadView时生成该版本的事务还是活跃的，该版本不可以被访问；如果不在，说明创建ReadView时生成该版本的事务已经被提交，该版本可以被访问  
-- 生成时机  
-  - READ COMMITTED  每次读取数据前都生成一个ReadView  
-  - REPEATABLE READ  在第一次读取数据时生成一个ReadView  
+- 隔离性
+  - 并发问题  
+    - 脏写  
+      一个事务修改了另一个未提交事务修改过的数据，那就意味着发生了脏写  
+    - 脏读  
+      一个事务读到了另一个未提交事务修改过的数据，那就意味着发生了脏读   
+    - 不可重复读  
+      一个事务读到另一个已经提交的事务修改过的数据，并且其他事务每对该数据进行一次修改并提交后，该事务都能查询得到最新值，那就意味着发生了不可重复读  
+    - 幻读  
+      一个事务先根据某些条件查询出一些记录，之后另一个事务又向表中插入了符合这些条件的记录，原先的事务再次按照该条件查询时，能把另一个事务插入的记录也读出来，那就意味着发生了幻读
+  - 隔离级别  
+    - read uncommitted  未提交读
+    - read committed  已提交读   
+    - repeatable read  可重复读
+    - serializable  可串行化
+    | 隔离级别 | 脏读 | 不可重复读 | 幻读 |  
+    | :---: | :---: | :---: | :---: |
+    | read uncommitted | Possible | Possible | Possible |
+    | read committed | Not Possible | Possible | Possible |
+    | repeatable read | Not Possible | Not Possible | Possible |
+    | serializable | Not Possible | Not Possible | Not Possible |
+    - 设置隔离级别  
+      `show variables like 'transaction_isolation`  
+      `SET [GLOBAL|SESSION] TRANSACTION ISOLATION LEVEL level`
+      level: {
+          read uncommitted
+          read committed
+          repeatable read
+          serializable
+      }
+  - MVCC
+    - trx_id 
+      每次一个事务对某条聚簇索引记录进行改动时，都会把该事务的事务id赋值给trx_id隐藏列
+    - roll_pointer 
+      每次对某条聚簇索引记录进行改动时，都会把旧的版本写入到undo日志中，然后这个隐藏列就相当于一个指针，可以通过它来找到该记录修改前的信息  
+      记录每次更新后，都会将旧值放到一条undo日志中，就算是该记录的一个旧版本，随着更新次数的增多，所有的版本都会被roll_pointer属性连接成一个链表，我们把这个链表称之为版本链
+    - ReadView    
+      - m_ids  表示在生成ReadView时当前系统中活跃的读写事务的事务id列表  
+      - min_trx_id  表示在生成ReadView时当前系统中活跃的读写事务中最小的事务id，也就是m_ids中的最小值
+      - max_trx_id  表示生成ReadView时系统中应该分配给下一个事务的id值
+      - creator_trx_id  表示生成该ReadView的事务的事务id  
+    - 访问过程
+      - 如果被访问版本的trx_id属性值与ReadView中的creator_trx_id值相同，意味着当前事务在访问它自己修改过的记录，所以该版本可以被当前事务访问  
+      - 如果被访问版本的trx_id属性值小于ReadView中的min_trx_id值，表明生成该版本的事务在当前事务生成ReadView前已经提交，所以该版本可以被当前事务访问  
+      - 如果被访问版本的trx_id属性值大于或等于ReadView中的max_trx_id值，表明生成该版本的事务在当前事务生成ReadView后才开启，所以该版本不可以被当前事务访问
+      - 如果被访问版本的trx_id属性值在ReadView的min_trx_id和max_trx_id之间，那就需要判断一下trx_id属性值是不是在m_ids列表中，如果在，说明创建ReadView时生成该版本的事务还是活跃的，该版本不可以被访问；如果不在，说明创建ReadView时生成该版本的事务已经被提交，该版本可以被访问  
+    - 生成时机  
+      - READ COMMITTED  每次读取数据前都生成一个ReadView  
+      - REPEATABLE READ  第一次读取数据时生成一个ReadView  
+  - 常见问题
+    - 可重复读隔离级别，出现幻读的情况
+      - 快照读  
+        通过MVCC方式解决了幻读  
+        事务B插入记录，事务A更新了事务B插入的记录，事务A就能看到事务B插入的纪录了  
+      - 当前读  
+        通过next-key lock(记录锁+间隙锁)方式解决了幻读  
+        事务A先执行快照读，事务B插入一条记录，事务A再执行当前读  
 ```
 
 ## 存储结构 ##
@@ -780,35 +775,34 @@ redo日志刷新到磁盘的好处
 
 ## 锁 ##
 ```
-目的
-- 解决事务并发问题
-  事务并发问题
-  - 读-读  
-    无并发问题
-  - 写-写
-    - 并发问题
-      - 脏写  
-    - 解决
-      - 加锁    
-  - 读-写或写-读 
-    一个事务进行读取操作，另一个进行改动操作  
-    - 并发问题
-      - 脏读、不可重复读、幻读  
-    - 解决
-      - 读操作利用多版本并发控制（MVCC），写操作进行加锁
-      - 读、写操作都采用加锁的方式  
-分类
-- 共享锁，S锁
-- 独占锁，X锁
-兼容情况  
-| 兼容性 | X | S |
-| :---: | :---: | :---: |
-| X | 不兼容 | 不兼容 |
-| S | 不兼容 | 兼容 |
-
-
-加锁
-- 操作
+InnoDB存储引擎中的锁
+- 表级锁
+  - S锁
+  - X锁
+  - IS锁
+  - IX锁
+  - 自增锁
+    - AUTO-INC 
+      插入记录数量不定时使用，插入语句开始前上锁，插入数据结束释放锁
+    - 轻量级的锁
+      插入记录数量确定时，插入语句开始前上锁生成值，然后释放锁
+  | 兼容性 | X | IX | S | IS |
+  | :---: | :---: | :---: | :---: | :---: |
+  | X | 不兼容 | 不兼容 | 不兼容 | 不兼容 |
+  | IX | 不兼容 | 兼容 | 不兼容 | 兼容 |
+  | S | 不兼容 | 不兼容 | 兼容 | 兼容 |
+  | IS | 不兼容 | 兼容 | 兼容 | 兼容 |
+- 行级锁
+  - Record Locks
+  - Gap Locks
+    间隙锁和间隙锁是兼容的
+  - Next-Key Locks
+  - Insert Intention Locks
+    插入意向锁和任意锁是兼容的
+  - 隐式锁
+    一个事务对新插入的记录可以不显式的加锁，但是由于事务id的存在，相当于加了一个隐式锁
+    别的事务在对这条记录加S锁或者X锁时，由于隐式锁的存在，会先帮助当前事务生成一个锁结构，然后自己再生成一个锁结构后进入等待状态
+- 加锁
   - 读  
     - 对读取的记录加S锁 
       `SELECT ... LOCK IN SHARE MODE`
@@ -819,51 +813,12 @@ redo日志刷新到磁盘的好处
       查找记录加X锁，执行逻辑删除  
     - UPDATE
       - 不修改键值，原记录修改 
-        查找记录加X锁，进行修改
+        查找记录加X锁逻辑删除
       - 不修改键值，新记录修改 
         查找记录加X锁彻底删除，再insert
       - 修改键值 
-        先delete再insert
+        查找记录加X锁逻辑删除再insert
     - INSERT 
       不加锁  
-- 表  
-  - S锁
-  - X锁
-  - IS锁
-  - IX锁  
-  | 兼容性 | X | IX | S | IS |
-  | :---: | :---: | :---: | :---: | :---: |
-  | X | 不兼容 | 不兼容 | 不兼容 | 不兼容 |
-  | IX | 不兼容 | 兼容 | 不兼容 | 兼容 |
-  | S | 不兼容 | 不兼容 | 兼容 | 兼容 |
-  | IS | 不兼容 | 兼容 | 兼容 | 兼容 |
 
 
-InnoDB存储引擎中的锁
-- 表级锁
-  - S锁、 X锁
-  - IS锁、IX锁
-  - 自增锁
-    - AUTO-INC 
-      插入记录数量不定时使用，插入语句开始前上锁，插入数据结束释放锁
-    - 轻量级的锁
-      插入记录数量确定时，插入语句开始前上锁生成值，然后释放锁
-- 行级锁
-  - Record Locks
-  - Gap Locks
-  - Next-Key Locks
-  - Insert Intention Locks
-  - 隐式锁
-    一个事务对新插入的记录可以不显式的加锁，但是由于事务id的存在，相当于加了一个隐式锁。
-    别的事务在对这条记录加S锁或者X锁时，由于隐式锁的存在，会先帮助当前事务生成一个锁结构，然后自己再生成一个锁结构后进入等待状态。  
-- 锁定读加锁过程
-  - 语句
-    - SELECT ... LOCK IN SHARE MODE
-    - SELECT ... FOR UPDATE
-    - UPDATE ...
-    - DELETE ...
-  - 隔离级别
-    - READ UNCOMMITTED & READ COMMITTED
-      记录加锁，间隙不加锁
-    - REPEATABLE READ
-      记录加锁，间隙加锁

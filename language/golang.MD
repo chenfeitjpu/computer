@@ -138,6 +138,8 @@
   - net
   - sync
   - runtime
+    Go语言的运行时系统，提供了与底层系统交互和控制的功能。它包含了与内存管理、垃圾回收、协程调度等相关的函数和变量
+    - runtime.NumGoroutine()
   - unsafe
     - unsafe.SizeOf
       获取变量占用内存大小
@@ -221,6 +223,8 @@ slice
 
 map
 - 使用
+  - 概念
+    map是一种无序的键值对集合，也称为字典。map中的键必须是唯一的，而值可以重复。map提供了快速的查找和插入操作，适用于需要根据键快速检索值的场景。
   - 声明  
     - var name map[type]type 
     - name := make(map[type]type, [cap])  
@@ -302,6 +306,8 @@ map
   - sync.Map
     - sync.Map适用于读多、更新多、删多、写少的场景  
     - 倘若写操作过多，sync.Map基本等价于互斥锁+map  
+- 有序实现
+  创建切片保存键值，进行排序，然后遍历切片
 
 sync.map
 - 使用
@@ -379,10 +385,23 @@ func
 - 闭包
   - 函数内部变量离开其作用域后始终保持在内存中而不被销毁
 - defer
-  延迟函数
-  - 延迟函数的参数在defer声明时就决定了
-  - 多个defer语句，按照先进后出的方式执行
-  - return赋值 执行defer return返回
+  - 作用
+    延迟函数的执行，即在函数退出前执行某个操作。defer通常用于解锁、关闭文件，释放资源等清理操作
+  - 示例
+    file, err := os.Open("test.txt")
+	if err != nil {
+		return
+	}
+	defer func() {
+		err := file.Close()
+		if err != nil {
+			return
+		}
+	}()   
+  - 注意事项
+    - 参数在defer声明时就决定了
+    - 多个defer语句，按照先进后出的方式执行
+    - return赋值->执行defer->return返回
 - init  
   import->const->var->init->main
   - 一个包里可以包含多个init函数
@@ -441,6 +460,17 @@ interface
   }
 
 pointer
+- 作用
+  指针是一种变量，存储了另一个变量的内存地址。通过指针，我们可以直接访问和修改变量的值，而不是对变量进行拷贝
+- 示例
+  func swap(a, b *int) {
+      *a, *b = *b, *a
+  }
+  func main() {
+      x, y := 10, 20
+      swap(&x, &y)
+      fmt.Println(x, y)
+  }
 - 使用
   - &取址
   - *取值
@@ -471,8 +501,23 @@ reflect
   - reflect实现里面有大量的枚举，也就是for循环，比如类型之类的
 
 error&panic&recover
-- panic
-  - 无法捕获的panic
+- error
+- panic & recover
+  - 作用
+    当程序遇到无法处理的错误时，可以使用panic引发一个异常，中断程序的正常执行  
+    recover用于捕获并处理panic引发的异常，使程序能够继续执行
+  - 示例
+    func divide(a, b int) int {
+        defer func() {
+            if err := recover(); err != nil {
+                fmt.Println("Error: ", err)
+            }
+        }()
+        if b == 0 {
+            panic("division by zero")
+        }
+        return a / b
+    }
 
 类型转换
 - 类型转换
@@ -577,6 +622,21 @@ make & new
     - 如果mheap中也没有合适大小的mspan，则向操作系统申请
 
 垃圾回收
+- 作用
+  Go语言中的垃圾回收器是自动管理内存的机制，用于回收不再使用的内存。垃圾回收器会自动检测不再使用的对象，并释放其占用的内存空间。
+- 示例
+  func createObject() {
+      for i := 0; i < 1000000; i++ {
+          _ = make([]byte, 1024)
+      }
+  }
+  func main() {
+      go createObject()
+      time.Sleep(1 * time.Second)
+      var stats runtime.MemStats
+      runtime.ReadMemStats(&stats)
+      fmt.Println("alloc memory ", stats.Alloc)
+  }
 - 常见算法
   - 标记清扫
     - 流程
@@ -680,28 +740,62 @@ make & new
 
 ## 并发 ##
 ```
+并发安全性
+- 概念
+  多个goroutine对共享资源的访问不会导致数据竞争
+- 实现
+  - Mutex & RWMutex
+  - automic
+  - channel
 组件
 - goroutine
-  同时运行的函数
+  - 概念
+    go语言的并发执行单元
   - 使用
-    - go func(){}
-  - 退出
-    通过向goroutine发送一个信号通道来停止它告知检查时响应信号，
+    func test() {
+        fmt.Println("hello test")
+    }
+    func main() {
+        go test()
+        fmt.Println("hello main")
+        time.Sleep(time.Second)
+    }
 
-- waitGroup
-  - wg := &sync.WaitGroup{}
-  - wg.Add()
-  - wg.Done()
-  - wg.Wait()
-- channel
+- WaitGroup
+  - 概念
+    同步等待组
   - 使用
-    - 声明
-      - 只读通道
-        <- ch
-      - 只写通道
-        ch <-
-      - 双向通道
-        ch
+    wg := sync.WaitGroup{}
+    wg.Add()
+    wg.Done()
+    wg.Wait()
+
+- channel
+  - 作用
+    用于在goroutine之间进行通信和同步的机制
+  - 使用
+    - 只读通道
+      <- ch
+    - 只写通道
+      ch <-
+    - 双向通道
+      ch
+  - 示例
+    func fibonacci(n int, ch chan int) {
+        x, y := 0, 1
+        for i := 0; i < n; i++ {
+            ch <- x
+            x, y = y, x+y
+        }
+        close(ch)
+    }
+    func main() {
+        ch := make(chan int)
+        go fibonacci(10, ch)
+        for num := range ch {
+            fmt.Println(num)
+        }
+    }
   - 结构
     type hchan struct {
   	    qcount   uint           // total data in the queue
@@ -748,17 +842,70 @@ make & new
     |    读 <-ch     |     阻塞     | 成功或阻塞  |    读到零值     |
     |    写 ch<-     |     阻塞     | 成功或阻塞  |      panic      |
     | 关闭 close(ch) |    panic     |    成功     |      panic      |
-  - select
-    - 作用
-      监听多个channel
+
+- select
+  - 作用
+    同时监听多个通道的读写操作，并在其中任意一个通道就绪时执行相应的操作
+  - 示例
+    func main() {
+        ch1 := make(chan int)
+        ch2 := make(chan int)
+        go func() {
+            ch1 <- 10
+        }()
+        go func() {
+            ch2 <- 20
+        }()
+        select {
+        case num := <-ch1:
+            fmt.Println("receive from ch1 ", num)
+        case num := <-ch2:
+            fmt.Println("receive from ch2", num)
+        }
+    } 
+  - 注意事项 
     - 通道关闭
       如果其中一个case通道已经关闭，则每次都会执行到这个case  
       如果select里边只有一个case，而这个case被关闭了，则会出现死循环  
     - 不读关闭后通道
       将关闭通道置为nil
-- mutex
-  - 互斥锁  sync.Mutex
-  - 读写互斥锁  sync.RWMutex
+
+- 锁
+  - 作用
+    限制对共享资源的并发访问
+  - 互斥锁(sync.Mutex)  
+    var (
+        counter int
+        mu      sync.Mutex
+    )
+    func increment() {
+        defer mu.Unlock()
+        mu.Lock()
+        counter++
+    }
+    func main() {
+        wg := &sync.WaitGroup{}
+        for i := 0; i < 1000; i++ {
+            wg.Add(1)
+            go func() {
+                defer wg.Done()
+                increment()
+            }()
+        }
+        wg.Wait()
+        fmt.Println(counter)
+    }
+  - 读写锁(sync.RWMutex)
+    rmu := sync.RWMutex{}
+	defer rmu.RUnlock()
+	rmu.RLock()
+
+- 原子操作
+  - 作用
+    保证单个指令操作的原子性
+  - 与锁的区别
+    - 原子操作适用于对单个变量的读写操作，具有较低的性能开销
+    - 锁适用于对一组操作的访问进行同步，具有更高的性能开销
 
 - context
   - 作用
@@ -829,6 +976,11 @@ make & new
       Get
     - 添加
       Put
+
+- 自旋
+  - 概念
+    线程在等待某个条件满足时，不会进入休眠或阻塞状态，而是通过不断地检查条件是否满足来进行忙等待
+    可以减少线程切换的开销，但会导致CPU资源的浪费
 
 GMP
 - 思想
