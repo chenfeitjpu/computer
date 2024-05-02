@@ -14,56 +14,67 @@
 ## 基础语法 ##
 ```
 优势
-- 支持高并发
-- 高效的垃圾回收，与程序并发执行
+- 支持高并发，使用关键字go可以轻松的创建goroutine
+- 高效的垃圾回收，GC与程序并发执行
 
 常用命令
-- go build
-  编译包和依赖
-- go run
-  编译和运行程序
-- go install
-  编译和安装包和依赖
-- go get
-  下载和安装包和依赖
-- go clean
-  移除对象文件和缓存文件
-- go fmt
-  格式化源码包
-- go test
-  运行测试包
-- go vet
-  报告代码错误
+- go build  编译包和依赖
+- go run  编译和运行程序
+- go install  编译和安装包和依赖
+- go get  下载和安装包和依赖
+- go clean  移除对象文件和缓存文件
+- go fmt  格式化源码包
+- go test  运行测试包
+- go vet  报告代码错误
+
+常用包
+- fmt  提供了输入输出的格式化功能
+  - fmt.Print、fmt.Println、fmt.Printf  标准输出
+    - %v  输出值
+    - %+v  输出属性和值
+    - %#v  输出值的GO语法表示
+  - fmt.Sprint、fmt.Sprintln、fmt.Sprintf  输出到字符串
+  - fmt.Fprint、fmt.Fprintln、fmt.Fprintf  输出到文件
+- math  提供了数学函数和常量的功能
+- math/rand  提供了随机数生成的功能
+- strings  提供了字符串处理的功能
+- strconv  提供了基本数据类型与其字符串表示的转换功能
+- time  提供了时间和日期的功能
+- sort  提供了排序功能
+- net  提供了网络编程的功能
+- sync  提供了同步原语的功能，原语在执行过程中不允许中断
+- runtime  Go语言的运行时系统，提供了与底层系统交互和控制的功能。它包含了与内存管理、垃圾回收、协程调度等相关的函数和变量
+  - runtime.NumGoroutine()
+- unsafe  提供了一些不安全的编程操作，如直接操作指针、修改内存等
+  - unsafe.SizeOf  获取变量占用内存大小
 
 变量
 - 使用
-  - 声明  
-    - var name [type] [= expression]  
-    - var name, name [type] [= expression, expression]  
-    - var (  
-          name [type] [= expression]  
-          name [type] [= expression]  
-      )
-    - name := value
-- 注意事项
+  - var name [type] [= expression]  
+  - var name, name [type] [= expression, expression]  
+  - var (  
+        name [type] [= expression]  
+        name [type] [= expression]  
+    )
+  - name := value
   - _不会分配内存
+- 注意事项
   - 变量类型转换时允许溢出
 
 常量
-常量数据类型只能是数值型（整数型、浮点型和复数）、字符串型、布尔型  
+常量数据类型只能是数值型(整数型、浮点型和复数)、字符串型、布尔型  
 - 使用
-  - 声明
-    - const name [type] = expression
-    - const name [type], [type] = expression, expression
-    - const (  
-          name [type] = expression  
-          name [type] = expression    
-      )
-      常量定义与前一行的定义一致，则可以省略类型和值
-    - iota    
+  - const name [type] = expression
+  - const name [type], [type] = expression, expression
+  - const (  
+        name [type] = expression  
+        name [type] = expression    
+    )
+    常量定义与前一行的定义一致，则可以省略类型和值
+  - iota    
 - 注意事项
-  - 不能取址
   - 无类型常量可通过字面量转换为对应类型的变量
+  - 不能取址
   - 常量类型转换时不允许溢出
 
 数据类型
@@ -79,114 +90,66 @@
   - func 
   - pointer uintptr
 - 引用类型 
-  slice map channel func interface  
+  slice、map、channel、func、interface 
 - 类型比较
-  - 静态类型
-    - 不同类型不能比较
-    - 不可比较类型不能比较
-  - 动态类型
-    - 一个接口覆盖另一个接口的所有方法，且不是同一种不可比较类型
+  - 不同类型不能比较
+  - 不可比较类型不能比较
+  - 一个接口覆盖另一个接口的所有方法，且不是同一种不可比较类型
 
 运算符
-- 算术运算符  
-  + - * / % ++ --
-- 关系运算符
-  > >= < <= == != 
-- 逻辑运算符 
-  && || !
-- 位运算符
-  & | ^  << >>
-- 赋值运算符 
-  =
+- 算术运算符  +、-、*、/、%、++、--
+- 关系运算符  >、>=、<、<=、==、!= 
+- 逻辑运算符  &&、||、!
+- 位运算符  &、|、^、&^、<<、>>
 
 流程控制 
 - 选择
   - if else if else
   - switch case fallthrough
 - 循环
+  - for index break continue
   - for range break continue
 - 跳转
   - goto
     - 只能在函数内跳转，需要配合标签一起使用
     - 不能跳过内部变量声明语句
     - 只能跳到同级作用域或者上层作用域内，不能跳到内部作用域内
-
-包
-- 常用
-  - fmt
-    - 标准输出
-      - fmt.Print
-      - fmt.Println
-      - fmt.Printf
-        - %v  
-          对于结构体，只打印值
-        - %+v  
-          对于结构体，打印属性和值
-    - 输出到字符串
-      - fmt.Sprint()
-      - fmt.Sprintln()
-      - fmt.Sprintf()
-    - 输出到文件
-      - fmt.Fprint
-      - fmt.Fprintln
-      - fmt.Fprintf
-  - math 
-  - rand
-  - strings
-  - strconv
-  - sort
-  - net
-  - sync
-  - runtime
-    Go语言的运行时系统，提供了与底层系统交互和控制的功能。它包含了与内存管理、垃圾回收、协程调度等相关的函数和变量
-    - runtime.NumGoroutine()
-  - unsafe
-    - unsafe.SizeOf
-      获取变量占用内存大小
 ```
 
 ## 数据结构 ##
 ```
 string 
-- 结构
+- 运行时结构
   type StringHeader struct {
       Data uintptr
-     Len  int
+      Len  int
   }
 - 注意事项
   - string不能修改
   - 转换成[]byte会发生内存拷贝
-    - 不发生拷贝
-      *(*[]byte)(unsafe.Pointer(&a))
+    - 不发生拷贝*(*[]byte)(unsafe.Pointer(&a))
 
 array
+固定长度集合
 - 使用
-  - 声明
-    - var name = [size]type{}
-    - var name = [...]type{value}
-    - var name = [...]type{index:value}
-  - 遍历  
-    - for index
-    - for range
-  - 多维数组   
-    - var name [size][size]type
+  - [size]T{}
+  - [...]T{}
+  - [...][size]T
+  - for index
+  - for range 
 - 注意事项
-  - 多维数组只有第一层可以使用...来让编译器推导数组长度
+  - 多维数组只有第一层可以使用[...]来让编译器推导数组长度
   - 数组是值类型，赋值和传参会复制整个数组
 
 slice
+可变长度集合
 - 使用
-  - 声明  
-    - var name = []type{}
-    - name := make([]type, length, capacity)
+  - []T{}
+  - make([]T, length[, capacity])
   - append
   - copy
-  - 切片表达式
-    - a[low : high : max]  
-      0 <= low <= high <= max <= cap(a) 
-      high默认是len(a)
-  - 遍历
-    for range在循环开始前会获取切片的长度，然后再执行len(切片)次数的循环  
+  - a[low:high:max]  0 <= low <= high <= max <= cap(a)，high默认是len(a)
+  - for range  在循环开始前会获取切片的长度，然后再执行len(切片)次数的循环  
 - 结构
   type slice struct {
       array unsafe.Pointer
@@ -202,39 +165,32 @@ slice
     - 如果新申请容量比两倍原有容量大，那么扩容后容量大小为新申请容量
     - 如果原有slice长度小于1024，那么就扩容为原来的2倍
     - 如果原有slice长度大于等于1024，那么每次扩容就扩为原来的1.25倍，直到新容量大于期望容量
-    - 内存对齐(size_to_class&class_to_size)
-      CPU以字长访问内存，如果不进行内存对齐，很可能增加CPU访问内存的次数
+    - 内存对齐(size_to_class&class_to_size)  CPU以字长访问内存，如果不进行内存对齐，很可能增加CPU访问内存的次数
   - 1.18及以后
     - 如果新申请容量比两倍原有容量大，那么扩容后容量大小为新申请容量
     - 如果原有slice长度小于256，那么就扩容为原来的2倍
     - 如果原有slice长度大于等于256，那么每次扩容就扩为原来的1.25倍+3/4*256，直到新容量大于期望容量
-    - 内存对齐(size_to_class&class_to_size)
-      CPU以字长访问内存，如果不进行内存对齐，很可能增加CPU访问内存的次数
+    - 内存对齐(size_to_class&class_to_size)  CPU以字长访问内存，如果不进行内存对齐，很可能增加CPU访问内存的次数
 - 注意事项
-  - 扩容前后的slice是否相同
-    - 相同 
-      原数组还有容量可以扩容
-    - 不同 
-      原数组容量不够
+  - 扩容前后的slice是否相同，原数组还有容量可以扩容则相同，原数组容量不够则不同
   - nil切片 & 空切片
     - nil切片引用数组指针地址为0(无指向任何实际地址)
     - 空切片引用数组指针地址是有的，且固定为一个值
   - 拷贝大切片跟小切片的代价是一样的
 
 map
-- 使用
-  - 概念
-    map是一种无序的键值对集合，也称为字典。map中的键必须是唯一的，而值可以重复。map提供了快速的查找和插入操作，适用于需要根据键快速检索值的场景。
-  - 声明  
-    - var name map[type]type 
-    - name := make(map[type]type, [cap])  
-  - 删除
-    - delete(map, key)
+一种无序的键值对集合，也称为字典。map中的键必须是唯一的，而值可以重复。map提供了快速的查找和插入操作，适用于需要根据键快速检索值的场景。
+- 使用 
+  - map[T]T 
+  - make(map[T]T[, cap])  
+  - delete(map, key)
 - 特点
   - 无序
     - 添加时无序
     - 扩容时发生key的搬迁
     - 读取时从一个随机序号的bucket开始遍历，并且是从这个bucket的一个随机序号的cell开始遍历
+  - 有序实现
+    创建切片保存键值，进行排序，然后遍历切片
 - 结构
   type hmap struct {
       // 元素个数，调用 len(map) 时，直接返回此值
@@ -262,6 +218,13 @@ map
       pad      uintptr
       overflow uintptr
   }
+- 定位
+  - 查找
+  - 计算key的hash值
+  - 通过最后的B位来确定桶号
+  - 根据key对应的hash值前8位快速确定是在这个桶的哪个位置
+  - 对比key是否匹配
+  - 如果都没有找到，就去连接的下一个溢出桶中找
 - 扩容
   - 条件
     - 等量扩容(桶中空位过多)
@@ -270,44 +233,31 @@ map
     - 双倍扩容(桶不够用了)
       - 装载因子>6.5
         装载因子=count/(2^B) map中元素的个数/map中当前桶的个数
-  - 实现
+  - 操作
     - minTopHash
       当一个cell的tophash值小于minTopHash时，标志这个cell的迁移状态
-      - 0
-        空的cell，也是初始时bucket的状态
-      - 1
-        cell已经搬迁完毕，空cell
-      - 2
-        cell已经搬迁完毕，key在新bucket前半部分
-      - 3
-        cell已经搬迁完毕，key在新bucket后半部分
-    - 新增｜修改
+      - 0  空的cell，也是初始时bucket的状态
+      - 1  cell已经搬迁完毕，空cell
+      - 2  cell已经搬迁完毕，key在新bucket前半部分
+      - 3  cell已经搬迁完毕，key在新bucket后半部分
+    - 新增|修改
       定位到了某个bucket后，直接触发一次搬迁操作
     - 删除  
       定位到了某个bucket后，直接触发一次搬迁操作
     - 遍历
       定位到某个bucket后，通过新桶找旧桶，旧桶已经迁移，直接遍历新桶，旧桶没有迁移，遍历旧桶中会分到新桶中的元素
-- 实现
-  - 查找
-    - 计算key的hash值
-    - 通过最后的B位来确定桶号
-    - 根据key对应的hash值前8位快速确定是在这个桶的哪个位置
-    - 对比key是否匹配
-    - 如果都没有找到，就去连接的下一个溢出桶中找
-  - 赋值
+- 操作
+  - 新增|修改
     查找key，进行修改或者新增
   - 删除  
     查找key，对key和value进行清空
   - 遍历
-    - 遍历所有的bucket以及它后面挂的overflow bucket  
-    - 遍历bucket中的所有cell  
+    遍历所有的bucket以及它后面挂的overflow bucket，遍历bucket中的所有cell  
 - 线程安全
   - map+sync.RWMutex
   - sync.Map
     - sync.Map适用于读多、更新多、删多、写少的场景  
     - 倘若写操作过多，sync.Map基本等价于互斥锁+map  
-- 有序实现
-  创建切片保存键值，进行排序，然后遍历切片
 
 sync.map
 - 使用
@@ -359,34 +309,32 @@ sync.map
       - 遍历read，取出entry 中的值，调用f(k, v)      
 
 struct
+多个类型的集合
 - 使用
-  - 声明
+  - 定义
     type name struct {  
         name type 
         name type  
     }
+  - tag  丰富语义
+    - 转json
+      - 小写字段不能转
+      - 大写字段加了tag取别名，不加tag则json内的字段跟结构体字段原名一致
+- 扩展
   - 嵌套结构体
   - 匿名结构体
   - 空结构体
     不占内存，占位使用
-  - tag  
-    丰富语义
-    - 转json
-      - 小写字段不能转
-      - 大写字段加了tag取别名，不加tag则json内的字段跟结构体字段原名一致
 
-func 
+func  
+多个操作的集合
 - 使用
-  - 声明  
-    func name(parameter type, parameter type) ([output] type, [output] type) {
-        return value, value
-    }
-    - 返回值要么同时命名，要么不命名
-- 闭包
-  - 函数内部变量离开其作用域后始终保持在内存中而不被销毁
-- defer
-  - 作用
-    延迟函数的执行，即在函数退出前执行某个操作。defer通常用于解锁、关闭文件，释放资源等清理操作
+  func name(parameter type, parameter type) ([output] type, [output] type) {
+      return value, value
+  }
+  - 返回值要么同时命名，要么不命名
+- 闭包  函数内部变量离开其作用域后始终保持在内存中而不被销毁
+- defer  延迟函数的执行，即在函数退出前执行某个操作。defer通常用于解锁、关闭文件，释放资源等清理操作
   - 示例
     file, err := os.Open("test.txt")
 	if err != nil {
@@ -406,37 +354,23 @@ func
   import->const->var->init->main
   - 一个包里可以包含多个init函数
   - 程序运⾏时，先执⾏依赖包的init函数，再执⾏当前包内的init函数
-  - init 函数可以被其他函数调⽤
+  - init函数不可以被其他函数调⽤
 
 method
 - 使用
-  - 声明
-    func (name type) name(parameter type, parameter type) ([output] type, [output] type) {
-        return value, value
-    }
-  - 调用
-    - object.method()
+  func (name type) name(parameter type, parameter type) ([output] type, [output] type) {
+      return value, value
+  }
+  - object.method()
 - 注意事项
-  - 类型T不能调用*T的方法
-    不可寻址
-    - 常量
-    - 字符串中的直接
-    - map对象中的元素
+  - 对于不可寻址的类型T，不能调用*T的方法
 
 interface
 - 使用
-  - 声明
-    type name interface {  
-        name(name type) type  
-        name(name type) type  
-   }
-- 注意事项
-  - 对于T类型的接口，可以使用T类型的方法
-  - 对于*T类型的接口，可以使用T和*T类型的方法
-
-- 类型断言
-  - i.(T)
-  - i.(type)
+  type name interface {  
+      name(name type) type  
+      name(name type) type  
+  }
 - 结构
   //非空接口
   type iface struct {
@@ -458,10 +392,26 @@ interface
       _type *_type  // 实体类型
       data  unsafe.Pointer
   }
+- 类型断言
+  - i.(T)
+  - i.(type)
+- 注意事项
+  - 对于T类型的接口，可以使用T类型的方法
+  - 对于*T类型的接口，可以使用T和*T类型的方法
 
 pointer
-- 作用
-  指针是一种变量，存储了另一个变量的内存地址。通过指针，我们可以直接访问和修改变量的值，而不是对变量进行拷贝
+指针是一种变量，存储了另一个变量的内存地址。通过指针，我们可以直接访问和修改变量的值，而不是对变量进行拷贝
+- 使用
+  - &取址
+    - 不可寻址的类型
+      - 常量
+      - 字符串中的直接
+      - map对象中的元素
+  - *取值
+- 分类 
+  - 普通指针  *T
+  - 通用指针  unsafe.Pointer
+  - 指针地址  uintptr
 - 示例
   func swap(a, b *int) {
       *a, *b = *b, *a
@@ -471,13 +421,6 @@ pointer
       swap(&x, &y)
       fmt.Println(x, y)
   }
-- 使用
-  - &取址
-  - *取值
-- 分类 
-  - 普通指针  *T
-  - 通用指针  unsafe.Pointer
-  - 指针地址  uintptr
 - 比较
   - unsafe.Pointer只是单纯的通用指针类型，用于转换不同类型指针，它不可以参与指针运算
   - uintptr是用于指针运算的，GC不把uintptr当指针，也就是说uintptr无法持有对象，uintptr类型的目标会被回收
@@ -485,8 +428,7 @@ pointer
   - unsafe.Pointer可以和uintptr进行相互转换
 
 reflect
-- 作用 
-  - 程序在运行的时候能够观察并且修改自己的行为
+程序在运行的时候能够观察并且修改自己的行为
 - 使用
   - reflect.TypeOf()
   - reflect.Type.Field()
@@ -503,9 +445,8 @@ reflect
 error&panic&recover
 - error
 - panic & recover
-  - 作用
-    当程序遇到无法处理的错误时，可以使用panic引发一个异常，中断程序的正常执行  
-    recover用于捕获并处理panic引发的异常，使程序能够继续执行
+  当程序遇到无法处理的错误时，可以使用panic引发一个异常，中断程序的正常执行  
+  recover用于捕获并处理panic引发的异常，使程序能够继续执行
   - 示例
     func divide(a, b int) int {
         defer func() {
@@ -518,12 +459,6 @@ error&panic&recover
         }
         return a / b
     }
-
-类型转换
-- 类型转换
-  T(v)
-- 类型检查
-  switch v.(type)
 ```
 
 ## 内存管理 ##
@@ -750,7 +685,7 @@ make & new
 组件
 - goroutine
   - 概念
-    go语言的并发执行单元
+    go语言的并发执行单元，可以同时执行多个goroutine，而不需要显式地管理线程的生命周期
   - 使用
     func test() {
         fmt.Println("hello test")
@@ -872,7 +807,7 @@ make & new
 
 - 锁
   - 作用
-    限制对共享资源的并发访问
+    一种并发编程中常用的同步机制，用于保护共享资源的访问
   - 互斥锁(sync.Mutex)  
     var (
         counter int
@@ -900,12 +835,25 @@ make & new
 	defer rmu.RUnlock()
 	rmu.RLock()
 
-- 原子操作
+- atomic
   - 作用
-    保证单个指令操作的原子性
+    并发编程中常用的一种同步机制，保证单个指令操作的原子性
+  - 使用
+  	- atomic.StoreInt64()
+	- atomic.LoadInt64()
+	- atomic.AddInt64()
+	- atomic.SwapInt64()
+	- atomic.CompareAndSwapInt64()
   - 与锁的区别
-    - 原子操作适用于对单个变量的读写操作，具有较低的性能开销
-    - 锁适用于对一组操作的访问进行同步，具有更高的性能开销
+    - 粒度
+      - 原子操作通常是针对单个变量或内存位置的操作
+      - 锁通常是针对一段代码或一组操作的访问进行同步      
+    - 使用方式
+      - 原子操作是通过硬件指令或特定的原子操作函数来实现的，可以直接应用于变量或内存位置，而无需额外的代码
+      - 锁是通过编程语言提供的锁机制来实现的，需要显式地使用锁的相关方法或语句来保护临界区的访问
+    - 性能开销
+      - 原子操作通常具有较低的性能开销，因为它们是在硬件级别上实现的，无需额外的同步机制
+      - 锁通常具有较高的性能开销，因为它们需要进行上下文切换和线程同步等操作
 
 - context
   - 作用
