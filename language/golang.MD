@@ -4,7 +4,7 @@
   - [基础语法](#基础语法)
   - [数据结构](#数据结构)
   - [内存管理](#内存管理)
-  - [并发](#并发)
+  - [并发控制](#并发控制)
 - [学习资料](#学习资料)
 
 # 定义 #
@@ -459,30 +459,27 @@ error&panic&recover
         }
         return a / b
     }
+  - 注意事项
+    - 子协程的panic会导致主协程退出
+    - 子协程的panic，主协程无法捕获
 ```
 
 ## 内存管理 ##
 ```
 make & new
-- make 
-  - 为slice、map、channel分配内存并初始化
-  - 返回值类型
-- new 
-  - 为任意类型分配内存
-  - 返回引用类型
+- make  为slice、map、channel分配内存并初始化，返回值
+- new  为任意类型分配内存，返回指针
 
 逃逸分析
-- 现象
-  分析内存分配地址是栈还是堆
+分析内存是分配在栈上还是堆上
 - 场景
   - 指针被作用域之外所引用
-  - 无法确定其具体的类型
+  - 变量类型不确定(如接口)
   - 变量大小不确定(如slice长度或容量不定)
   - 变量较大(栈空间不足)
 
 内存分配
-- 核心思想(TCMalloc)
-  把内存分为多级管理，从而降低锁的粒度  
+- 核心思想(TCMalloc)  把内存分为多级管理，从而降低锁的粒度  
   - mheap  全局的内存起源，访问要加全局锁
   - mcentral  每种对象大小规格(全局共划分为68种)对应的缓存，锁的粒度也仅限于同一种规格以内
   - mcache  每个P(正是GMP中的P)持有一份的内存缓存，访问时无锁
@@ -491,9 +488,7 @@ make & new
   - bitmap  16G  标识arena区域哪些地址保存了对象 一个byte大小的内存对应arena区域中4个指针大小(指针大小为8B)的内存
   - spans  512M  存放mspan指针，每个指针对应一页
 - 内存管理组件
-  - mspan
-    - 作用 
-      由一片连续的8KB的页组成的大块内存
+  - mspan  由一片连续的8KB的页组成的大块内存
     - 结构
       type mspan struct {
           //链表前向指针，用于将span链接起来
@@ -515,16 +510,12 @@ make & new
           // class表中的对象大小，也即块大小
           elemsize uintptr 
       }
-  - mcache
-    - 作用
-      每个工作线程都会绑定一个mcache，缓存可用的mspan资源，包含68*2个mspan
+  - mcache  每个工作线程都会绑定一个mcache，缓存可用的mspan资源，包含68*2个mspan
     - 结构
       type mcache struct {
           alloc [numSpanClasses]*mspan 
       }
-  - mcentral
-    - 作用
-      为所有mcache提供mspan资源  
+  - mcentral  为所有mcache提供mspan资源  
     - 结构
       type mcentral struct {
           // 互斥锁
@@ -538,18 +529,14 @@ make & new
           // 已累计分配的对象个数
           nmalloc uint64 
       }
-  - mheap
-    - 作用
-      当mcentral没有空闲的mspan时，会向mheap申请, mheap没有资源时，会向操作系统申请新内存, mheap主要用于大对象的内存分配，以及管理未切割的mspan，用于给mcentral切割成小对象，包含68*2个mcentral
+  - mheap  当mcentral没有空闲的mspan时，会向mheap申请, mheap没有资源时，会向操作系统申请新内存, mheap主要用于大对象的内存分配，以及管理未切割的mspan，用于给mcentral切割成小对象，包含68*2个mcentral
 - 分配条件
-  - new(T)
+  - 字面量
   - make(T)
-  - &T{}
+  - new(T)
 - 分配流程  
-  - >32KB的对象
-    直接从mheap上分配  
-  - <=16B的对象(不含指针)
-    使用mcache的tiny分配器分配  
+  - >32KB的对象  直接从mheap上分配  
+  - <=16B的对象(不含指针)  使用mcache的tiny分配器分配  
   - (16B,32KB]的对象
     - 首先计算对象的规格大小，然后使用mcache中相应规格大小的mspan分配
     - 如果mcache没有相应规格大小的mspan，则向mcentral申请
@@ -673,7 +660,7 @@ make & new
     - 回收未标记对象
 ```
 
-## 并发 ##
+## 并发控制 ##
 ```
 并发安全性
 - 概念
@@ -682,10 +669,10 @@ make & new
   - Mutex & RWMutex
   - automic
   - channel
+
 组件
 - goroutine
-  - 概念
-    go语言的并发执行单元，可以同时执行多个goroutine，而不需要显式地管理线程的生命周期
+  go语言的并发执行单元，可以同时执行多个goroutine，而不需要显式地管理线程的生命周期
   - 使用
     func test() {
         fmt.Println("hello test")
@@ -696,25 +683,59 @@ make & new
         time.Sleep(time.Second)
     }
 
-- WaitGroup
-  - 概念
-    同步等待组
-  - 使用
-    wg := sync.WaitGroup{}
-    wg.Add()
-    wg.Done()
-    wg.Wait()
+- 锁  并发编程中一种同步机制，用于保护共享资源的访问
+  - 互斥锁(sync.Mutex)  同一时刻只能有一个协程持有锁
+    - 示例
+      var (
+          counter int
+          mu      sync.Mutex
+      )
+      func increment() {
+          defer mu.Unlock()
+          mu.Lock()
+          counter++
+      }
+      func main() {
+          wg := &sync.WaitGroup{}
+          for i := 0; i < 1000; i++ {
+              wg.Add(1)
+              go func() {
+                  defer wg.Done()
+                  increment()
+              }()
+          }
+          wg.Wait()
+          fmt.Println(counter)
+      }
+  - 读写锁(sync.RWMutex)  同一时刻只能有一个协程持有写锁，或者多个协程持有读锁
+    - 示例
+      rmu := sync.RWMutex{}
+	  defer rmu.RUnlock()
+	  rmu.RLock()
 
-- channel
-  - 作用
-    用于在goroutine之间进行通信和同步的机制
+- atomic  并发编程中的一种同步机制，保证单个指令操作的原子性
   - 使用
-    - 只读通道
-      <- ch
-    - 只写通道
-      ch <-
-    - 双向通道
-      ch
+  	- atomic.StoreInt64()
+	- atomic.LoadInt64()
+	- atomic.AddInt64()
+	- atomic.SwapInt64()
+	- atomic.CompareAndSwapInt64()
+  - 与锁的区别
+    - 访问粒度
+      - 原子操作通常是针对单个变量或内存位置的操作
+      - 锁通常是针对一段代码或一组操作的访问进行同步      
+    - 使用方式
+      - 原子操作是通过硬件指令或特定的原子操作函数来实现的，可以直接应用于变量或内存位置，而无需额外的代码
+      - 锁是通过编程语言提供的锁机制来实现的，需要显式地使用锁的相关方法或语句来保护临界区的访问
+    - 性能开销
+      - 原子操作通常具有较低的性能开销，因为它们是在硬件级别上实现的，无需额外的同步机制
+      - 锁通常具有较高的性能开销，因为它们需要进行上下文切换和线程同步等操作
+
+- channel  用于在goroutine之间进行通信和同步的机制
+  - 使用
+    - 只读通道  <- ch
+    - 只写通道  ch <-
+    - 双向通道  ch
   - 示例
     func fibonacci(n int, ch chan int) {
         x, y := 0, 1
@@ -778,9 +799,7 @@ make & new
     |    写 ch<-     |     阻塞     | 成功或阻塞  |      panic      |
     | 关闭 close(ch) |    panic     |    成功     |      panic      |
 
-- select
-  - 作用
-    同时监听多个通道的读写操作，并在其中任意一个通道就绪时执行相应的操作
+- select  同时监听多个通道的读写操作，并在其中任意一个通道就绪时执行相应的操作
   - 示例
     func main() {
         ch1 := make(chan int)
@@ -805,59 +824,7 @@ make & new
     - 不读关闭后通道
       将关闭通道置为nil
 
-- 锁
-  - 作用
-    一种并发编程中常用的同步机制，用于保护共享资源的访问
-  - 互斥锁(sync.Mutex)  
-    var (
-        counter int
-        mu      sync.Mutex
-    )
-    func increment() {
-        defer mu.Unlock()
-        mu.Lock()
-        counter++
-    }
-    func main() {
-        wg := &sync.WaitGroup{}
-        for i := 0; i < 1000; i++ {
-            wg.Add(1)
-            go func() {
-                defer wg.Done()
-                increment()
-            }()
-        }
-        wg.Wait()
-        fmt.Println(counter)
-    }
-  - 读写锁(sync.RWMutex)
-    rmu := sync.RWMutex{}
-	defer rmu.RUnlock()
-	rmu.RLock()
-
-- atomic
-  - 作用
-    并发编程中常用的一种同步机制，保证单个指令操作的原子性
-  - 使用
-  	- atomic.StoreInt64()
-	- atomic.LoadInt64()
-	- atomic.AddInt64()
-	- atomic.SwapInt64()
-	- atomic.CompareAndSwapInt64()
-  - 与锁的区别
-    - 粒度
-      - 原子操作通常是针对单个变量或内存位置的操作
-      - 锁通常是针对一段代码或一组操作的访问进行同步      
-    - 使用方式
-      - 原子操作是通过硬件指令或特定的原子操作函数来实现的，可以直接应用于变量或内存位置，而无需额外的代码
-      - 锁是通过编程语言提供的锁机制来实现的，需要显式地使用锁的相关方法或语句来保护临界区的访问
-    - 性能开销
-      - 原子操作通常具有较低的性能开销，因为它们是在硬件级别上实现的，无需额外的同步机制
-      - 锁通常具有较高的性能开销，因为它们需要进行上下文切换和线程同步等操作
-
-- context
-  - 作用
-    - 解决goroutine之间退出通知、元数据传递
+- context  解决goroutine之间退出通知、元数据传递
   - 结构
     type Context interface {
         // 当context被取消或者到了 deadline，返回一个被关闭的 channel
@@ -893,23 +860,25 @@ make & new
           deadline time.Time
       }
 
+- WaitGroup  同步等待组
+  - 使用
+    wg := sync.WaitGroup{}
+    wg.Add()
+    wg.Done()
+    wg.Wait()
+
 - Cond
   - 使用
-    - 初始化
-      cond := &sync.Cond
-    - 等待
-      cond.L.Lock()
-      cond.wait()
-      cond.L.Unlock()
-    - 唤醒
-      cond.BroadCast()
+     - cond := &sync.Cond
+     - cond.L.Lock()
+     - cond.wait()
+     - cond.L.Unlock()
+     - cond.BroadCast()
 
 - Once
   - 使用
-    - 初始化
-      once := &sync.Once
-    - 执行
-      once.Do(f func())
+    - once := &sync.Once
+    -  once.Do(f func())
   - 结构
     type Once struct {
         done uint32
@@ -918,12 +887,9 @@ make & new
 
 - Pool
   - 使用
-    - 初始化
-      New
-    - 获取
-      Get
-    - 添加
-      Put
+    - New
+    - Get
+    - Put
 
 - 自旋
   - 概念
@@ -931,51 +897,42 @@ make & new
     可以减少线程切换的开销，但会导致CPU资源的浪费
 
 GMP
-- 思想
-  把大量的goroutine分配到少量线程上去执行
+go语言的调度模型，把大量的goroutine分配到少量线程上去执行
 - 概念
   - G  goroutine协程
   - P  processor处理器
   - M  thread线程
 - 初始化
-  - go进程启动，会新建m0和g0，并且互相绑定
-    - 其中m0作为初始化的第一个M，会和p绑定之后执行main方法
-    - g0作为m执行调度切换时的特殊栈，m执行调度切换，需要先切换到g0
-  - 做一些系统参数相关的初始化，然后初始化p数组， p的个数和系统的CPU核数一致， 初始化p数组主要会做两件事
-    - 把数组中第一个p和m0绑定
-    - 把所有的p放到allp数组中，把空闲的p放到全局调度器的空闲p链表中
-  - m和p都有了，接下来就需要g来供m和p调度执行了
-    - runtime.main函数作为groutine 的执行函数传入，然后新建一个g
-    - 这个g会放到m0绑定的p的可执行队列上，就可以开始调度了
+  - 进程启动，会新建M0和G0，并且互相绑定
+  - 初始化p数组，P的个数和系统的CPU核数一致，把数组中第一个P和M0绑定
+  - 把runtime.main函数作为groutine的执行函数，新建一个G，这个G会放到M0绑定的P的可执行队列上
 - 调度
   - 全局队列  
     - 存放等待运行的G  
   - 本地队列  
     - 存放等待运行的G
     - 数量有限，不超过256个
-    - 新创建的G优先放在P的本地队列中，如果队列满了，会把本地队列中一半的G移动到全局队列  
-      - 在创建G时，有自旋状态的M，不做处理；如果没有，会寻找空闲的P，和M进行绑定
+    - 新创建的G优先放在P的本地队列中，如果队列满了，会把本地队列中一半的G移动到全局队列，在创建G时，会根据条件唤醒P
   - P列表  
-    - 程序启动时创建
-    - 有GOMAXPROCS个
+    - 程序启动时创建，有GOMAXPROCS个
     - 手动设置
       - 环境变量GOMAXPROCS
       - 在程序中通过runtime.GOMAXPROCS来设置
   - M 
-    - 线程想运行任务就得获取P，从P的本地队列获取G，P队列为空时，M也会尝试从全局队列拿一批G放到P的本地队列，或从其他P的本地队列偷一半放到自己P的本地队列。M运行G，G执行之后，M会从P获取下一个G，不断重复下去  
+    - 线程想运行G就得获取P，从P的本地队列获取G，P队列为空时，M也会尝试从全局队列拿一批G放到P的本地队列，或从其他P的本地队列偷一半放到自己P的本地队列。M运行G，G执行之后，M会从P获取下一个G，不断重复下去  
     - 数量限制
       - go语言本身的限制M的最大数量10000.
       - runtime/debug中的SetMaxThreads来设置
     - 系统中最多有忙碌P/2个自旋的线程，多余的线程会让它们休眠，长时间休眠等待GC回收销毁
 - 策略  
-  - work stealing机制
-    当本线程无可运行的G时，尝试从其他线程绑定的P偷取G，而不是销毁线程
+  - work stealing
+    当线程无可运行的G时，尝试从全局队列或者其他线程绑定的P偷取G，而不是销毁线程
   - hand off机制
-    - M执行G发生了阻塞操作，M和P立即解绑，如果P本地队列有G，全局队列有G，P会绑定M，否则P则会加入到空闲列表
+    - M执行G发生了系统调用，M和P立即解绑，如果P本地队列有G，全局队列有G，P会绑定M，否则P则会加入到空闲列表
     - 当M系统调用结束时候，这个G会尝试获取一个空闲的P执行，并放入到这个P的本地队列。如果获取不到P，那么这个线程M变成休眠状态，加入到空闲线程中，然后这个G会被放入全局队列中
 
 框架
-- gin 
+- gin
 
 - beego
 
@@ -983,8 +940,8 @@ GMP
 ```
 
 # 学习资料 #
-rune
-[深究字符串——从byte rune string到Unicode与UTF-8](http://www.randyfield.cn/post/2022-01-14-rune-unicode-utf8/)
+rune  
+[深究字符串——从byte rune string到Unicode与UTF-8](http://www.randyfield.cn/post/2022-01-14-rune-unicode-utf8/)  
 slice  
 [Go slice新的扩容机制-你背的八股文过时啦](https://juejin.cn/post/7136774425415794719)  
 map  
