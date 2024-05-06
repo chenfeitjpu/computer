@@ -1009,7 +1009,7 @@ gmp
 [Golang的协程调度器原理及GMP设计思想](https://github.com/aceld/golang/blob/main/2%E3%80%81Golang%E7%9A%84%E5%8D%8F%E7%A8%8B%E8%B0%83%E5%BA%A6%E5%99%A8%E5%8E%9F%E7%90%86%E5%8F%8AGMP%E8%AE%BE%E8%AE%A1%E6%80%9D%E6%83%B3%EF%BC%9F.md)  
 [GMP原理与调度](https://www.topgoer.com/%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B/GMP%E5%8E%9F%E7%90%86%E4%B8%8E%E8%B0%83%E5%BA%A6.html)  
 [深入golang runtime的调度](https://zboya.github.io/post/go_scheduler/) 
-[GO：从进程启动到调度](https://zhuanlan.zhihu.com/p/607208932) 
+[GO：从进程启动到调度](https://zhuanlan.zhihu.com/p/607208932)  
 内存管理  
 [图解Go语言内存分配](https://juejin.cn/post/6844903795739082760)  
 [Golang内存模型与分配机制](https://zhuanlan.zhihu.com/p/603335718)  
