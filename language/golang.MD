@@ -79,23 +79,23 @@
 
 数据类型
 - 分类
-  - uint8 uint16 uint32 uint64 uint int8 int16 int32 int64 int
-  - float32 float64 
-  - complex64 complex128
-  - byte rune
-  - string
+  - uint8、uint16、uint32、uint64、uint、int8、int16、int32、int64、int
+  - float32、float64 
+  - complex64、complex128
   - bool
-  - array slice map channel 
-  - struct interface
+  - byte、rune
+  - string
+  - array、slice、map、channel 
+  - struct、interface
   - func 
-  - pointer uintptr
+  - pointer、uintptr
 - 引用类型 
   slice、map、channel、func、interface 
 - 类型比较
   - 不同类型不能比较
   - 不可比较类型不能比较
-  - 一个接口覆盖另一个接口的所有方法，且不是同一种不可比较类型
-- 线程安全
+  - 接口比较，一个接口覆盖另一个接口的所有方法，且不是同一种不可比较类型
+- 线程安全的类型
   channel、sync.Map
 
 运算符
@@ -128,17 +128,13 @@ string
   }
 - 注意事项
   - string不能修改
-  - 转换成[]byte会发生内存拷贝
-    - 不发生拷贝*(*[]byte)(unsafe.Pointer(&a))
+  - 转换成[]byte会发生内存拷贝，不发生拷贝*(*[]byte)(unsafe.Pointer(&a))
 
 array
 固定长度集合
 - 使用
-  - [size]T{}
-  - [...]T{}
-  - [...][size]T
-  - for index
-  - for range 
+  - [size]T{}、[...]T{}、[...][size]T
+  - for index、for range 
 - 注意事项
   - 多维数组只有第一层可以使用[...]来让编译器推导数组长度
   - 数组是值类型，赋值和传参会复制整个数组
@@ -146,12 +142,10 @@ array
 slice
 动态长度集合
 - 使用
-  - []T{}
-  - make([]T, length[, capacity])
-  - append
-  - copy
+  - []T{}、make([]T, len[, cap])
+  - append、copy
   - a[low:high:max]  0 <= low <= high <= max <= cap(a)，high默认是len(a)
-  - for range  在循环开始前会获取切片的长度，然后再执行len(切片)次数的循环  
+  - for index、for range在循环开始前会获取切片的长度，然后再执行len(切片)次数的循环  
 - 结构
   type slice struct {
       array unsafe.Pointer
@@ -159,9 +153,9 @@ slice
       cap   int
   }
   slice占用24个字节  
-  - array 指向底层数组的指针，占用8个字节  
-  - len 切片的长度，占用8个字节  
-  - cap 切片的容量，cap 总是大于等于 len 的，占用8个字节  
+  - array  指向底层数组的指针，占用8个字节  
+  - len  切片的长度，占用8个字节  
+  - cap  切片的容量，cap总是大于等于len的，占用8个字节  
 - 扩容
   - 1.18以前
     - 如果新申请容量比两倍原有容量大，那么扩容后容量大小为新申请容量
@@ -175,16 +169,13 @@ slice
     - 内存对齐(size_to_class&class_to_size)  CPU以字长访问内存，如果不进行内存对齐，很可能增加CPU访问内存的次数
 - 注意事项
   - 扩容前后的slice是否相同，原数组还有容量可以扩容则相同，原数组容量不够则不同
-  - nil切片 & 空切片
-    - nil切片引用数组指针地址为0(无指向任何实际地址)
-    - 空切片引用数组指针地址是有的，且固定为一个值
+  - nil切片引用数组指针地址为0(无指向任何实际地址)，空切片引用数组指针地址是有的，且固定为一个值
   - 拷贝大切片跟小切片的代价是一样的
 
 map
-一种无序的键值对集合，也称为字典。map中的键必须是唯一的，而值可以重复。map提供了快速的查找和插入操作，适用于需要根据键快速检索值的场景。
+一种无序的键值对集合，也称为字典。map中的键必须是唯一的，而值可以重复。map提供了快速的查找和插入操作，适用于需要根据键快速检索值的场景
 - 使用 
-  - map[T]T 
-  - make(map[T]T[, cap])  
+  - map[T]T、make(map[T]T[, cap])  
   - delete(map, key)
 - 特点
   - 无序
@@ -284,31 +275,30 @@ sync.map
     - 正常值
 - 实现
   sync.Map设置了两个map(read map和dirty map)，read map并发读，dirty map并发读写，两个map的key指向同一个entry，通过CAS原子操作更新entry
-  - 操作
-    - 写入
-      - 如果在read里能够找到待存储的key，并且对应的entry的值不为expunged，也就是没被删除时，直接更新对应的entry即可
-      - 第一步没有成功，要么read中没有这个key，要么key被标记为删除。则先加锁，再进行后续的操作
-      - 再次在read中查找是否存在这个key，也就是double check一下，这也是lock-free编程里的常见套路。如果read中存在该key，但p == expunged，说明m.dirty != nil并且m.dirty中不存在该key值
-        - 将p的状态由expunged更改为nil
-        - dirty map插入key
-        - 直接更新对应的value
-      - 如果read中没有此key，那就查看dirty中是否有此key，如果有，则直接更新对应的value，这时read中还是没有此key
-      - 最后一步，如果read和dirty中都不存在该key
-        - 如果dirty为空，则需要创建dirty，并从read中拷贝未被删除的元素
-        - 更新amended字段，标识dirty map中存在read map中没有的key
-        - 将k-v写入dirty map中
-    - 删除
-      - 先从read里查是否有这个key，如果有则执行entry.delete方法，将p置为nil，这样read和dirty都能看到这个变化
-      - 如果没在read中找到这个key，并且dirty不为空，那么就要操作dirty了，操作之前，还是要先上锁。然后进行double check，如果仍然没有在read里找到此key，则从dirty中直接删掉这个key。
-      - read中没有这个key，且amended为fase，说明dirty为空，那直接返回空和false
-    - 读取
-      - 直接在read中找，如果找到了直接调用entry的load方法，取出其中的值
-      - 如果read中没有这个key，且amended为true，说明dirty中可能存在我们要找的key。当然要先上锁，再尝试去dirty中查找。在这之前，仍然有一个double check的操作。若还是没有在read中找到，那么就从dirty中找。不管dirty中有没有找到，都要"记一笔"，因为在dirty被提升为read之前，都会进入这条路径
-        直接将misses的值加1，表示一次未命中，如果misses值小于m.dirty 的长度，就直接返回。否则，将m.dirty晋升为read，并清空dirty，清空misses计数值
-      - read中没有这个key，且amended为fase，说明dirty为空，那直接返回空和false
-    - 遍历
-      - 当amended为true时，说明dirty中含有read中没有的key，将dirty提升为read
-      - 遍历read，取出entry 中的值，调用f(k, v)      
+  - 写入
+    - 如果在read里能够找到待存储的key，并且对应的entry的值不为expunged，也就是没被删除时，直接更新对应的entry即可
+    - 第一步没有成功，要么read中没有这个key，要么key被标记为删除。则先加锁，再进行后续的操作
+    - 再次在read中查找是否存在这个key，也就是double check一下，这也是lock-free编程里的常见套路。如果read中存在该key，但p == expunged，说明m.dirty != nil并且m.dirty中不存在该key值
+      - 将p的状态由expunged更改为nil
+      - dirty map插入key
+      - 直接更新对应的value
+    - 如果read中没有此key，那就查看dirty中是否有此key，如果有，则直接更新对应的value，这时read中还是没有此key
+    - 最后一步，如果read和dirty中都不存在该key
+      - 如果dirty为空，则需要创建dirty，并从read中拷贝未被删除的元素
+      - 更新amended字段，标识dirty map中存在read map中没有的key
+      - 将k-v写入dirty map中
+  - 删除
+    - 先从read里查是否有这个key，如果有则执行entry.delete方法，将p置为nil，这样read和dirty都能看到这个变化
+    - 如果没在read中找到这个key，并且dirty不为空，那么就要操作dirty了，操作之前，还是要先上锁。然后进行double check，如果仍然没有在read里找到此key，则从dirty中直接删掉这个key。
+    - read中没有这个key，且amended为fase，说明dirty为空，那直接返回空和false
+  - 读取
+    - 直接在read中找，如果找到了直接调用entry的load方法，取出其中的值
+    - 如果read中没有这个key，且amended为true，说明dirty中可能存在我们要找的key。当然要先上锁，再尝试去dirty中查找。在这之前，仍
+      然有一个double check的操作。若还是没有在read中找到，那么就从dirty中找。不管dirty中有没有找到，都要"记一笔"，因为在dirty被提升为read之前，都会进入这条路径，直接将misses的值加1，表示一次未命中，如果misses值小于m.dirty 的长度，就直接返回。否则将m.dirty晋升为read，并清空dirty，清空misses计数值
+    - read中没有这个key，且amended为fase，说明dirty为空，那直接返回空和false
+  - 遍历
+    - 当amended为true时，说明dirty中含有read中没有的key，将dirty提升为read
+    - 遍历read，取出entry 中的值，调用f(k, v)      
 
 struct
 用于定义一组属性
@@ -1011,6 +1001,7 @@ sync.map
 [深度解密Go语言之sync.map](https://zhuanlan.zhihu.com/p/344834329)  
 channel  
 [深度解密Go语言之channel](https://zhuanlan.zhihu.com/p/74613114)  
+[08 - 如何优雅地关闭 channel](https://qcrao91.gitbook.io/go/channel/ru-he-you-ya-di-guan-bi-channel)  
 context  
 [深度解密Go语言之context](https://zhuanlan.zhihu.com/p/68792989)  
 gmp  
