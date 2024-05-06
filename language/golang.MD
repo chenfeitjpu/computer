@@ -1013,7 +1013,7 @@ gmp
 内存管理  
 [图解Go语言内存分配](https://juejin.cn/post/6844903795739082760)  
 [Golang内存模型与分配机制](https://zhuanlan.zhihu.com/p/603335718)  
-[https://eddycjy.gitbook.io/golang/di-1-ke-za-tan/stack-heap](https://eddycjy.gitbook.io/golang/di-1-ke-za-tan/stack-heap)  
+[1.9 我要在栈上。不，你应该在堆上](https://eddycjy.gitbook.io/golang/di-1-ke-za-tan/stack-heap)  
 垃圾回收  
 [Golang 垃圾回收原理分析](https://zhuanlan.zhihu.com/p/605315127)  
 [golang 垃圾回收（五）混合写屏障](https://liqingqiya.github.io/golang/gc/%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6/%E5%86%99%E5%B1%8F%E9%9A%9C/2020/07/24/gc5.html)  
