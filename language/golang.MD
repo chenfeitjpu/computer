@@ -142,7 +142,7 @@ array
   - 数组是值类型，赋值和传参会复制整个数组
 
 slice
-可变长度集合
+动态长度集合
 - 使用
   - []T{}
   - make([]T, length[, capacity])
@@ -309,7 +309,7 @@ sync.map
       - 遍历read，取出entry 中的值，调用f(k, v)      
 
 struct
-多个类型的集合
+用于定义一组属性
 - 使用
   - 定义
     type name struct {  
@@ -366,6 +366,7 @@ method
   - 对于不可寻址的类型T，不能调用*T的方法
 
 interface
+用于定义一组方法
 - 使用
   type name interface {  
       name(name type) type  
@@ -404,8 +405,9 @@ pointer
 - 使用
   - &取址
     - 不可寻址的类型
+      - 字面量
       - 常量
-      - 字符串中的直接
+      - 字符串对应的字节数组
       - map对象中的元素
   - *取值
 - 分类 
@@ -711,6 +713,14 @@ make & new
           wg.Wait()
           fmt.Println(counter)
       }
+    - 两种模式
+      - 正常模式
+        等待锁的goroutine会进入一个先进先出队列，唤醒队列的第一个goroutine和新进来的goroutine进行竞争  
+        新请求进来的锁会更容易抢占到锁，因为正在CPU上运行  
+        如果竞争失败，回到队列头部，如果goroutine等待时间超过1毫秒，则会转换到饥饿模式
+      - 饥饿模式
+        锁会直接交给队列的第一个goroutine，新进来的goroutine不会抢占锁也不会进入自旋状态，直接进入队列尾部  
+        如果当前goroutine已经是队列的最后一个或者当前goroutine等待时间小于1毫秒，则会转换到正常模式    
   - 读写锁(sync.RWMutex)  同一时刻只能有一个协程持有写锁，或者多个协程持有读锁
     - 示例
       rmu := sync.RWMutex{}
@@ -871,18 +881,50 @@ make & new
     wg.Done()
     wg.Wait()
 
-- Cond
+- sync.Cond
+  通常应用于等待某个条件的一组goroutine，当条件变为true的时候，其中一个goroutine或者所有的goroutine都会被唤醒执行
   - 使用
-     - cond := &sync.Cond
-     - cond.L.Lock()
-     - cond.wait()
-     - cond.L.Unlock()
-     - cond.BroadCast()
+     - cond := sync.NewCond()  初始化
+     - cond.Wait()  放入Cond的等待队列中并阻塞
+     - cond.Singal()  唤醒一个等待此Cond的goroutine
+     - cond.BroadCast()  唤醒所有等待此Cond的goroutine
+  - 示例
+    func main() {
+        cond := sync.NewCond(&sync.Mutex{})
+        var ready int
+        for i := 0; i < 10; i++ {
+            go func(i int) {
+                time.Sleep(time.Duration(rand.Intn(10)) * time.Second)
+                cond.L.Lock()
+                ready++
+                cond.L.Unlock()
+                log.Printf("运动员%d就位", i)
+                cond.Broadcast()
+            }(i)
+        }
+        cond.L.Lock()
+        for ready != 10 {
+            cond.Wait()
+            log.Println("裁判员收到")
+        }
+        cond.L.Unlock()
+        log.Println("所有运动员全部就绪")
+    }
 
 - Once
+  函数只执行一次
   - 使用
     - once := &sync.Once
-    -  once.Do(f func())
+    - once.Do(f func())
+  - 示例
+    func main() {
+        once := &sync.Once{}
+        for i := 0; i < 10; i++ {
+            once.Do(func() {
+                fmt.Println("hello, world")
+            })
+        }
+    }
   - 结构
     type Once struct {
         done uint32
