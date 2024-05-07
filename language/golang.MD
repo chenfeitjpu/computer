@@ -5,6 +5,7 @@
   - [数据结构](#数据结构)
   - [内存管理](#内存管理)
   - [并发控制](#并发控制)
+  - [框架和库](#框架和库)
 - [学习资料](#学习资料)
 
 # 定义 #
@@ -40,6 +41,11 @@
 - strings  提供了字符串处理的功能
 - strconv  提供了基本数据类型与其字符串表示的转换功能
 - time  提供了时间和日期的功能
+  - time.Now()  获取当前时间
+  -	time.Date()  根据日期生成时间
+  -	time.Unix()  根据时间戳生成时间
+  -	time.Parse()  根据字符串生时间
+  - {time}.Format()  格式化时间
 - sort  提供了排序功能
 - net  提供了网络编程的功能
 - sync  提供了同步原语的功能，原语在执行过程中不允许中断
@@ -455,7 +461,7 @@ error&panic&recover
     }
   - 注意事项
     - 子协程的panic会导致主协程退出
-    - 子协程的panic，主协程无法捕获
+    - 子协程的panic主协程无法捕获
 ```
 
 ## 内存管理 ##
@@ -980,14 +986,34 @@ go语言的调度模型，把大量的goroutine分配到少量线程上去执行
     当线程无可运行的G时，尝试从全局队列或者其他线程绑定的P偷取G，而不是销毁线程
   - hand off机制
     - M执行G发生了系统调用，M和P立即解绑，如果P本地队列有G，全局队列有G，P会绑定M，否则P则会加入到空闲列表
-    - 当M系统调用结束时候，这个G会尝试获取一个空闲的P执行，并放入到这个P的本地队列。如果获取不到P，那么这个线程M变成休眠状态，加入到空闲线程中，然后这个G会被放入全局队列中
+    - 当M系统调用结束时候，这个G会尝试获取一个空闲的P执行，并放入到这个P的本地队列。如果获取不到P，那么这个线程M变成休眠状态，加入到
+      空闲线程中，然后这个G会被放入全局队列中
 
-框架
-- gin
+内存泄漏
+- 原因
+  - 读写nil通道
+  - 遍历未关闭通道
+  - 读写不同步
+  - 资源无法释放  加锁/解锁未同步、网络访问超时、写入大文件、数据库读写产生死锁  
+- 检测
+  - goleak
+    - defer goleak.VerifyNone(t)  单个测试用例集成
+    - func TestMain(m *testing.M) {  单个测试包集成，一个包里面只能有一个TestMain方法
+          goleak.VerifyTestMain(m)
+      }
 
-- beego
+数据竞争
+- 检测
+  - go build -race  在编译的时候检测DATA RACE
+  - go run -race  在运行的时候检测DATA RACE
+  - go test -race  在测试的时候检测DATA RACE
+  - go install -race  在安装的时候检测DATA RACE
+```
 
-三方库
+## 框架和库  ##
+```
+gin
+beego
 ```
 
 # 学习资料 #
@@ -1017,3 +1043,6 @@ gmp
 垃圾回收  
 [Golang 垃圾回收原理分析](https://zhuanlan.zhihu.com/p/605315127)  
 [golang 垃圾回收（五）混合写屏障](https://liqingqiya.github.io/golang/gc/%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6/%E5%86%99%E5%B1%8F%E9%9A%9C/2020/07/24/gc5.html)  
+并发  
+[Go 语言如何进行竞态分析](https://liqiang.io/post/how-golang-detect-data-race)  
+[goroutine 泄漏与检测](https://dbwu.tech/posts/golang_goroutine_leak/)  
