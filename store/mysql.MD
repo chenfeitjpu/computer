@@ -123,15 +123,12 @@
 | 1或2 | 1字节 |
 | 3或4 | 2字节 |
 | 5或6 | 3字节 |
-- timestamp默认值
-  - default current_timestmap
-    插入当前时间
-  - on update current_timestamp
-    更新当前时间
-- 注意问题
+- timestamp
+  - 默认值
+    - default current_timestmap  插入当前时间
+    - on update current_timestamp  更新当前时间
   - timestamp只能表示1970-2038年
   - timestmp必须显式地设置时区，不要使用默认系统时区，否则存在性能问题
-
 
 字符串
 | 类型 | 最大长度 | 取值范围 | 存储空间 |
@@ -153,7 +150,7 @@
     - 建立索引
       建立索引时没有限制索引的大小，索引长度会默认采用的该字段的长度     
 
-二进制
+二进制字符串
 | 类型 | 最大长度 | 取值范围 | 存储空间 |
 | :--: | :--: | :--: | :--: |
 | bit(M) | M个比特位 | 1~64 | (M+7)/8个字节 | 
