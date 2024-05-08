@@ -711,23 +711,43 @@ make & new
           wg.Wait()
           fmt.Println(counter)
       }
-    - 两种模式
-      - 正常模式
-        等待锁的goroutine会进入一个先进先出队列，唤醒队列的第一个goroutine和新进来的goroutine进行竞争  
-        新请求进来的锁会更容易抢占到锁，因为正在CPU上运行  
-        如果竞争失败，回到队列头部，如果goroutine等待时间超过1毫秒，则会转换到饥饿模式
-      - 饥饿模式
-        锁会直接交给队列的第一个goroutine，新进来的goroutine不会抢占锁也不会进入自旋状态，直接进入队列尾部  
-        如果当前goroutine已经是队列的最后一个或者当前goroutine等待时间小于1毫秒，则会转换到正常模式    
     - 获取锁失败
-      - 自旋  一直循环判断该资源是否已经释放锁
-      - 阻塞  释放CPU给其他线程
-      Go语言中的Mutex实现了自旋与阻塞两种场景，当满足不了自旋条件时，就会进入阻塞
+      首先采用自旋+CAS的策略争夺锁，尝试持续受挫达到一定条件后，判定当前过于激烈，则由自旋转为阻塞模式
+      自旋模式转为阻塞模式的具体条件
+      - CPU单核或仅有单个P调度器(此时自旋，其他goroutine根本没机会释放锁，自旋纯属空转)
+      - 当前P的执行队列中仍有待执行的G(避免因自旋影响到GMP调度效率)
+      - 自旋累计达到4次仍未取得锁
+    - 唤醒
+      - 正常模式(性能较好)
+        当有goroutine从阻塞队列被唤醒时，会和此时先进入抢锁流程的goroutine进行锁资源的争夺，假如抢锁失败，会重新回到阻塞队列头部.
+        此时被唤醒的老goroutine相比新goroutine是处于劣势地位，因为新goroutine已经在占用CPU时间片，且新goroutine可能存在多个，从而形成多对一的人数优势，因此形势对老goroutine不利
+        当阻塞队列存在goroutine等锁超过1ms而不得，则进入饥饿模式
+      - 饥饿模式(严格公平)
+        锁的所有权按照阻塞队列的顺序进行依次传递，新goroutine进行流程时不得抢锁，而是进入队列尾部排队
+        当阻塞队列已清空，或取得锁的goroutine等锁时间已低于1ms时，则回到正常模式
+    - 结构
+      type Mutex struct {
+          state int32
+          sema  uint32
+      }
+      - state
+        - 最右侧的一个bit位，标志是否上锁，0:未上锁，1:已上锁
+        - 最右数第二个bit位，标志是否有goroutine从阻塞中被唤醒，0:没有，1:有
+        - 最右数第三个bit位，标志Mutex是否处于饥饿模式，0:非饥饿，1:饥饿
+        - 剩余的29位，记录当前阻塞队列goroutine的数量
   - 读写锁(sync.RWMutex)  同一时刻只能有一个线程持有写锁，或者多个线程持有读锁
     - 示例
       rmu := sync.RWMutex{}
 	  defer rmu.RUnlock()
 	  rmu.RLock()
+    - 结构
+      type RWMutex struct {
+          w           Mutex        // held if there are pending writers
+          writerSem   uint32       // semaphore for writers to wait for completing readers
+          readerSem   uint32       // semaphore for readers to wait for completing writers
+          readerCount atomic.Int32 // number of pending readers
+          readerWait  atomic.Int32 // number of departing readers
+      }
 
 - atomic  并发编程中的一种同步机制，保证单个指令操作的原子性
   - 使用
@@ -824,6 +844,7 @@ make & new
         - 一个发送者，多个接收者，发送者关闭
         - 多个发送者，一个接收者，接收者关闭，发送者进行关闭通道的监控
         - 多个发送者，多个接收者，发送者和接收者把关闭请求发送给中间人，中间人进行关闭，发送者和接收者进行关闭通道的监控
+
 - select  同时监听多个通道的读写操作，并在其中任意一个通道就绪时执行相应的操作
   - 示例
     func main() {
@@ -892,8 +913,7 @@ make & new
     wg.Done()
     wg.Wait()
 
-- sync.Cond
-  通常应用于等待某个条件的一组goroutine，当条件变为true的时候，其中一个goroutine或者所有的goroutine都会被唤醒执行
+- sync.Cond  通常应用于等待某个条件的一组goroutine，当条件变为true的时候，其中一个goroutine或者所有的goroutine都会被唤醒执行
   - 使用
      - cond := sync.NewCond()  初始化
      - cond.Wait()  放入Cond的等待队列中并阻塞
@@ -922,10 +942,9 @@ make & new
         log.Println("所有运动员全部就绪")
     }
 
-- Once
-  函数只执行一次
+- sync.Once  函数只执行一次
   - 使用
-    - once := &sync.Once
+    - once := &sync.Once{}
     - once.Do(f func())
   - 示例
     func main() {
@@ -941,12 +960,16 @@ make & new
         done uint32
         m    Mutex
     } 
+  - 注意事项
+    - 高频使用的字段放在第一个，不用计算偏移量
+    - 原子操作可以保证其它goroutine及时观察到的done值的变化
 
-- Pool
+- Pool  对象缓冲池
   - 使用
     - New
     - Get
     - Put
+  - 示例
 
 - 自旋
   - 概念
@@ -1046,3 +1069,7 @@ gmp
 并发  
 [Go 语言如何进行竞态分析](https://liqiang.io/post/how-golang-detect-data-race)  
 [goroutine 泄漏与检测](https://dbwu.tech/posts/golang_goroutine_leak/)  
+sync.Once  
+[通过 sync.Once 学习到 Go 的内存模型](https://studygolang.com/articles/25299)  
+sync.Mutex  
+[Golang 单机锁实现原理](https://zhuanlan.zhihu.com/p/599119674)

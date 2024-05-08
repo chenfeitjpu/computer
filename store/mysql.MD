@@ -3,10 +3,10 @@
 - [使用](#使用)
   - [基础命令](#基础命令)
   - [数据类型](#数据类型)
-  - [SQL](#sql)
-  - [查询](#查询)
-  - [事务](#事务)
+  - [数据操作](#数据操作)
+  - [##](#)
   - [存储结构](#存储结构)
+  - [事务](#事务)
   - [日志](#日志)
   - [锁](#锁)
 
@@ -162,186 +162,177 @@
 | longblob | 2³²-1个字节 |  | L+4个字节 | 
 ```
 
-## SQL ##
+## 数据操作 ##
 ```
-DDL
-- 引擎
-  - `show engines` 查看存储引擎
-  - innodb & myisam
-    - innodb支持事务、外键、行级锁
-- 数据库    
-  - `show databases` 查看所有库
-  - `create database [if not exists] 库名` 创建库
-  - `drop database [if exists] 库名` 删除库
-  - `use 库名` 选择库
-- 表    
-  - `show tables [from 库名]` 查看所有表
-  - `show create table [库名.]表名` 查看表定义
-  - `[describe|desc|explain|show columns from|show fields form] 表名` 查看表描述
-  - `create table [if not exists] 表名` 创建表
-  - `drop table [if exists ]表名` 删除表
-  - `rename table 旧表名 to 新表名` 修改表名
-  - `alter table 旧表名 rename to 新表名` 修改表名
-  - `alter table 表名 add [column] 列名 数据类型 [列的属性] [first|after 列名]` 增加列
-  - `alter table 表名 drop [column] 列名` 删除列
-  - `alter table 表名 modify [column] 列名 新数据类型 [新属性] [first|after 列名]` 修改列
-  - `alter table 表名 change [column] 列名 新列名 新数据类型 [新属性]` 修改列
-- 列    
-  - `default` 默认值
-  - `not null` 非空
-  - `comment` 注释
-  - `auto_increament` 自增
-    - 一个表中最多有一个具有AUTO_INCREMENT属性的列
-    - 具有AUTO_INCREMENT属性的列必须建立索引  
-    - 拥有AUTO_INCREMENT属性的列就不能再通过指定DEFAULT属性来指定默认值
-  - `zerofill` 零填充
-    - 该列必须是整数类型的
-    - 该列必须有unsigned zerofill的属性
-    - 该列的实际值的位数必须小于显示宽度  
-  - `primary key` 主键
-  - `unique [key] [约束名] (列名)` 唯一键
-  - `constraint [约束名] foreign key [索引名](列1, 列2, ...) references 父表名 (父列1, 父列2, ...)` 外键
+SQL
+- DDL
+  - 引擎
+    - `show engines` 查看存储引擎
+      - InnoDB支持事务、行级锁、外键
+      - MyISAM查询性能高
+        - 通过offset直接定位到记录
+        - 不需要做事务处理 
+      - MEMORY存储在内存，用于临时表
+  - 数据库    
+    - `show databases` 查看所有库
+    - `create database [if not exists] 库名` 创建库
+    - `drop database [if exists] 库名` 删除库
+    - `use 库名` 选择库
+  - 表    
+    - `show tables [from 库名]` 查看所有表
+    - `show create table [库名.]表名` 查看表定义
+    - `[describe|desc|explain|show columns from|show fields form] 表名` 查看表描述
+    - `create table [if not exists] 表名` 创建表
+    - `drop table [if exists ]表名` 删除表
+    - `rename table 旧表名 to 新表名` 修改表名
+    - `alter table 旧表名 rename to 新表名` 修改表名
+    - `alter table 表名 add [column] 列名 数据类型 [列的属性] [first|after 列名]` 增加列
+    - `alter table 表名 drop [column] 列名` 删除列
+    - `alter table 表名 change [column] 列名 新列名 新数据类型 [新属性]` 修改列
+    - `alter table 表名 modify [column] 列名 新数据类型 [新属性] [first|after 列名]` 修改列
+  - 列    
+    - `default` 默认值
+    - `not null` 非空
+    - `comment` 注释
+    - `auto_increament` 自增
+      - 一个表中最多有一个具有AUTO_INCREMENT属性的列
+      - 具有AUTO_INCREMENT属性的列必须建立索引  
+      - 拥有AUTO_INCREMENT属性的列就不能再通过指定DEFAULT属性来指定默认值
+    - `zerofill` 零填充
+      - 该列必须是整数类型的
+      - 该列必须有unsigned zerofill的属性
+      - 该列的实际值的位数必须小于显示宽度  
+    - `primary key`  主键
+    - `unique [key] [约束名] (列名)`  唯一键
+    - `key`  普通索引
+    - `foreign key [索引名](列1, 列2, ...) references 父表名 (父列1, 父列2, ...)`  外键
+  - DML
+    - `insert into 表名 [(列名, 列名)] values (值, 值) [,(值, 值)]` 插入单条|多条数据
+    - `insert into 表名 select` 插入结果集
+    - `insert ignore into` 插入忽略错误
+    - `insert into ... on duplicate key update 列名 = 值|values(列名)` 插入重复值
+    - `delete from 表名 [where 表达式]` 删除数据
+    - `update 表名 set 列名=值 [where 表达式]` 更新数据 
+  - DQL
+    - `select 列名 [as] [别名][, 列名 [as] [别名]] from 表名` 查询单个|多个列
+    - `select * from 表名` 查询所有列
+    - `select distinct 列名[, 列名] from 表名` 去除单列|多列的重复结果 
+    - `limit [开始行,] 限制条数` 限制查询结果条数
+    - `order by 列名 asc|desc[, 列名 asc|desc]` 按照单列|多列的值进行排序，默认升序
+  - DCL
+    - `grant 权限 on 库名.表名 to 用户@主机 identified by 密码` 授权
+    - `revoke 权限 on 库名.表名 to 用户@主机` 回收权限  
 
-DML
-- `insert into 表名 [(列名, 列名)] values (值, 值) [,(值, 值)]` 插入单条|多条数据
-- `insert into 表名 select` 插入结果集
-- `insert ignore into` 插入忽略错误
-- `insert into ... on duplicate key update 列名 = 值|values(列名)` 插入重复值
-- `delete from 表名 [where 表达式]` 删除数据
-- `update 表名 set 列名=值 [where 表达式]` 更新数据 
+查询
+- 过滤和处理
+  - 运算符
+    - 算术  `+, -, *, /, %`
+    - 比较  `>, >=, <, <=, =, !=, between and, in, not in, is null, is not null, like, not like`
+    - 逻辑  `and, or, xor`
+    - 通配  `_, %`
+  - 函数
+    - 文本  
+      - `left` 从左边取指定长度的子串
+      - `right` 从右边取指定长度的子串
+      - `length` 获取字符串长度
+      - `upper` 大写格式
+      - `lower` 小写格式
+      - `ltrim` 去掉字符串左边空格
+      - `rtrim` 去掉字符串右边空格
+      - `substring` 字符串截取
+      - `concat` 字符串拼接
+    - 时间  
+      - `now` 获取当前日期和时间
+      - `curdate` 获取当前日期
+      - `curtime` 获取当前时间
+      - `date(datetime)` 提取日期
+      - `date_add(datetime, interval value type)` 添加指定的时间间隔
+      - `date_sub(datetime, interval value type)` 减去指定的时间间隔
+      - `datediff(date, date)` 返回两个日期之间的天数
+      - `date_format(datetime, format)` 格式化显示日期和时间
+    - 算术  
+      - `rand` 随机数
+      - `mod` 取余
+      - `abs` 绝对值
+      - `pi` 圆周率
+      - `exp` e的指定次方
+      - `sqrt` 平方根
+      - `sin` 正弦
+      - `cos` 余弦
+      - `tan` 正切
+    - 聚集  
+      - `count` 总数
+      - `max` 最大值
+      - `min` 最小值
+      - `sum` 求和
+      - `avg` 平均值
+- 分类
+  - 单表
+    `select * from 表名 [where] [group by 列名 having] [order by 列名] [limit]`
+  - 子查询    
+    - 标量子查询
+    - 列子查询
+    - 行子查询
+    - 表子查询
+    - exists和not exists子查询
+  - 连接查询
+    - `[inner] [cross] join on` 内连接
+    - `left join on` 左外连接
+    - `right join on` 右外连接
+  - 组合查询
+    - `union all` 保留重复记录
+    - `union` 去除重复记录
 
-DQL
-- `select 列名 [as] [别名][, 列名 [as] [别名]] from 表名` 查询单个|多个列
-- `select * from 表名` 查询所有列
-- `select distinct 列名[, 列名] from 表名` 去除单列|多列的重复结果 
-- `limit [开始行,] 限制条数` 限制查询结果条数
-- `order by 列名 asc|desc[, 列名 asc|desc]` 按照单列|多列的值进行排序，默认升序
-
-DCL
-- `grant 权限 on 库名.表名 to 用户@主机 identified by 密码` 授权
-- `revoke 权限 on 库名.表名 to 用户@主机` 回收权限  
-```
-
-## 查询 ##
-**使用**
-```
-运算符
-- 算术  `+, -, *, /, %`
-- 比较  `>, >=, <, <=, =, !=, between and, in, not in, is null, is not null, like, not like`
-- 逻辑  `and, or, xor`
-- 通配  `_, %`
-
-函数
-- 文本  
-  - `left` 从左边取指定长度的子串
-  - `right` 从右边取指定长度的子串
-  - `length` 获取字符串长度
-  - `upper` 大写格式
-  - `lower` 小写格式
-  - `ltrim` 去掉字符串左边空格
-  - `rtrim` 去掉字符串右边空格
-  - `substring` 字符串截取
-  - `concat` 字符串拼接
-- 时间  
-  - `now` 获取当前日期和时间
-  - `curdate` 获取当前日期
-  - `curtime` 获取当前时间
-  - `date(datetime)` 提取日期
-  - `date_add(datetime, interval value type)` 添加指定的时间间隔
-  - `date_sub(datetime, interval value type)` 减去指定的时间间隔
-  - `datediff(date, date)` 返回两个日期之间的天数
-  - `date_format(datetime, format)` 格式化显示日期和时间
-- 算术  
-  - `rand` 随机数
-  - `mod` 取余
-  - `abs` 绝对值
-  - `pi` 圆周率
-  - `exp` e的指定次方
-  - `sqrt` 平方根
-  - `sin` 正弦
-  - `cos` 余弦
-  - `tan` 正切
-- 聚集  
-  - `count` 总数
-  - `max` 最大值
-  - `min` 最小值
-  - `sum` 求和
-  - `avg` 平均值
-```
-
-**分类**  
-```
-简单查询   
-- `select * from`
-分组查询  
-- `group by 列名 [, 列名] having`
-子查询    
-- 标量子查询
-- 列子查询
-- 行子查询
-- 表子查询
-- exists和not exists子查询
-连接查询
-- `[inner] [cross] join on` 内连接
-- `left join on` 左外连接
-- `right join on` 右外连接
-组合查询
-- `union all` 保留重复记录
-- `union` 去除重复记录
-```
-
-**加速**  
-```
-索引
-- 基本操作  
-  CREATE TALBE 表名 (
-    各种列的信息 ··· , 
-    [KEY|INDEX] 索引名 (需要被索引的单个列或多个列)
-  )
-
-  ALTER TABLE 表名 ADD [INDEX|KEY] 索引名 (需要被索引的单个列或多个列)
-  ALTER TABLE 表名 DROP [INDEX|KEY] 索引名
-  CREATE INDEX 索引名 ON 表名(列名)
-  DROP INDEX 索引名 ON 表名
-- 应用  
-  - 全值匹配
-  - 匹配左边的列
-  - 匹配列前缀
-  - 匹配范围值
-  - 用于排序
-  - 用于分组
-- 注意事项
-  - 只为用于搜索、排序或分组的列创建索引
-  - 为列的基数大的列创建索引
-  - 索引列的类型尽量小
-  - 可以只对字符串值的前缀建立索引
-  - 只有索引列在比较表达式中单独出现才可以使用索引
-  - 定位并删除表中的重复和冗余索引
-  - 为了尽可能少的让聚簇索引发生页面分裂和记录移位的情况，建议让主键拥有AUTO_INCREMENT属性
-  - 尽量使用覆盖索引进行查询，避免回表带来的性能损耗
-- 代价  
-  - 占用额外的存储空间  
-  - 增删改时需要维护索引值的顺序  
-- 回表  
-  - 会使用到两个B+树索引，一个二级索引，一个聚簇索引  
-  - 访问二级索引使用顺序I/O，访问聚簇索引使用随机I/O  
-- 存储结构
-  B+树
-  - 为什么使用B+树 
-    - 非叶子结点不存储数据，降低树高，减少磁盘IO，单点查询效率高
-    - 节点采用双向链表，便于范围查找
-    - 有冗余节点存在，插入和删除树的调整较少
-- 失效
-  - 对索引使用左或者左右模糊匹配
-  - 对索引使用函数
-  - 对索引进行表达式计算
-  - 对索引隐式类型转换
-    - MySQL遇到字符串和数字比较的时候，会自动把字符串转为数字，然后再进行比较
-  - 联合索引非最左匹配
-  - WHERE子句中的OR
-    - 只要有条件列不是索引列，就会进行全表扫描
+- 索引
+  - 基本操作  
+    CREATE TALBE 表名 (
+        各种列的信息 ··· , 
+        [KEY|INDEX] 索引名 (需要被索引的单个列或多个列)
+    )
+    ALTER TABLE 表名 ADD [INDEX|KEY] 索引名 (需要被索引的单个列或多个列)
+    ALTER TABLE 表名 DROP [INDEX|KEY] 索引名
+    CREATE INDEX 索引名 ON 表名(列名)
+    DROP INDEX 索引名 ON 表名
+  - 应用  
+    - 全值匹配
+    - 匹配左边的列
+    - 匹配列前缀
+    - 匹配范围值
+    - 用于排序
+    - 用于分组
+  - 注意事项
+    - 只为用于搜索、排序或分组的列创建索引
+    - 为列的基数大的列创建索引
+    - 索引列的类型尽量小
+    - 可以只对字符串值的前缀建立索引
+    - 只有索引列在比较表达式中单独出现才可以使用索引
+    - 定位并删除表中的重复和冗余索引
+    - 为了尽可能少的让聚簇索引发生页面分裂和记录移位的情况，建议让主键拥有AUTO_INCREMENT属性
+    - 尽量使用覆盖索引进行查询，避免回表带来的性能损耗
+  - 代价  
+    - 占用额外的存储空间  
+    - 增删改时需要维护索引值的顺序  
+  - 回表  
+    - 会使用到两个B+树索引，一个二级索引，一个聚簇索引  
+    - 访问二级索引使用顺序I/O，访问聚簇索引使用随机I/O  
+  - 存储结构
+    B+树
+    - 为什么使用B+树 
+      - 非叶子结点不存储数据，降低树高，减少磁盘IO，单点查询效率高
+      - 节点采用双向链表，便于范围查找
+      - 有冗余节点存在，插入和删除树的调整较少
+  - 失效
+    - 对索引使用左或者左右模糊匹配
+    - 对索引使用函数
+    - 对索引进行表达式计算
+    - 对索引隐式类型转换
+      - MySQL遇到字符串和数字比较的时候，会自动把字符串转为数字，然后再进行比较
+    - 联合索引非最左匹配
+    - WHERE子句中的OR
+      - 只要有条件列不是索引列，就会进行全表扫描
 ```
 
+##  ##
 **原理**  
 ```
 - 单表访问方法
@@ -521,80 +512,6 @@ explain
     在将In子查询转为semi-join时，如果采用的是FirstMatch执行策略，则在被驱动表执行计划的Extra列就是显示FirstMatch(tbl_name)提示  
 ```
 
-## 事务 ##
-```
-概念
-- 特性  
-  - 原子性(Atomicity)
-  - 一致性(Consistency)
-  - 隔离性(Isolation)
-  - 持久性(Durability)
-  InnoDB使用回滚日志保证原子性，使用MVCC和锁来保证隔离性，重做日志保证持久性，通过原子性、隔离性、持久性来保证一致性
-- 使用
-  - `BEGIN`  开启事务   
-  - `COMMIT`  提交事务
-  - `ROLLBACK`  手动中止事务 
-  - `START TRANSACTION [READ ONLY|READ WRITE] [WITH CONSISTENT SNAPSHOT]`  开启事务  
-  - `AUTOCOMMIT` 自动提交 
-- 隔离性
-  - 并发问题  
-    - 脏写  
-      一个事务修改了另一个未提交事务修改过的数据，那就意味着发生了脏写  
-    - 脏读  
-      一个事务读到了另一个未提交事务修改过的数据，那就意味着发生了脏读   
-    - 不可重复读  
-      一个事务读到另一个已经提交的事务修改过的数据，并且其他事务每对该数据进行一次修改并提交后，该事务都能查询得到最新值，那就意味着发生了不可重复读  
-    - 幻读  
-      一个事务先根据某些条件查询出一些记录，之后另一个事务又向表中插入了符合这些条件的记录，原先的事务再次按照该条件查询时，能把另一个事务插入的记录也读出来，那就意味着发生了幻读
-  - 隔离级别  
-    - read uncommitted  未提交读
-    - read committed  已提交读   
-    - repeatable read  可重复读
-    - serializable  可串行化
-    | 隔离级别 | 脏读 | 不可重复读 | 幻读 |  
-    | :---: | :---: | :---: | :---: |
-    | read uncommitted | Possible | Possible | Possible |
-    | read committed | Not Possible | Possible | Possible |
-    | repeatable read | Not Possible | Not Possible | Possible |
-    | serializable | Not Possible | Not Possible | Not Possible |
-    - 设置隔离级别  
-      `show variables like 'transaction_isolation`  
-      `SET [GLOBAL|SESSION] TRANSACTION ISOLATION LEVEL level`
-      level: {
-          read uncommitted
-          read committed
-          repeatable read
-          serializable
-      }
-  - MVCC
-    - trx_id 
-      每次一个事务对某条聚簇索引记录进行改动时，都会把该事务的事务id赋值给trx_id隐藏列
-    - roll_pointer 
-      每次对某条聚簇索引记录进行改动时，都会把旧的版本写入到undo日志中，然后这个隐藏列就相当于一个指针，可以通过它来找到该记录修改前的信息  
-      记录每次更新后，都会将旧值放到一条undo日志中，就算是该记录的一个旧版本，随着更新次数的增多，所有的版本都会被roll_pointer属性连接成一个链表，我们把这个链表称之为版本链
-    - ReadView    
-      - m_ids  表示在生成ReadView时当前系统中活跃的读写事务的事务id列表  
-      - min_trx_id  表示在生成ReadView时当前系统中活跃的读写事务中最小的事务id，也就是m_ids中的最小值
-      - max_trx_id  表示生成ReadView时系统中应该分配给下一个事务的id值
-      - creator_trx_id  表示生成该ReadView的事务的事务id  
-    - 访问过程
-      - 如果被访问版本的trx_id属性值与ReadView中的creator_trx_id值相同，意味着当前事务在访问它自己修改过的记录，所以该版本可以被当前事务访问  
-      - 如果被访问版本的trx_id属性值小于ReadView中的min_trx_id值，表明生成该版本的事务在当前事务生成ReadView前已经提交，所以该版本可以被当前事务访问  
-      - 如果被访问版本的trx_id属性值大于或等于ReadView中的max_trx_id值，表明生成该版本的事务在当前事务生成ReadView后才开启，所以该版本不可以被当前事务访问
-      - 如果被访问版本的trx_id属性值在ReadView的min_trx_id和max_trx_id之间，那就需要判断一下trx_id属性值是不是在m_ids列表中，如果在，说明创建ReadView时生成该版本的事务还是活跃的，该版本不可以被访问；如果不在，说明创建ReadView时生成该版本的事务已经被提交，该版本可以被访问  
-    - 生成时机  
-      - READ COMMITTED  每次读取数据前都生成一个ReadView  
-      - REPEATABLE READ  第一次读取数据时生成一个ReadView  
-  - 常见问题
-    - 可重复读隔离级别，出现幻读的情况
-      - 快照读  
-        通过MVCC方式解决了幻读  
-        事务B插入记录，事务A更新了事务B插入的记录，事务A就能看到事务B插入的纪录了  
-      - 当前读  
-        通过next-key lock(记录锁+间隙锁)方式解决了幻读  
-        事务A先执行快照读，事务B插入一条记录，事务A再执行当前读  
-```
-
 ## 存储结构 ##
 **行结构**  
 [compact行格式](./images/mysql/innodb_row_format_compact.webp)
@@ -735,6 +652,80 @@ Buffer Pool实例
 - 设置
   `innodb_buffer_pool_instances`  设置Buffer Pool实例的个数  
   `innodb_buffer_pool_chunk_size`  一个Buffer Pool实例其实是由若干个chunk组成的  
+```
+
+## 事务 ##
+```
+概念
+- 特性  
+  - 原子性(Atomicity)
+  - 一致性(Consistency)
+  - 隔离性(Isolation)
+  - 持久性(Durability)
+  InnoDB使用回滚日志保证原子性，使用MVCC和锁来保证隔离性，重做日志保证持久性，通过原子性、隔离性、持久性来保证一致性
+- 使用
+  - `BEGIN`  开启事务   
+  - `COMMIT`  提交事务
+  - `ROLLBACK`  手动中止事务 
+  - `START TRANSACTION [READ ONLY|READ WRITE] [WITH CONSISTENT SNAPSHOT]`  开启事务  
+  - `AUTOCOMMIT` 自动提交 
+- 隔离性
+  - 并发问题  
+    - 脏写  
+      一个事务修改了另一个未提交事务修改过的数据，那就意味着发生了脏写  
+    - 脏读  
+      一个事务读到了另一个未提交事务修改过的数据，那就意味着发生了脏读   
+    - 不可重复读  
+      一个事务读到另一个已经提交的事务修改过的数据，并且其他事务每对该数据进行一次修改并提交后，该事务都能查询得到最新值，那就意味着发生了不可重复读  
+    - 幻读  
+      一个事务先根据某些条件查询出一些记录，之后另一个事务又向表中插入了符合这些条件的记录，原先的事务再次按照该条件查询时，能把另一个事务插入的记录也读出来，那就意味着发生了幻读
+  - 隔离级别  
+    - read uncommitted  未提交读
+    - read committed  已提交读   
+    - repeatable read  可重复读
+    - serializable  可串行化
+    | 隔离级别 | 脏读 | 不可重复读 | 幻读 |  
+    | :---: | :---: | :---: | :---: |
+    | read uncommitted | Possible | Possible | Possible |
+    | read committed | Not Possible | Possible | Possible |
+    | repeatable read | Not Possible | Not Possible | Possible |
+    | serializable | Not Possible | Not Possible | Not Possible |
+    - 设置隔离级别  
+      `show variables like 'transaction_isolation`  
+      `SET [GLOBAL|SESSION] TRANSACTION ISOLATION LEVEL level`
+      level: {
+          read uncommitted
+          read committed
+          repeatable read
+          serializable
+      }
+  - MVCC
+    - trx_id 
+      每次一个事务对某条聚簇索引记录进行改动时，都会把该事务的事务id赋值给trx_id隐藏列
+    - roll_pointer 
+      每次对某条聚簇索引记录进行改动时，都会把旧的版本写入到undo日志中，然后这个隐藏列就相当于一个指针，可以通过它来找到该记录修改前的信息  
+      记录每次更新后，都会将旧值放到一条undo日志中，就算是该记录的一个旧版本，随着更新次数的增多，所有的版本都会被roll_pointer属性连接成一个链表，我们把这个链表称之为版本链
+    - ReadView    
+      - m_ids  表示在生成ReadView时当前系统中活跃的读写事务的事务id列表  
+      - min_trx_id  表示在生成ReadView时当前系统中活跃的读写事务中最小的事务id，也就是m_ids中的最小值
+      - max_trx_id  表示生成ReadView时系统中应该分配给下一个事务的id值
+      - creator_trx_id  表示生成该ReadView的事务的事务id  
+    - 访问过程
+      - 如果被访问版本的trx_id属性值与ReadView中的creator_trx_id值相同，意味着当前事务在访问它自己修改过的记录，所以该版本可以被当前事务访问  
+      - 如果被访问版本的trx_id属性值小于ReadView中的min_trx_id值，表明生成该版本的事务在当前事务生成ReadView前已经提交，所以该版本可以被当前事务访问  
+      - 如果被访问版本的trx_id属性值大于或等于ReadView中的max_trx_id值，表明生成该版本的事务在当前事务生成ReadView后才开启，所以该版本不可以被当前事务访问
+      - 如果被访问版本的trx_id属性值在ReadView的min_trx_id和max_trx_id之间，那就需要判断一下trx_id属性值是不是在m_ids列表中，如果在，说明创建ReadView时生成该版本的事务还是活跃的，该版本不可以被访问；如果不在，说明创建ReadView时生成该版本的事务已经被提交，该版本可以被访问  
+    - 生成时机  
+      - READ COMMITTED  每次读取数据前都生成一个ReadView  
+      - REPEATABLE READ  第一次读取数据时生成一个ReadView  
+  - 常见问题
+    - 可重复读隔离级别，出现幻读的情况
+      - 快照读  
+        通过MVCC方式解决了幻读  
+        事务B插入记录，事务A更新了事务B插入的记录，事务A就能看到事务B插入的纪录了  
+      - 当前读  
+        通过next-key lock(记录锁+间隙锁)方式解决了幻读  
+        事务A先执行快照读，事务B插入一条记录，事务A再执行当前读  
 ```
 
 ## 日志 ##
