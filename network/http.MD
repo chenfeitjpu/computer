@@ -32,7 +32,8 @@
   - 304 Not Modified 资源未修改
 - 4xx 客户端错误，请求报文有误，服务器无法处理
   - 400 Bad Request 请求报文有误
-  - 403 Forbidden 禁止访问
+  - 401 Unauthorized  认证错误
+  - 403 Forbidden 认证成功，没有授权
   - 404 Not Found 请求资源不存在
 - 5xx 服务端错误，服务器在处理请求时内部发生了错误
   - 500 服务器错误 
@@ -68,9 +69,6 @@
   - 参数
     - GET  请求参数放在URL中，只能是字符串，且长度受客户端限制
     - POST  请求参数放在请求体，可以是各种数据格式
-- RESTFUL API 
-  https://domain/version/resource?filter(key=value)
-  对于资源的具体操作类型，由HTTP动词表示
 
 缓存技术
 - 强制缓存  
@@ -78,14 +76,12 @@
   - Expires 是一个绝对时间  
   Cache-Control的优先级高于Expires
 - 协商缓存  
-  - 基于时间  
-    - 响应头部中的Last-Modified
-      标示资源的最后修改时间
-    - 请求头部中的If-Modified-Since 
   - 基于内容
-    - 响应头部中Etag  
-      唯一标识资源
+    - 响应头部中Etag  唯一标识资源
     - 请求头部中的If-None-Match
+  - 基于时间  
+    - 响应头部中的Last-Modified  标示资源的最后修改时间
+    - 请求头部中的If-Modified-Since 
     Etag的优先级更高  
 
 HTTP1.1特性
@@ -161,6 +157,17 @@ HTTP2特性
 - CSRF
   - Referer校验
   - Token校验
+
+RESTFUL API 
+一套应用程序的API设计规范
+https://domain/version/resource?filter(key=value)
+- 协议  总是使用https协议
+- 域名  使用api专用域名
+- 版本  放入URL中
+- 路径  使用资源表示
+- 过滤
+- 动词  GET、POST、PUT、PATCH、DELETE
+- 返回结果  使用JSON格式，根据请求资源返回单个或者多个
 ```
 
   

@@ -90,5 +90,5 @@ LeetCode
 - 23.合并K个升序链表  
 ```
 
-学习资料
+学习资料  
 [线段树原理及其实现](https://imageslr.com/2020/02/02/segment.html)
