@@ -97,7 +97,7 @@
   slice、map、channel、func、interface 
 - 类型比较
   - 不同类型不能比较
-  - 不可比较类型不能比较  slice、map、function
+  - 不可比较类型不能比较  slice、map、function，但可以与nil进行比较
   - 接口比较，一个接口覆盖另一个接口的所有方法，且不是同一种不可比较类型
 - 线程安全的类型
   channel、sync.Map
@@ -131,7 +131,7 @@ string
       Len  int
   }
 - 注意事项
-  - string不能修改
+  - string对应的底层字节数组不能修改
   - 转换成[]byte会发生内存拷贝，不发生拷贝*(*[]byte)(unsafe.Pointer(&a))
 
 array
@@ -282,15 +282,9 @@ sync.map
   - 写入
     - 如果在read里能够找到待存储的key，并且对应的entry的值不为expunged，也就是没被删除时，直接更新对应的entry即可
     - 第一步没有成功，要么read中没有这个key，要么key被标记为删除。则先加锁，再进行后续的操作
-    - 再次在read中查找是否存在这个key，也就是double check一下，这也是lock-free编程里的常见套路。如果read中存在该key，但p == expunged，说明m.dirty != nil并且m.dirty中不存在该key值
-      - 将p的状态由expunged更改为nil
-      - dirty map插入key
-      - 直接更新对应的value
+    - 再次在read中查找是否存在这个key，也就是double check一下，这也是lock-free编程里的常见套路。如果read中存在该key，但p == expunged，说明m.dirty != nil并且m.dirty中不存在该key值，dirty map插入key，直接更新对应的value
     - 如果read中没有此key，那就查看dirty中是否有此key，如果有，则直接更新对应的value，这时read中还是没有此key
-    - 最后一步，如果read和dirty中都不存在该key
-      - 如果dirty为空，则需要创建dirty，并从read中拷贝未被删除的元素
-      - 更新amended字段，标识dirty map中存在read map中没有的key
-      - 将k-v写入dirty map中
+    - 最后一步，如果read和dirty中都不存在该key，如果dirty为空，则需要创建dirty，并从read中拷贝未被删除的元素，更新amended字段，标识dirty map中存在read map中没有的key，将k-v写入dirty map中
   - 删除
     - 先从read里查是否有这个key，如果有则执行entry.delete方法，将p置为nil，这样read和dirty都能看到这个变化
     - 如果没在read中找到这个key，并且dirty不为空，那么就要操作dirty了，操作之前，还是要先上锁。然后进行double check，如果仍然没有在read里找到此key，则从dirty中直接删掉这个key。
@@ -307,29 +301,25 @@ sync.map
 struct
 用于定义一组属性
 - 使用
-  - 定义
-    type name struct {  
-        name type 
-        name type  
-    }
+  type name struct {  
+      name type 
+      name type  
+  }
   - tag  丰富语义
-    - 转json
-      - 小写字段不能转
-      - 大写字段加了tag取别名，不加tag则json内的字段跟结构体字段原名一致
+    - 转json  小写字段不能转，大写字段加了tag取别名，不加tag则json内的字段跟结构体字段原名一致
 - 扩展
   - 嵌套结构体
   - 匿名结构体
-  - 空结构体
-    不占内存，占位使用
+  - 空结构体  不占内存，占位使用
 
 func  
-多个操作的集合
+用户定义一组操作
 - 使用
   func name(parameter type, parameter type) ([output] type, [output] type) {
       return value, value
   }
   - 返回值要么同时命名，要么不命名
-- 闭包  函数内部变量离开其作用域后始终保持在内存中而不被销毁
+- 闭包  函数及其相关引用环境组合而成的实体  
 - defer  延迟函数的执行，在函数退出前执行相应操作。defer通常用于解锁、关闭文件，释放资源等清理操作
   - 示例
     file, err := os.Open("test.txt")
