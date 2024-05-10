@@ -24,16 +24,13 @@
 - go install  编译和安装包和依赖
 - go get  下载和安装包和依赖
 - go clean  移除对象文件和缓存文件
-- go fmt  格式化源码包
-- go test  运行测试包
-- go vet  报告代码错误
+- go fmt pkg/...  格式化源码包
+- go vet pkg/...  报告代码错误
+- go test -v pkg/... -run method  运行测试包
 
 常用包
 - fmt  提供了输入输出的格式化功能
-  - fmt.Print、fmt.Println、fmt.Printf  标准输出
-    - %v  输出值
-    - %+v  输出属性和值
-    - %#v  输出值的GO语法表示
+  - fmt.Print、fmt.Println、fmt.Printf  标准输出，%v、%+v、%#v、%s、%d、%p
   - fmt.Sprint、fmt.Sprintln、fmt.Sprintf  输出到字符串
   - fmt.Fprint、fmt.Fprintln、fmt.Fprintf  输出到文件
 - math  提供了数学函数和常量的功能
@@ -43,16 +40,17 @@
 - time  提供了时间和日期的功能
   - time.Now()  获取当前时间
   -	time.Date()  根据日期生成时间
-  -	time.Unix()  根据时间戳生成时间
-  -	time.Parse()  根据字符串生时间
+  - time.Unix()  根据时间戳生成时间
+  - time.Parse()  根据字符串生时间
   - {time}.Format()  格式化时间
-- sort  提供了排序功能
-- net  提供了网络编程的功能
-- sync  提供了同步原语的功能，原语在执行过程中不允许中断
+- sort  提供了排序的功能
+- net  提供了网络通信的功能
+- sync  提供了同步原语的功能，保证并发安全性
 - runtime  Go语言的运行时系统，提供了与底层系统交互和控制的功能。它包含了与内存管理、垃圾回收、协程调度等相关的函数和变量
-  - runtime.NumGoroutine()
-- unsafe  提供了一些不安全的编程操作，如直接操作指针、修改内存等
-  - unsafe.SizeOf  获取变量占用内存大小
+  - runtime.NumGoroutine()  获取当前运行的goroutine数量
+  - runtime.GOMAXPROCS(0)  获取当前P的数量
+- unsafe  提供了直接操作内存的工作
+  - unsafe.SizeOf()  获取变量占用内存大小
 
 变量
 - 使用
@@ -99,7 +97,7 @@
   slice、map、channel、func、interface 
 - 类型比较
   - 不同类型不能比较
-  - 不可比较类型不能比较
+  - 不可比较类型不能比较  slice、map、function
   - 接口比较，一个接口覆盖另一个接口的所有方法，且不是同一种不可比较类型
 - 线程安全的类型
   channel、sync.Map
@@ -462,6 +460,10 @@ error&panic&recover
   - 注意事项
     - 子协程的panic会导致主协程退出
     - 子协程的panic主协程无法捕获
+  - 无法捕获panic的情况
+    - defer需要在函数里直接调用recover
+    - panic的信息为nil时无法捕获
+    - 不同goroutine间无法捕获
 ```
 
 ## 内存管理 ##
