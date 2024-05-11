@@ -1,4 +1,4 @@
-*golang*
+**golang**
 - [定义](#定义)
 - [使用](#使用)
   - [基础语法](#基础语法)
@@ -90,15 +90,14 @@
   - byte、rune
   - string
   - array、slice、map、channel 
-  - struct、interface
-  - func 
+  - struct、func、interface 
   - pointer、uintptr
 - 引用类型 
-  slice、map、channel、func、interface 
+  slice、map、channel、func、interface、pointer
 - 类型比较
   - 不同类型不能比较
   - 不可比较类型不能比较  slice、map、function，但可以与nil进行比较
-  - 接口比较，一个接口覆盖另一个接口的所有方法，且不是同一种不可比较类型
+  - 接口比较，一个接口覆盖另一个接口的所有方法，且实际类型不是同一种不可比较类型
 - 线程安全的类型
   channel、sync.Map
 
@@ -111,15 +110,12 @@
 流程控制 
 - 选择
   - if else if else
-  - switch case fallthrough
+  - switch case default fallthrough
 - 循环
-  - for index break continue
-  - for range break continue
+  - for index continue break
+  - for range continue break
 - 跳转
-  - goto
-    - 只能在函数内跳转，需要配合标签一起使用
-    - 不能跳过内部变量声明语句
-    - 只能跳到同级作用域或者上层作用域内，不能跳到内部作用域内
+  - goto 只能在函数内跳转，需要配合标签一起使用，不能跳过内部变量声明语句，只能跳到同级作用域或者上层作用域内，不能跳到内部作用域内
 ```
 
 ## 数据结构 ##
@@ -133,6 +129,9 @@ string
 - 注意事项
   - string对应的底层字节数组不能修改
   - 转换成[]byte会发生内存拷贝，不发生拷贝*(*[]byte)(unsafe.Pointer(&a))
+  - 高效拼接
+    - strings.Builder String()时不会另外申请内存
+    - bytes.Buffer  String()时会另外申请内存
 
 array
 固定长度集合
@@ -350,6 +349,7 @@ method
   - object.method()
 - 注意事项
   - 对于不可寻址的类型T，不能调用*T的方法
+  - 方法接受者不能是接口，或者本身就是指针类型
 
 interface
 用于定义一组方法
@@ -459,11 +459,11 @@ error&panic&recover
 ## 内存管理 ##
 ```
 make & new
-- make  为slice、map、channel分配内存并初始化，返回值
-- new  为任意类型分配内存，返回指针
+- make  为slice、map、channel分配内存并初始化为非零值，返回值
+- new  为任意类型分配内存并初始化为零值，返回指针
 
 逃逸分析
-分析内存是分配在栈上还是堆上
+在函数中分配的对象，由于其生命周期需要延长，导致编译器将其分配到堆区而不是栈区
 - 场景
   - 指针被作用域之外所引用
   - 变量类型不确定(如接口)
@@ -616,6 +616,8 @@ make & new
   - 定期触发，默认每隔两分钟触发一次GC
   - 新建对象，检测内存分配如果到达阀值触发GC
   - 手动触发，runtime.GC()
+- 注意事项
+  - 小对象多了会造成GC压力  小对象过多会导致GC消耗过多的CPU
 ```
 
 ## 并发控制 ##
@@ -824,7 +826,7 @@ make & new
     - 不读关闭后通道
       将关闭通道置为nil
 
-- context  解决goroutine之间退出通知、元数据传递
+- context  用于在单个请求下多个goroutine之间同步数据、取消信号、超时控制
   - 结构
     type Context interface {
         // 当context被取消或者到了 deadline，返回一个被关闭的 channel
@@ -978,6 +980,10 @@ go语言的调度模型，把大量的goroutine分配到少量线程上去执行
     - func TestMain(m *testing.M) {  单个测试包集成，一个包里面只能有一个TestMain方法
           goleak.VerifyTestMain(m)
       }
+- 解决
+  - 使用带超时的操作，比如select语句配合time.After
+  - 使用context包来传递取消信号
+  - 使用sync.WaitGroup等待所有的协程完成
 
 数据竞争
 - 检测
