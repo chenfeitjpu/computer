@@ -318,7 +318,7 @@ func
       return value, value
   }
   - 返回值要么同时命名，要么不命名
-- 闭包  函数及其相关引用环境组合而成的实体  
+- 闭包  函数及其相关引用环境的组合体  
 - defer  延迟函数的执行，在函数退出前执行相应操作。defer通常用于解锁、关闭文件，释放资源等清理操作
   - 示例
     file, err := os.Open("test.txt")
@@ -411,21 +411,12 @@ pointer
   }
 - 比较
   - unsafe.Pointer只是单纯的通用指针类型，用于转换不同类型指针，它不可以参与指针运算
-  - uintptr是用于指针运算的，GC不把uintptr当指针，也就是说uintptr无法持有对象，uintptr类型的目标会被回收
+  - uintptr是用于指针运算的，uintptr不持有对象，会被GC回收
   - unsafe.Pointer可以和普通指针进行相互转换
   - unsafe.Pointer可以和uintptr进行相互转换
 
 reflect
 程序在运行的时候能够观察并且修改自己的行为
-- 使用
-  - reflect.TypeOf()
-  - reflect.Type.Field()
-  - reflect.Type.Method()
-  - reflect.ValueOf()
-  - reflect.Value.Field()
-  - reflect.Value.Method()
-  - reflect.Value.MethodByName()
-  - reflect.Value.Call()
 - reflect慢的主要原因
   - 涉及到内存分配以及后续的GC
   - reflect实现里面有大量的枚举，也就是for循环，比如类型之类的
