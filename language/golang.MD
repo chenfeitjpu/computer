@@ -309,7 +309,7 @@ struct
 - 扩展
   - 嵌套结构体
   - 匿名结构体
-  - 空结构体  不占内存，占位使用
+  - 空结构体  不占内存，内存地址都是同一个，常用于占位
 
 func  
 用户定义一组操作
@@ -352,7 +352,7 @@ method
   - 方法接受者不能是接口，或者本身就是指针类型
 
 interface
-用于定义一组方法
+用于定义一组方法，可以由不同的类型实现，将抽象与实现分离
 - 使用
   type name interface {  
       name(name type) type  
@@ -614,51 +614,30 @@ make & new
 ## 并发控制 ##
 ```
 并发安全性
-- 概念
+- 概念 
   多个goroutine对共享资源的访问不会导致数据竞争
-- 实现
-  - Mutex & RWMutex
-  - automic
-  - channel
+- 实现  
+  Mutex、RWMutex、automic、channel
 
-组件
-- goroutine
-  go语言的并发执行单元，可以同时执行多个goroutine，而不需要显式地管理线程的生命周期
-  - 使用
-    func test() {
-        fmt.Println("hello test")
-    }
-    func main() {
-        go test()
-        fmt.Println("hello main")
-        time.Sleep(time.Second)
-    }
+goroutine 
+go语言的并发执行单元，可以同时执行多个goroutine，而不需要显式地管理线程的生命周期
 
-- 锁  并发编程中一种同步机制，用于保护共享资源的访问
-  - 互斥锁(sync.Mutex)  同一时刻只能有一个线程持有锁
-    - 示例
-      var (
-          counter int
-          mu      sync.Mutex
-      )
-      func increment() {
-          defer mu.Unlock()
-          mu.Lock()
-          counter++
-      }
-      func main() {
-          wg := &sync.WaitGroup{}
-          for i := 0; i < 1000; i++ {
-              wg.Add(1)
-              go func() {
-                  defer wg.Done()
-                  increment()
-              }()
-          }
-          wg.Wait()
-          fmt.Println(counter)
-      }
-    - 获取锁失败
+锁
+并发编程中一种同步机制，用于保护共享资源的访问
+- 互斥锁(sync.Mutex)  
+  同一时刻只能有一个锁操作
+  - 结构
+    type Mutex struct {
+        state int32
+        sema  uint32
+    }
+    - state
+      - 最右侧的一个bit位，标志是否上锁，0:未上锁，1:已上锁
+      - 最右数第二个bit位，标志是否有goroutine从阻塞中被唤醒，0:没有，1:有
+      - 最右数第三个bit位，标志Mutex是否处于饥饿模式，0:非饥饿，1:饥饿
+      - 剩余的29位，记录当前阻塞队列goroutine的数量
+  - 实现
+    - 获取锁
       首先采用自旋+CAS的策略争夺锁，尝试持续受挫达到一定条件后，判定当前过于激烈，则由自旋转为阻塞模式
       自旋模式转为阻塞模式的具体条件
       - CPU单核或仅有单个P调度器(此时自旋，其他goroutine根本没机会释放锁，自旋纯属空转)
@@ -672,256 +651,206 @@ make & new
       - 饥饿模式(严格公平)
         锁的所有权按照阻塞队列的顺序进行依次传递，新goroutine进行流程时不得抢锁，而是进入队列尾部排队
         当阻塞队列已清空，或取得锁的goroutine等锁时间已低于1ms时，则回到正常模式
-    - 结构
-      type Mutex struct {
-          state int32
-          sema  uint32
-      }
-      - state
-        - 最右侧的一个bit位，标志是否上锁，0:未上锁，1:已上锁
-        - 最右数第二个bit位，标志是否有goroutine从阻塞中被唤醒，0:没有，1:有
-        - 最右数第三个bit位，标志Mutex是否处于饥饿模式，0:非饥饿，1:饥饿
-        - 剩余的29位，记录当前阻塞队列goroutine的数量
-  - 读写锁(sync.RWMutex)  同一时刻只能有一个线程持有写锁，或者多个线程持有读锁
-    - 示例
-      rmu := sync.RWMutex{}
-	  defer rmu.RUnlock()
-	  rmu.RLock()
-    - 结构
-      type RWMutex struct {
-          w           Mutex        // held if there are pending writers
-          writerSem   uint32       // semaphore for writers to wait for completing readers
-          readerSem   uint32       // semaphore for readers to wait for completing writers
-          readerCount atomic.Int32 // number of pending readers
-          readerWait  atomic.Int32 // number of departing readers
-      }
+  
+- 读写锁(sync.RWMutex)  
+  同一时刻只能写操作，或者多个读操作
+  - 结构
+    type RWMutex struct {
+        w           Mutex  // 复用互斥锁
+        writerSem   uint32 // 信号量，用于写等待读
+        readerSem   uint32 // 信号量，用于读等待写
+        readerCount int32  // 当前执行读的goroutine数量
+        readerWait  int32  // 被阻塞的准备读的goroutine的数量
+    }
+  - 实现
 
-- atomic  并发编程中的一种同步机制，保证单个指令操作的原子性
-  - 使用
+atomic  
+并发编程中的一种同步机制，保证单个指令操作的原子性
+- 使用
   	- atomic.StoreInt64()
 	- atomic.LoadInt64()
 	- atomic.AddInt64()
 	- atomic.SwapInt64()
 	- atomic.CompareAndSwapInt64()
-  - 与锁的区别
-    - 访问粒度
-      - 原子操作通常是针对单个变量或内存位置的操作
-      - 锁通常是针对一段代码或一组操作的访问进行同步      
-    - 使用方式
-      - 原子操作是通过硬件指令或特定的原子操作函数来实现的，可以直接应用于变量或内存位置，而无需额外的代码
-      - 锁是通过编程语言提供的锁机制来实现的，需要显式地使用锁的相关方法或语句来保护临界区的访问
-    - 性能开销
-      - 原子操作通常具有较低的性能开销，因为它们是在硬件级别上实现的，无需额外的同步机制
-      - 锁通常具有较高的性能开销，因为它们需要进行上下文切换和线程同步等操作
+- 与锁的区别
+  - 访问粒度
+    - 原子操作通常是针对单个变量或内存位置的操作
+    - 锁通常是针对一段代码或一组操作的访问进行同步      
+  - 使用方式
+    - 原子操作是通过硬件指令或特定的原子操作函数来实现的，可以直接应用于变量或内存位置，而无需额外的代码
+    - 锁是通过编程语言提供的锁机制来实现的，需要显式地使用锁的相关方法或语句来保护临界区的访问
+  - 性能开销
+    - 原子操作通常具有较低的性能开销，因为它们是在硬件级别上实现的，无需额外的同步机制
+    - 锁通常具有较高的性能开销，因为它们需要进行上下文切换和线程同步等操作
 
-- channel  用于在goroutine之间进行通信和同步的机制
-  - 使用
-    - 只读通道  <- ch
-    - 只写通道  ch <-
-    - 双向通道  ch
-  - 示例
-    func fibonacci(n int, ch chan int) {
-        x, y := 0, 1
-        for i := 0; i < n; i++ {
-            ch <- x
-            x, y = y, x+y
-        }
-        close(ch)
-    }
-    func main() {
-        ch := make(chan int)
-        go fibonacci(10, ch)
-        for num := range ch {
-            fmt.Println(num)
-        }
-    }
-  - 结构
-    type hchan struct {
-  	    qcount   uint           // total data in the queue
-  	    dataqsiz uint           // size of the circular queue
-  	    buf      unsafe.Pointer // points to an array of dataqsiz elements
-  	    elemsize uint16
-  	    closed   uint32
-  	    elemtype *_type // element type
-	    sendx    uint   // send index
- 	    recvx    uint   // receive index
-	    recvq    waitq  // list of recv waiters
-	    sendq    waitq  // list of send waiters
-	    lock mutex
-    }
-    - buf  指向一个环形数组，用来实现循环队列
-    - sendx  循环队列的队尾指针
-    - recvx  循环队列的队头指针
-    - recvq  等待从通道中接收数据的goroutine  双向链表
-    - sendq  等待发送数据到通道的goroutine  双向链表
-  - 操作
-    - 发送
-      - 空通道，阻塞
-      - 加锁
-      - 已关闭通道，直接panic
-      - recvq不为空，移出第一个协程接收数据
-      - 循环队列未满，数据添加到buf中
-      - 当前队列阻塞，并放入sendq中
-    - 读取
-      - 空通道，阻塞
-      - 加锁
-      - 通道关闭且缓冲为空，返回空值
-      - 发送队列不为空，发送者出队，通道是非缓冲类型通道，直接将发送者数据传送给接收者
-      - 发送队列不为空，发送者出队，通道是缓冲类型通道，从循环队列取出一条数据，将发送者数据传递至循环队列
-      - 通道缓冲有数据，从buf中取出值
-      - 通道缓冲无数据，当前协程阻塞，并放入recvq中
-    - 关闭
-      - 空通道，直接panic
-      - 加锁
-      - 已关闭通道，直接panic
-      - 唤醒接收者队列中所有接受者
-      - 唤醒发送者队列中所有发送者
-    |      操作      | nil的channel | 正常channel | 已关闭的channel |
-    | :------------: | :----------: | :---------: | :-------------: |
-    |    读 <-ch     |     阻塞     | 成功或阻塞  |    读到零值     |
-    |    写 ch<-     |     阻塞     | 成功或阻塞  |      panic      |
-    | 关闭 close(ch) |    panic     |    成功     |      panic      |
+channel  
+用于在goroutine之间进行通信和同步的机制
+- 使用
+  - 只读通道  <- ch
+  - 只写通道  ch <-
+  - 双向通道  ch
+- 结构
+  type hchan struct {
+      qcount   uint           // total data in the queue
+ 	  dataqsiz uint           // size of the circular queue
+  	  buf      unsafe.Pointer // points to an array of dataqsiz elements
+      elemsize uint16
+  	  closed   uint32
+  	  elemtype *_type // element type
+	  sendx    uint   // send index
+ 	  recvx    uint   // receive index
+	  recvq    waitq  // list of recv waiters
+	  sendq    waitq  // list of send waiters
+	  lock mutex
+  }
+  - buf  指向一个环形数组，用来实现循环队列
+  - sendx  循环队列的队尾指针
+  - recvx  循环队列的队头指针
+  - recvq  等待从通道中接收数据的goroutine  双向链表
+  - sendq  等待发送数据到通道的goroutine  双向链表
+- 操作
+  - 发送
+    - 空通道，阻塞
+    - 加锁
+    - 已关闭通道，直接panic
+    - recvq不为空，移出第一个协程接收数据
+    - 循环队列未满，数据添加到buf中
+    - 当前队列阻塞，并放入sendq中
+  - 读取
+    - 空通道，阻塞
+    - 加锁
+    - 通道关闭且缓冲为空，返回空值
+    - 发送队列不为空，发送者出队，通道是非缓冲类型通道，直接将发送者数据传送给接收者
+    - 发送队列不为空，发送者出队，通道是缓冲类型通道，从循环队列取出一条数据，将发送者数据传递至循环队列
+    - 通道缓冲有数据，从buf中取出值
+    - 通道缓冲无数据，当前协程阻塞，并放入recvq中
+  - 关闭
+    - 空通道，直接panic
+    - 加锁
+    - 已关闭通道，直接panic
+    - 唤醒接收者队列中所有接受者
+    - 唤醒发送者队列中所有发送者
+  |      操作      | nil的channel | 正常channel | 已关闭的channel |
+  | :------------: | :----------: | :---------: | :-------------: |
+  |    读 <-ch     |     阻塞     | 成功或阻塞  |    读到零值     |
+  |    写 ch<-     |     阻塞     | 成功或阻塞  |      panic      |
+  | 关闭 close(ch) |    panic     |    成功     |      panic      |
 
-  - 注意事项
-    - 优雅关闭channel
-      - defer + recover
-      - sync.Once
-      - channel
-        - 一个发送者，一个接收者，发送者关闭
-        - 一个发送者，多个接收者，发送者关闭
-        - 多个发送者，一个接收者，接收者关闭，发送者进行关闭通道的监控
-        - 多个发送者，多个接收者，发送者和接收者把关闭请求发送给中间人，中间人进行关闭，发送者和接收者进行关闭通道的监控
+- 注意事项
+  - 优雅关闭channel
+    - defer + recover
+    - sync.Once
+    - channel
+      - 一个发送者，一个接收者，发送者关闭
+      - 一个发送者，多个接收者，发送者关闭
+      - 多个发送者，一个接收者，接收者关闭，发送者进行关闭通道的监控
+      - 多个发送者，多个接收者，发送者和接收者把关闭请求发送给中间人，中间人进行关闭，发送者和接收者进行关闭通道的监控
 
-- select  同时监听多个通道的读写操作，并在其中任意一个通道就绪时执行相应的操作
-  - 示例
-    func main() {
-        ch1 := make(chan int)
-        ch2 := make(chan int)
-        go func() {
-            ch1 <- 10
-        }()
-        go func() {
-            ch2 <- 20
-        }()
-        select {
-        case num := <-ch1:
-            fmt.Println("receive from ch1 ", num)
-        case num := <-ch2:
-            fmt.Println("receive from ch2", num)
-        }
-    } 
-  - 注意事项 
-    - 通道关闭
-      如果其中一个case通道已经关闭，则每次都会执行到这个case  
-      如果select里边只有一个case，而这个case被关闭了，则会出现死循环  
-    - 不读关闭后通道
-      将关闭通道置为nil
+select  
+同时监听多个通道的读写操作，并在其中任意一个通道就绪时执行相应的操作
+- 注意事项 
+  - 通道关闭
+    如果其中一个case通道已经关闭，则每次都会执行到这个case  
+    如果select里边只有一个case，而这个case被关闭了，则会出现死循环  
+  - 不读关闭后通道
+    将关闭通道置为nil
 
-- context  用于在单个请求下多个goroutine之间同步数据、取消信号、超时控制
-  - 结构
-    type Context interface {
-        // 当context被取消或者到了 deadline，返回一个被关闭的 channel
-        Done() <-chan struct{}
-        // 在 channel Done 关闭后，返回 context 取消原因
-        Err() error
-        // 返回context是否会被取消以及自动取消时间
-        Deadline() (deadline time.Time, ok bool)
-        // 获取 key 对应的 value
-        Value(key interface{}) interface{}
-    }
-  - 分类
-    - emptyCtx
-      type emptyCtx int
-    - valueCtx
-      type valueCtx struct {
-          Context
-          key, val any
+WaitGroup  
+同步等待组
+- 使用
+  wg := sync.WaitGroup{}
+  wg.Add()
+  wg.Done()
+  wg.Wait()
+
+sync.Cond  
+通常应用于等待某个条件的一组goroutine，当条件变为true的时候，其中一个goroutine或者所有的goroutine都会被唤醒执行
+- 使用
+  - cond := sync.NewCond()  初始化
+  - cond.Wait()  放入Cond的等待队列中并阻塞
+  - cond.Singal()  唤醒一个等待此Cond的goroutine
+  - cond.BroadCast()  唤醒所有等待此Cond的goroutine
+- 示例
+  func main() {
+      cond := sync.NewCond(&sync.Mutex{})
+      var ready int
+      for i := 0; i < 10; i++ {
+          go func(i int) {
+              time.Sleep(time.Duration(rand.Intn(10)) * time.Second)
+              cond.L.Lock()
+              ready++
+              cond.L.Unlock()
+              log.Printf("运动员%d就位", i)
+              cond.Broadcast()
+          }(i)
       }
-    - cancelCtx
-      type cancelCtx struct {
-          Context
-          mu       sync.Mutex         
-          done     atomic.Value          
-          children map[canceler]struct{} 
-          err      error                 
-          cause    error                
+      cond.L.Lock()
+      for ready != 10 {
+          cond.Wait()
+          log.Println("裁判员收到")
       }
-    - timerCtx
-      type timerCtx struct {
-          *cancelCtx
-          timer *time.Timer
-          deadline time.Time
+      cond.L.Unlock()
+      log.Println("所有运动员全部就绪")
+  }
+
+context  
+用于在单个请求下多个goroutine之间同步数据、取消信号、超时控制
+- 结构
+  type Context interface {
+      // 当context被取消或者到了 deadline，返回一个被关闭的 channel
+      Done() <-chan struct{}
+      // 在 channel Done 关闭后，返回 context 取消原因
+      Err() error
+      // 返回context是否会被取消以及自动取消时间
+      Deadline() (deadline time.Time, ok bool)
+      // 获取 key 对应的 value
+      Value(key interface{}) interface{}
+  }
+- 分类
+  - emptyCtx
+    type emptyCtx int
+  - valueCtx
+    type valueCtx struct {
+        Context
+        key, val any
+    }
+  - cancelCtx
+    type cancelCtx struct {
+        Context
+        mu       sync.Mutex         
+        done     atomic.Value          
+        children map[canceler]struct{} 
+        err      error                 
+        cause    error                
       }
-
-- WaitGroup  同步等待组
-  - 使用
-    wg := sync.WaitGroup{}
-    wg.Add()
-    wg.Done()
-    wg.Wait()
-
-- sync.Cond  通常应用于等待某个条件的一组goroutine，当条件变为true的时候，其中一个goroutine或者所有的goroutine都会被唤醒执行
-  - 使用
-     - cond := sync.NewCond()  初始化
-     - cond.Wait()  放入Cond的等待队列中并阻塞
-     - cond.Singal()  唤醒一个等待此Cond的goroutine
-     - cond.BroadCast()  唤醒所有等待此Cond的goroutine
-  - 示例
-    func main() {
-        cond := sync.NewCond(&sync.Mutex{})
-        var ready int
-        for i := 0; i < 10; i++ {
-            go func(i int) {
-                time.Sleep(time.Duration(rand.Intn(10)) * time.Second)
-                cond.L.Lock()
-                ready++
-                cond.L.Unlock()
-                log.Printf("运动员%d就位", i)
-                cond.Broadcast()
-            }(i)
-        }
-        cond.L.Lock()
-        for ready != 10 {
-            cond.Wait()
-            log.Println("裁判员收到")
-        }
-        cond.L.Unlock()
-        log.Println("所有运动员全部就绪")
+  - timerCtx
+    type timerCtx struct {
+        *cancelCtx
+        timer *time.Timer
+        deadline time.Time
     }
 
-- sync.Once  函数只执行一次
-  - 使用
-    - once := &sync.Once{}
-    - once.Do(f func())
-  - 示例
-    func main() {
-        once := &sync.Once{}
-        for i := 0; i < 10; i++ {
-            once.Do(func() {
-                fmt.Println("hello, world")
-            })
-        }
-    }
-  - 结构
-    type Once struct {
-        done uint32
-        m    Mutex
-    } 
-  - 注意事项
-    - 高频使用的字段放在第一个，不用计算偏移量
-    - 原子操作可以保证其它goroutine及时观察到的done值的变化
+sync.Once  
+函数只执行一次
+- 使用
+  - once := &sync.Once{}
+  - once.Do(f func())
+- 结构
+  type Once struct {
+      done uint32
+      m    Mutex
+  } 
 
-- Pool  对象缓冲池
-  - 使用
-    - New
-    - Get
-    - Put
-  - 示例
+Pool  
+对象缓冲池
+- 使用
+  - New
+  - Get
+  - Put
 
-- 自旋
-  - 概念
-    线程在等待某个条件满足时，不会进入阻塞状态，而是通过不断地检查条件是否满足来进行忙等待
-    可以减少线程切换的开销，但会导致CPU资源的浪费
+自旋
+线程在等待某个条件满足时，不会进入阻塞状态，而是通过不断地检查条件是否满足来进行忙等待
+可以减少线程切换的开销，但会导致CPU资源的浪费
 
 GMP
 go语言的调度模型，把大量的goroutine分配到少量线程上去执行
