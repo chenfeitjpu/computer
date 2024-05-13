@@ -2,7 +2,6 @@
 - [定义](#定义)
 - [使用](#使用)
   - [基础语法](#基础语法)
-  - [数据类型](#数据类型)
   - [数据结构](#数据结构)
   - [持久化](#持久化)
   - [内存管理](#内存管理)
@@ -15,279 +14,107 @@
 ## 基础语法 ##
 ```
 key 
-- `KEYS pattern`  查找所有符合给定模式的键  ?|*|[]|^|-
-- `SCAN cursor [MATCH pattern] [COUNT count] [TYPE type]`  迭代数据库中的键
-- `EXISTS key`  检查给定键是否存在
-- `TYPE key`  返回键所储存的值的类型
-- `RANDOMKEY`  随机返回一个键
-- `DEL key`  删除键
-- `UNLINK key`  异步删除键
-- `RENAME key newkey`  修改键的名称
-- `RENAMENX key newkey`  修改键的名称, 新键不存在
-- `MOVE key db`  将当前数据库的键移动到给定的数据库db中
-- `DUMP key`  序列化键
-- `RESTORE key ttl serialized-value`  反序列化
-- `EXPIRE key seconds`  设置键过期时间，以秒计
-- `PEXPIRE key milliseconds`  设置键过期时间，以毫秒计
-- `EXPIREAT key unix-time-seconds`  设置键过期时间的时间戳，以秒计
-- `PEXPIREAT key unix-time-milliseconds`  设置键过期时间的时间戳，以毫秒计
-- `PERSIST KEY`  设置键永久有效
-- `TTL key`  以秒为单位返回键的剩余过期时间
-- `PTTL key`  以毫秒为单位返回键的剩余过期时间
+- 注意事项
+  - key、value上限是512M
 
-db  
-- `SELECT db`  切换数据库
-- `FLUSHDB [ASYNC]`  清空当前数据库中的所有键
-- `FLUSHALL [ASYNC]`  清空所有数据库的所有键
-- `DBSIZE`  当前数据库的key数量
-
-string 
-- `SET key value [EX second | PX millisecond] [EXAT timestamp | PXAT timestamp] [NX|XX] [GET] [KEEPTTL]` 设置键值对
-- `SETNX key value` 设置键值对，key不存在
-- `SETEX key second value` 设置过期时间，以秒为单位
-- `PSETEX key millisecond value` 设置过期时间，以毫秒为单位
-- `APPEND key value` 追加值
-- `INCR key` 自增1
-- `INCRBY key increment` 指定自增量，整数
-- `INCRBYFLOAT key increment` 指定自增量，浮点数
-- `DECR key` 自减1
-- `DECRBY key decrement` 指定自减量，整数
-- `MSET key value [key value]` 批量设置
-- `MSETNX key value [key value]` 批量设置，key不存在
-- `GET key` 获取key
-- `GETSET key value` 设置新值，返回旧值
-- `MGET key [key]` 批量获取key
-- `SETRANGE key offset value` 从指定位置覆盖值 
-- `GETRANGE key start end` 获取指定位置字符串
-- `STRLEN key` 获取字符串长度
+string
+- 内部实现
+  - int  存储8个字节的长整型(-2^63到12^63-1)
+  - embstr  字符串的长度<=44字节，redisObject和SDS内存是连续分配的
+  - raw  redisObject和SDS内存是随机分配的
+- 应用
+  缓存字符串、计数器、分布式锁
 
 list 
-- `LPUSH key value [value]` 左边添加列表元素
-- `LPUSHX key value [value]` 左边添加列表元素，key已存在
-- `RPUSH key value [value]` 右边添加列表元素
-- `RPUSHX key value [value]` 右边添加列表元素，key已存在
-- `LINSERT key BEFORE|AFTER pivot value` 在指定元素前后添加列表元素
-- `LPOP key` 左边移除列表元素
-- `BLPOP key [key] timeout` 左边移除列表元素，等待指定时间
-- `RPOP key` 右边边移除列表元素
-- `BRPOP key [key] timeout` 右边移除列表元素，等待指定时间
-- `RPOPLPUSH source destination` 右边移除列表元素，左边追加列表元素
-- `BRPOPLPUSH source destination timeout` 右边移除列表元素，左边追加列表元素，等待指定时间
-- `LREM key count value` 移除列表元素
-- `LTRIM key start stop` 保留列表指定区间的元素
-- `LSET key index value` 通过索引设置列表的值
-- `LINDEX key index` 通过索引获取列表的值
-- `LRANGE key start stop` 获取指定范围的值
-- `LLEN key` 获取列表长度
-
-hash
-- `HSET key field value`  设置哈希表字段
-- `HSETNX key field value`  设置哈希表字段，属性不存在
-- `HMSET key field value field value`  批量设置哈希表字段
-- `HDEL key field [field]`  删除哈希表字段
-- `HINCRBY key field increment`  自增，按整型值
-- `HINCRBYFLOAT key field increment`  自增，按浮点值
-- `HEXISTS key field`  判断哈希表字段是否存在
-- `HGET key field`  获取哈希表字段
-- `HMGET key field field`  批量获取哈希表字段
-- `HKEYS key`  获取哈希表所有字段
-- `HVALS key` 获取哈希表所有值
-- `HGETALL key`  获取哈希表所有字段和值
-- `HLEN key`  获取哈希表长度
-
-set
-- `SADD key member [member]`  向集合中添加元素
-- `SPOP key`  随机从集合中移除元素
-- `SREM key member [member]`  从集合中移除指定元素
-- `SMOVE source destination member` 移动集合元素
-- `SISMEMBER key member`  判断元素是否在集合中
-- `SRANDMEMBER key count`  随机返回集合中的元素
-- `SMEMBERS key`  返回集合中所有元素
-- `SINTER key key`  求集合交集
-- `SINTERSTORE destination key key`  存储集合交集
-- `SUNION key key`  求集合并集
-- `SUNIONSTORE destination key key`  存储集合并集
-- `SDIFF key key`  求集合差集
-- `SDIFFSTORE destination key key`  存储集合差集
-- `SCARD key`  获取集合长度
-
-sorted set
-- `ZADD key score member [score member]`  添加元素
-- `ZINCRBY key increment member`  自增
-- `ZREM key member [member]`  移除元素
-- `ZREMRANGEBYRANK key start stop`  按排名区间移除元素
-- `ZREMRANGEBYSCORE key min max`  按分数区间移除元素
-- `ZREMRANGEBYLEX key min max`  按字典区间移除元素
-- `ZRANK key member`  获取元素排名
-- `ZREVRANK key member`  获取元素反向排名
-- `ZSCORE key member`  获取元素分数
-- `ZRANGE key start stop [WITHSCORES]`  获取指定排名区间的成员
-- `ZREVRANGE key start stop [WITHSCORES]`  获取指定反向排名区间的成员
-- `ZRANGEBYSCORE key min max [WITHSCORES] [LIMIT offset count]`  获取指定分数区间的成员
-- `ZREVRANGEBYSCORE key min max [WITHSCORES]`  获取指定反向分数区间的成员
-- `ZRANGEBYLEX key min max [LIMIT offset count]`  获取指定字典区间的成员
-- `ZINTERSTORE destination numkeys key key`  存储交集
-- `ZUNIONSTORE destination numkeys key key`  存储并集
-- `ZCARD key`  获取成员数量
-- `ZCOUNT key min max`  获取分数区间的成员数量
-- `ZLEXCOUNT key min max`  获取字典区间的成员数量
-
-bitmap
-- `SETBIT key offset value`  设置bit位
-- `GETBIT key offset`  获取bit位
-- `BITPOS key bit [start] [end] [BYTE|BIT]` 在指定字节区间查找bit第一次出现的位置
-- `BITCOUNT key [start] [end]`  在指定位区间统计1出现的次数
-- `BITFIELD key`  对多个二进制位进行操作
-- `BITOP operation destkey key key`  对key进行位运算
-
-hyperloglog
-- `PFADD key element [element]`  添加元素
-- `PFCOUNT key [key]`   获取统计数量
-- `PFMERGE destkey sourcekey sourcekey`  合并多个集合
-
-geo
-- `GEOADD key longitude latitude member [longitude latitude member]`  添加坐标
-- `GEOPOS key member [member]`  获取坐标
-- `GEODIST key member member [M|KM|FT|MI]`  获取两个位置的距离
-- `GEORADIUS key longitude latitude radius [M|KM|FT|MI] [WITHCOORD] [WITHDIST] [WITHHASH] [COUNT count] [AES|DESC] [STORE key]`  以给定的经纬度为中心， 返回指定范围内的元素
-- `GEORADIUSBYMEMBER key member radius [M|KM|FT|MI] [WITHCOORD] [WITHDIST] [WITHHASH] [COUNT count] [AES|DESC] [STORE key]`  以给定的位置为中心， 返回指定范围内的元素
-- `GEOHASH key member [member]`  获取坐标的hash位置
-
-发布&订阅
-- SUBSCRIBE channel [channel]  订阅频道
-- PSUBSCRIBE pattern [pattern]  订阅指定模式的频道
-- UNSUBSCRIBE channel [channel]  退订频道
-- PUNSUBSCRIBE pattern [pattern]  退订指定模式的频道
-- PUBLISH channel message  发送消息
-
-事务
-- 使用
-  服务端原子执行多个命令
-  - MULTI  开始事务
-  - EXEC  执行事务
-  - DISCARD  取消事务
-  - WATCH key [key]  监视key
-  - UNWATCH  取消监视
-- 特点
-  - 不保证原子性
-
-pipeline
-- 使用
-  客户端提供的一种批处理技术，解决多个命令执行时的网络等待
-  - 客户端批量发送命令
-  - 服务端批量返回结果
-
-lua
-- 使用
-  - eval  eval "redis.call('set', KEYS[1], ARGV[1]);redis.call('expire', KEYS[1], ARGV[2]); return 1;" 1 age 10 60
-```
-
-## 数据类型 ##
-```
-字符串(string)
 - 内部实现
-  - int(整数) 
-    存储8个字节的长整型(-2^63到12^63-1)
-  - embstr(sds) 
-    字符串的长度小于等于44字节
-    redisObject和SDS内存是连续分配的
-  - raw(sds)
-    redisObject和SDS内存是随机分配的
-- 应用
-  - 缓存字符串
-  - 计数器
-  - 分布式锁
-
-列表(list)
-- 内部实现
-  - listpack  
-    list_max_listpack_size正数表示数量，负数表示大小  
+  - listpack  元素个数<512个且元素值<64字节
   - quicklist  
 - 应用
-  - 队列
-  - 栈
-  
-哈希(hash)
+  队列、栈
+
+hash
 - 内部实现
-  - listpack  
-    元素个数(hash_max_listpack_entries)小于等于512个且元素值(hash_max_listpack_value)小于等于64字节
+  - listpack  元素个数<512个且元素值<64字节
   - hashtable
 - 应用  
   - 缓存对象
 
-集合(set)
+set
 - 内部实现  
-  - intset  
-    元素个数(set-max-intset-entries)小于等于512个且元素都是整数
+  - intset  元素个数<512个且元素都是整数
   - hashtable
 - 应用  
-  - 去重
-  - 交集、并集、差集
+  去重、交集、并集、差集
 
-有序集合(sorted set)
+sorted set
 - 内部实现
-  - listpack
-    元素个数(zset_max_listpack_entries)小于等于128个且元素值(zset_max_listpack_value)小于等于64字节
+  - listpack  元素个数<128个且元素值<64字节
   - skiplist
 - 应用 
-  - 排序
+  排序
 
-位图(bitmap)
+bitmap
 - 内部实现
   - string
 - 应用  
-  - 签到
-  - 登录
+  签到、登录
 
-基数统计(hyperloglog)
+hyperloglog
 - 内部实现
   - string
 - 应用  
-  - UV计数
+  UV计数
 
-位置(geo)
+geo
 - 内部实现
   - sorted set
 - 应用  
-  - 打车
+  打车
 
-流(stream)
+stream
 - 内部实现
   - stream
 - 应用
-  - 消息队列
+  消息队列
 
-注意事项
-- key、value上限是512M
-- object encoding key  查看数据类型
+pub/sub
+
+transaction
+服务端原子执行多个命令  
+- 注意事项
+  - 不保证原子性
+
+pipeline
+客户端提供的一种批处理技术，解决多个命令执行时的网络等待
+- 客户端批量发送命令
+- 服务端批量返回结果
+
+lua
 ```
 
 ## 数据结构 ##
-**redis存储模型**  
-![avatar](./images/redis/redis-struct.png)  
+**redisDb**  
+![redisDb](./images/redis/redis-db-struct.png)  
 ```
-- redisDb结构  Redis数据库的结构 结构体里存放了指向了dict结构的指针   
-- dict结构  结构体里存放了2个哈希表，正常情况下都是用「哈希表1」，「哈希表2」只有在 rehash 的时候才用  
-- ditctht结构 结构里存放了哈希表数组，数组中的每个元素都是指向一个哈希表节点结构（dictEntry）的指针  
-- dictEntry结构  结构里存放了key和value指针，key指向的是String对象，而value则可以指向String对象，也可以指向集合类型的对象，比如List对象、Hash对象、Set对象和Zset对象  
+- redisDb  结构体里存放了指向了dict结构的指针  
+- dict  结构体里存放了2个哈希表，正常情况下都是用「哈希表1」，「哈希表2」只有在 rehash 的时候才用  
+- ditctht  结构里存放了哈希表数组，数组中的每个元素都是指向一个哈希表节点结构（dictEntry）的指针  
+- dictEntry  结构里存放了key和value指针，key指向的是String对象，而value则可以指向String对象，也可以指向集合类型的对象，比如List对象、Hash对象、Set对象和Zset对象  
 ```
 
-**redis对象** 
-![avatar](./images/redis/redis-object-struct.png) 
+**redisObject** 
+![redisObject](./images/redis/redis-object-struct.png) 
 ``` 
-- type  
-  标识该对象是什么类型的对象（string、list、hash、set、zset） 
-- encoding  
-  标识该对象使用了哪种底层的数据结构  
-  `object encoding key` 查看命令
-- ptr
-  指向底层数据结构的指针  
+- type  标识该对象是什么类型的对象(string、list、hash、set、zset)
+- encoding  标识该对象使用了哪种底层数据结构，可以使用`object encoding key`命令查看
+- ptr  指向底层数据结构的指针  
 ```
 
-**sds**
+**SDS**
+![sds](./images/redis/redis-sds-struct.webp)
 ```
 c语言字符串的不足
-- 获取字符串长度的时间复杂度为O(N)
+- 获取字符串长度的时间复杂度为O(n)
 - 字符串的结尾是以"\0"字符标识，字符串里面不能包含有"\0"字符，因此不能保存二进制数据；
 - 字符串操作函数不高效且不安全，比如有缓冲区溢出的风险，有可能会造成程序运行终止
 结构
@@ -301,18 +128,14 @@ struct __attribute__ ((__packed__)) sdshdr16 {
 - alloc  分配给字符数组的空间长度  
 - flags  不同容量的sds，sdshdr5、sdshdr8、sdshdr16、sdshdr32和sdshdr64  
 - buf[]  字符数组，用来保存实际数据  
-
 优点 
-- 高效  
-  直接获取长度 
-- 二进制安全  
-  不以\0结束
-- 节省空间  
-  不同的类型
-  不字节拉齐
+- 高效  直接获取字符串长度 
+- 二进制安全  不以\0结束
+- 节省空间  有不同类型的SDS、不字节拉齐
 ```
 
 **链表**
+![redis-linked-list](./images/redis/redis-linked-list-struct.webp)
 ```
 结构
 typedef struct listNode {
@@ -349,7 +172,9 @@ typedef struct list {
 ```
 
 **跳表**
+![skiplist](./images/redis/redis-skiplist-struct.webp)
 ```
+结构
 typedef struct zskiplistNode {
     //Zset 对象的元素值
     sds ele;
@@ -376,15 +201,20 @@ typedef struct zskiplist {
 - 最大层数  便于在O(1)时间复杂度获取跳表中层高最大的那个节点的层数量
 
 查询过程
-- 如果当前节点的权重「小于」要查找的权重时，跳表就会访问该层上的下一个节点
-- 如果当前节点的权重「等于」要查找的权重时，并且当前节点的 SDS 类型数据「小于」要查找的数据时，跳表就会访问该层上的下一个节点
-- 下一个节点为空时，跳表就会使用目前遍历到的节点的 level 数组里的下一层指针，然后沿着下一层指针继续查找
+- 如果当前节点的权重小于要查找的权重时，跳表就会访问该层上的下一个节点
+- 如果当前节点的权重等于要查找的权重时，并且当前节点的SDS类型数据小于要查找的数据时，跳表就会访问该层上的下一个节点
+- 下一个节点为空时，跳表就会使用目前遍历到的节点的level数组里的下一层指针，然后沿着下一层指针继续查找
 
 层数设置
 跳表在创建节点时候，会生成范围为[0-1]的一个随机数，如果这个随机数小于等于0.25（相当于概率25%），那么层数就增加1层，然后继续生成下一个随机数，直到随机数的结果大于0.25结束，最终确定该节点的层数
+
+为什么用跳表而不用平衡树
+- 从内存占用上来比较，跳表比平衡树更灵活一些
+- 在做范围查找的时候，跳表比平衡树操作要简单
+- 从算法实现难度上来比较，跳表比平衡树要简单得多
 ```
 
-**压缩列表**
+**ziplist**
 ![avatar](./images/redis/redis_ziplist_struct.webp) 
 ```
 结构
@@ -417,6 +247,7 @@ entry
 ```
 
 **quicklist**
+![quicklist](./images/redis/redis-quicklist-struct.webp)
 ```
 结构
 typedef struct quicklist {
@@ -445,7 +276,7 @@ typedef struct quicklistNode {
 }
 ```
 
-**整数集合**
+**intset**
 ```
 结构
 typedef struct intset {
@@ -460,12 +291,13 @@ typedef struct intset {
 整数集合升级
 过程
 - 当我们将一个新元素加入到整数集合里面，如果新元素的类型比整数集合现有所有元素的类型都要长时，整数集合需要先进行升级，也就是按新元素的类型扩展contents数组的空间大小，然后才能将新元素加入到整数集合里，当然升级的过程中，也要维持整数集合的有序性
-- 整数集合升级的过程不会重新分配一个新类型的数组，而是在原本的数组上扩展空间，然后在将每个元素按间隔类型大小分割
+- 整数集合升级的过程不会重新分配一个新对象，而是在原本的数组上扩展空间，然后在将每个元素按间隔类型大小分割
 好处
 - 节省内存资源
 ```
 
 **哈希表**
+![hash](./images/redis/redis-hash-struct.webp)
 ```
 结构
 typedef struct dictht {
@@ -495,8 +327,7 @@ typedef struct dictEntry {
 }
 - 缺点
   哈希冲突加剧，导致查询性能降低
-- 解决
-  rehash
+- rehash
   - 条件
     - 当负载因子大于等于1，并且Redis没有在执行bgsave命令或者bgrewiteaof命令，也就是没有执行RDB快照或没有进行AOF重写的时候，就会进行rehash操作
     - 当负载因子大于等于5，此时说明哈希冲突非常严重了，不管有没有有在执行RDB快照或AOF重写，都会强制进行rehash操作
