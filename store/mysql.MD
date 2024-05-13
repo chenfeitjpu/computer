@@ -1,7 +1,7 @@
 **MySQL**
 - [定义](#定义)
 - [使用](#使用)
-  - [基础命令](#基础命令)
+  - [基础使用](#基础使用)
   - [数据类型](#数据类型)
   - [数据操作](#数据操作)
   - [存储结构](#存储结构)
@@ -13,7 +13,7 @@
 关系型数据库
 
 # 使用 #
-## 基础命令 ##
+## 基础使用 ##
 ```
 变量&状态
 - 系统变量
@@ -27,42 +27,11 @@
 - 查看
   - `show (character set | charset)` 查看字符集
   - `show collation` 查看比较规则
-- 比较规则后缀
-  | 后缀 | 英文释义 | 描述 |
-  | :--: | :--: | :--: |
-  | _ai | accent insensitive | 不区分重音 |
-  | _as | accent sensitive | 区分重音 |
-  | _ci | case insensitive | 不区分大小写 |
-  | _cs | case sensitive | 区分大小写 |
-  | _bin | binary | 以二进制方式比较 |
 - 字符集设置
   - 服务器级别  
-    `show variables like 'character_set_server'`
-    `show variables like 'collation_server'`
-    `set character_set_server='utf8mb4'`
-    `set collation_server='utf8mb4_0900_ai_ci'`
   - 数据库级别  
-    `show create database 数据库名`
-    `create database 数据库名
-    [[default] character set 字符集名称]
-    [[default] collate 比较规则名称]`
-    `alter database 数据库名
-    [[default] character set 字符集名称]
-    [[default] collate 比较规则名称]`
   - 表级别   
-    `show create table 表名
-    create table 表名 (列的信息)
-    [[default] character set 字符集名称]
-    [collate 比较规则名称]`
-    `alter table 表名
-    [[default] character set 字符集名称]
-    [collate 比较规则名称]`
   - 列级别  
-    `show create table 表名`
-    `CREATE TABLE 表名(
-    列名 字符串类型 [CHARACTER SET 字符集名称] [COLLATE 比较规则名称]
-    )`
-    `ALTER TABLE 表名 MODIFY 列名 字符串类型 [CHARACTER SET 字符集名称] [COLLATE 比较规则名称]`
 - 字符集转换过程   
   - 客户端使用操作系统的字符集编码请求字符串，向服务器发送的是经过编码的一个字节串  
   - 服务器将客户端发送来的字节串采用character_set_client代表的字符集进行解码，将解码后的字符串再按照character_set_connection代表的字符集进行编码  
@@ -82,46 +51,16 @@
 ## 数据类型 ##
 ```
 整型
-| 类型 | 取值范围 | 存储空间 |
-| :--- | :--- | :--- | 
-| tinyint | 无符号 0~2⁸-1 有符号 -2⁷~2⁷-1 | 1个字节 |
-| smallint | 无符号 0~2¹⁶-1 有符号 -2¹⁵~2¹⁵-1 | 2个字节 |
-| mediumint | 无符号 0~2²⁴-1 有符号 -2²³~2²³-1 | 3个字节 |
-| int | 无符号 0~2³²-1 有符号 -2³¹~2³¹-1 | 4个字节 |
-| bigint | 无符号 0~2⁶⁴-1 有符号 -2⁶³~2⁶³-1 | 8个字节 |
+tinyint、smallint、mediumint、int、bigint
 
 浮点数  
-| 类型 | 取值范围| 存储空间 |
-| :--- | :--- | :--- |
-| float | M 1~255 D 0~30 | 4个字节 | 
-| double | M 1~255 D 0~30 | 8个字节 |  
+float(M,D)、double(M,D)  
 
 定点数  
-| 类型 | 取值范围 | 存储空间 |
-| :--- | :--- | :--- |
-| decimal(M,D) | M 1~65 D 0~30 | 取决于M和D 
-定点数占用的存储空间
-| 组中包含的十进制位数 | 占用存储空间大小 |
-| :--: | :--: |
-| 1或2 | 1字节 |
-| 3或4 | 2字节 |
-| 5或6 | 3字节 |
-| 7或8或9| 4字节 |
+decimal(M,D) 
 
 时间和日期
-| 类型 | 取值范围 | 存储空间 |
-| :--- | :--- | :--- |
-| year | 1901~2155 | 1个字节 |
-| date | '1000-01-01'~'9999-12-31' | 3个字节 |
-| time | '-838:59:59[.000000]'~'838:59:59[.000000]' | 3个字节+小数秒的存储空间 |
-| datetime(N) | '1000-01-01 00:00:00[.000000]'~'9999-12-31 23:59:59[.999999]' | 5个字节+小数秒的存储空间 |
-| timestamp(N) | '1970-01-01 00:00:01[.000000]'~'2038-01-19 03:14:07[.999999]' | 4个字节+小数秒的存储空间 |
-小数位占用的存储空间  
-| 保留的小数秒位数 | 额外需要的存储空间要 |
-| :--- | :--- |
-| 1或2 | 1字节 |
-| 3或4 | 2字节 |
-| 5或6 | 3字节 |
+year、date、time、datetime、timestamp
 - timestamp
   - 默认值
     - default current_timestmap  插入当前时间
@@ -130,16 +69,7 @@
   - timestmp必须显式地设置时区，不要使用默认系统时区，否则存在性能问题
 
 字符串
-| 类型 | 最大长度 | 取值范围 | 存储空间 |
-| :--: | :--: | :--: | :--: |
-| char(M) | M个字符 | 0~255 | M×W |
-| varchar(M) | M个字符 | 1~65535 | L+1或2 |
-| tinytext | 2⁸-1个字节 |  | L+1个字节 |
-| text | 2¹⁶-1个字节 |  | L+2个字节 |
-| mediumtext | 2²⁴-1个字节 |  | L+3个字节 |
-| longtext | 2³²-1个字节 |  | L+4个字节 |
-| enum | - | - | - |
-| set | - | - | - |
+char(M)、varchar(M)、tinytext、text、mediumtext、longtext、enum、set
 - varchar
   - varchar(50) vs varchar(100)
     - 磁盘占用
@@ -150,34 +80,26 @@
       建立索引时没有限制索引的大小，索引长度会默认采用的该字段的长度     
 
 二进制字符串
-| 类型 | 最大长度 | 取值范围 | 存储空间 |
-| :--: | :--: | :--: | :--: |
-| bit(M) | M个比特位 | 1~64 | (M+7)/8个字节 | 
-| binary(M) | M个字节 | 0~255 | M个字节 | 
-| varbinary(M) | M个字节 | 1~65535 | L+1或2个字节 | 
-| tinyblob | 2⁸-1个字节 |  | L+1个字节 | 
-| blob | 2¹⁶-1个字节 |  | L+2个字节 | 
-| mediumblob | 2²⁴-1个字节 |  | L+3个字节 | 
-| longblob | 2³²-1个字节 |  | L+4个字节 | 
+bit(M)、binary(M)、varbinary(M)、tinyblob、blob、mediumblob、longblob
 ```
 
 ## 数据操作 ##
 ```
 SQL
 - DDL
-  - 引擎
+  - engine
     - `show engines` 查看存储引擎
       - InnoDB支持事务、行级锁、外键
       - MyISAM查询性能高
         - 通过offset直接定位到记录
         - 不需要做事务处理 
       - MEMORY存储在内存，用于临时表
-  - 数据库    
+  - database    
     - `show databases` 查看所有库
     - `create database [if not exists] 库名` 创建库
     - `drop database [if exists] 库名` 删除库
     - `use 库名` 选择库
-  - 表    
+  - table    
     - `show tables [from 库名]` 查看所有表
     - `show create table [库名.]表名` 查看表定义
     - `[describe|desc|explain|show columns from|show fields form] 表名` 查看表描述
@@ -189,7 +111,7 @@ SQL
     - `alter table 表名 drop [column] 列名` 删除列
     - `alter table 表名 change [column] 列名 新列名 新数据类型 [新属性]` 修改列
     - `alter table 表名 modify [column] 列名 新数据类型 [新属性] [first|after 列名]` 修改列
-  - 列    
+  - column    
     - `default` 默认值
     - `not null` 非空
     - `comment` 注释
@@ -205,36 +127,24 @@ SQL
     - `unique [key] [约束名] (列名)`  唯一键
     - `key`  普通索引
     - `foreign key [索引名](列1, 列2, ...) references 父表名 (父列1, 父列2, ...)`  外键
-  - DML
-    - `insert into 表名 [(列名, 列名)] values (值, 值) [,(值, 值)]` 插入单条|多条数据
-    - `insert into 表名 select` 插入结果集
-    - `insert ignore into` 插入忽略错误
-    - `insert into ... on duplicate key update 列名 = 值|values(列名)` 插入重复值
-    - `delete from 表名 [where 表达式]` 删除数据
-    - `update 表名 set 列名=值 [where 表达式]` 更新数据 
-  - DQL
-    - `select 列名 [as] [别名][, 列名 [as] [别名]] from 表名` 查询单个|多个列
-    - `select * from 表名` 查询所有列
-    - `select distinct 列名[, 列名] from 表名` 去除单列|多列的重复结果 
-    - `limit [开始行,] 限制条数` 限制查询结果条数
-    - `order by 列名 asc|desc[, 列名 asc|desc]` 按照单列|多列的值进行排序，默认升序
-  - DCL
-    - `grant 权限 on 库名.表名 to 用户@主机 identified by 密码` 授权
-    - `revoke 权限 on 库名.表名 to 用户@主机` 回收权限  
+- DML
+  - `insert into 表名 [(列名, 列名)] values (值, 值) [,(值, 值)]` 插入单条|多条数据
+  - `insert into 表名 select` 插入结果集
+  - `insert ignore into` 插入忽略错误
+  - `insert into ... on duplicate key update 列名 = 值|values(列名)` 插入重复值
+  - `delete from 表名 [where 表达式]` 删除数据
+  - `update 表名 set 列名=值 [where 表达式]` 更新数据 
+- DQL
+  - `select 列名 [as] [别名][, 列名 [as] [别名]] from 表名` 查询单个|多个列
+  - `select * from 表名` 查询所有列
+  - `select distinct 列名[, 列名] from 表名` 去除单列|多列的重复结果 
+  - `limit [开始行,] 限制条数` 限制查询结果条数
+  - `order by 列名 asc|desc[, 列名 asc|desc]` 按照单列|多列的值进行排序，默认升序
+- DCL
+  - `grant 权限 on 库名.表名 to 用户@主机 identified by 密码` 授权
+  - `revoke 权限 on 库名.表名 to 用户@主机` 回收权限  
 
 查询
-- 运算
-  - 运算符
-    - 算术  `+, -, *, /, %`
-    - 比较  `>, >=, <, <=, =, !=, between and, in, not in, is null, is not null, like, not like`
-    - 逻辑  `and, or, xor`
-    - 通配  `_, %`
-  - 函数
-    - 文本  
-    - 时间  
-    - 算术  
-    - 聚集  
-
 - 分类
   - 单表
     `select * from 表名 [where] [group by 列名 having] [order by 列名] [limit]`
