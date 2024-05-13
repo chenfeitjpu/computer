@@ -94,6 +94,7 @@ lua
 
 ## 数据结构 ##
 **redisDb**  
+
 ![redisDb](./images/redis/redis-db-struct.png)  
 ```
 - redisDb  结构体里存放了指向了dict结构的指针  
@@ -103,6 +104,7 @@ lua
 ```
 
 **redisObject** 
+
 ![redisObject](./images/redis/redis-object-struct.png) 
 ``` 
 - type  标识该对象是什么类型的对象(string、list、hash、set、zset)
@@ -110,7 +112,8 @@ lua
 - ptr  指向底层数据结构的指针  
 ```
 
-**SDS**
+**SDS**  
+
 ![sds](./images/redis/redis-sds-struct.webp)
 ```
 c语言字符串的不足
@@ -134,7 +137,8 @@ struct __attribute__ ((__packed__)) sdshdr16 {
 - 节省空间  有不同类型的SDS、不字节拉齐
 ```
 
-**链表**
+**链表**  
+
 ![redis-linked-list](./images/redis/redis-linked-list-struct.webp)
 ```
 结构
@@ -171,7 +175,8 @@ typedef struct list {
 - 保存一个链表节点的值都需要一个链表节点结构头的分配，内存开销较大
 ```
 
-**跳表**
+**跳表**  
+
 ![skiplist](./images/redis/redis-skiplist-struct.webp)
 ```
 结构
@@ -214,7 +219,8 @@ typedef struct zskiplist {
 - 从算法实现难度上来比较，跳表比平衡树要简单得多
 ```
 
-**ziplist**
+**ziplist**  
+
 ![avatar](./images/redis/redis_ziplist_struct.webp) 
 ```
 结构
@@ -237,7 +243,8 @@ entry
 - 新增或修改某个元素时，压缩列表占用的内存空间需要重新分配，甚至可能引发连锁更新的问题
 ```
 
-**listpack**
+**listpack**  
+
 ![avatar](./images/redis/redis-listpack-struct.webp)
 ```
 结构
@@ -246,7 +253,8 @@ entry
 - len  encoding+data的总长度
 ```
 
-**quicklist**
+**quicklist**  
+
 ![quicklist](./images/redis/redis-quicklist-struct.webp)
 ```
 结构
@@ -296,7 +304,8 @@ typedef struct intset {
 - 节省内存资源
 ```
 
-**哈希表**
+**哈希表**  
+
 ![hash](./images/redis/redis-hash-struct.webp)
 ```
 结构
