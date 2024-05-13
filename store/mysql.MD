@@ -147,14 +147,18 @@ SQL
 查询
 - 分类
   - 单表
-    `select * from 表名 [where] [group by 列名 having] [order by 列名] [limit]`
+    `select * from table [where] [group by column having] [order by column] [limit]`
+  - 连接查询
+    - `inner join on`  内连接
+    - `left join on`  左外连接
+    - `right join on`  右外连接
   - 子查询   
     - 分类
       - 标量子查询
       - 列子查询
       - 行子查询
       - 表子查询
-      - exists和not exists子查询
+      - exists子查询
     - 优化
       - 标量子查询、行子查询
         - 不相关查询  
@@ -165,23 +169,20 @@ SQL
           - 执行子查询  
           - 检测外层查询  
       - IN子查询优化  
-        - 半连接  对于s1表的某条记录来说，我们只关心在s2表中是否存在与之匹配的记录，而不关心具体有多少条记录与之匹配，最终的结果集中只保留s1表的记录  
-          - Table pullout（子查询中的表上拉） 
-          - DuplicateWeedout execution strategy（重复值消除）
-          - LooseScan execution strategy（松散扫描）
-          - FirstMatch execution strategy（首次匹配）
-        - 将子查询物化之后再执行查询
+        - 半连接 
+          对于s1表的某条记录来说，我们只关心在s2表中是否存在与之匹配的记录，而不关心具体有多少条记录与之匹配，最终的结果集中只保留s1表的记录  
+          - Table pullout(子查询中的表上拉) 
+          - DuplicateWeedout execution strategy(重复值消除)
+          - FirstMatch execution strategy(首次匹配)
+          - LooseScan execution strategy(松散扫描)
+        - 将结果集物化之后再执行查询
         - 执行in to exists转换  
-      - 表子查询优化  
-        - 把派生表物化  
-        - 将派生表和外层的表合并 
-  - 连接查询
-    - `[inner] [cross] join on` 内连接
-    - `left join on` 左外连接
-    - `right join on` 右外连接
+      - 表子查询优化
+        - 把结果集物化  
+        - 和外层的表合并  
   - 组合查询
-    - `union all` 保留重复记录
-    - `union` 去除重复记录
+    - `union all`  保留重复记录
+    - `union`  去除重复记录
 
 - 索引
   - 基本操作  
@@ -224,9 +225,9 @@ SQL
   - 失效
     - 对索引使用左或者左右模糊匹配
     - 对索引进行表达式计算
-    - 对索引使用函数
-    - 对索引隐式类型转换  MySQL遇到字符串和数字比较的时候，会自动把字符串转为数字，然后再进行比较
+    - 对d索引使用函数
     - 联合索引非最左匹配
+    - 对索引隐式类型转换  MySQL遇到字符串和数字比较的时候，会自动把字符串转为数字，然后再进行比较
     - WHERE子句中的OR 只要有条件列不是索引列，就会进行全表扫描
 
 - 查询原理
@@ -317,7 +318,7 @@ SQL
     - LooseScan  在将In子查询转为semi-join时，如果采用的是LooseScan执行策略，则在驱动表执行计划的Extra列就是显示LooseScan提示  
     - FirstMatch  在将In子查询转为semi-join时，如果采用的是FirstMatch执行策略，则在被驱动表执行计划的Extra列就是显示FirstMatch(tbl_name)提示  
 
-- SQL优化
+SQL优化
   - 定位SQL
     - 开启慢查询
       slow_query_log
@@ -326,9 +327,7 @@ SQL
   - 原因
     - 没加索引
     - 索引失效
-    - 深分页
-      - 标签记录法  标记一下上次查询到哪一条了，下次再来查的时候，从该条开始往下扫描
-      - 延迟关联  
+    - 回表太多
     - 文件排序
     - 生成临时表
     - 锁等待
