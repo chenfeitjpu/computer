@@ -4,6 +4,7 @@
   - [架构](#架构)
   - [读写](#读写)
   - [存储](#存储)
+  - [对比](#对比)
 
 # 定义 #
 kafka是一种分布式消息系统
@@ -210,6 +211,16 @@ log结构
     只保留每个key最后一个版本的数据
     - 启用压缩策略
     `log.cleanup.policy=compact` 
+```
+
+## 对比 ##
+```
+kafka & rabbitmq
+- kafka配置复杂，吞吐量大，rabbitmq配置简单，吞吐量小
+- kafka消息严格有序，rabbitmq不一定
+- rabbitmq可灵活配置路由，kafka只能监控topic
+- rabbitmq错误消息会重新入队，超时消息会进入死信队列
+- kafka会保留历史消息，rabbitmq消费完即删除
 ```
 
 学习资料  
