@@ -14,68 +14,11 @@
 # 使用 #
 ## 基础语法 ##
 ```
-优势
-- 支持高并发，使用关键字go可以轻松的创建goroutine
-- 高效的垃圾回收，GC与程序并发执行
-
-常用命令
-- go build  编译包和依赖
-- go run  编译和运行程序
-- go install  编译和安装包和依赖
-- go get  下载和安装包和依赖
-- go clean  移除对象文件和缓存文件
-- go fmt pkg/...  格式化源码包
-- go vet pkg/...  报告代码错误
-- go test -v pkg/... -run method  运行测试包
-
-常用包
-- fmt  提供了输入输出的格式化功能
-  - fmt.Print、fmt.Println、fmt.Printf  标准输出，%v、%+v、%#v、%s、%d、%p
-  - fmt.Sprint、fmt.Sprintln、fmt.Sprintf  输出到字符串
-  - fmt.Fprint、fmt.Fprintln、fmt.Fprintf  输出到文件
-- math  提供了数学函数和常量的功能
-- math/rand  提供了随机数生成的功能
-- strings  提供了字符串处理的功能
-- strconv  提供了基本数据类型与其字符串表示的转换功能
-- time  提供了时间和日期的功能
-  - time.Now()  获取当前时间
-  -	time.Date()  根据日期生成时间
-  - time.Unix()  根据时间戳生成时间
-  - time.Parse()  根据字符串生时间
-  - {time}.Format()  格式化时间
-- sort  提供了排序的功能
-- net  提供了网络通信的功能
-- sync  提供了同步原语的功能，保证并发安全性
-- runtime  Go语言的运行时系统，提供了与底层系统交互和控制的功能。它包含了与内存管理、垃圾回收、协程调度等相关的函数和变量
-  - runtime.NumGoroutine()  获取当前运行的goroutine数量
-  - runtime.GOMAXPROCS(0)  获取当前P的数量
-- unsafe  提供了直接操作内存的工作
-  - unsafe.SizeOf()  获取变量占用内存大小
-
 变量
-- 使用
-  - var name [type] [= expression]  
-  - var name, name [type] [= expression, expression]  
-  - var (  
-        name [type] [= expression]  
-        name [type] [= expression]  
-    )
-  - name := value
-  - _不会分配内存
-- 注意事项
-  - 变量类型转换时允许溢出
+- 匿名变量不会分配内存
+- 变量类型转换时允许溢出
 
 常量
-常量数据类型只能是数值型(整数型、浮点型和复数)、字符串型、布尔型  
-- 使用
-  - const name [type] = expression
-  - const name [type], [type] = expression, expression
-  - const (  
-        name [type] = expression  
-        name [type] = expression    
-    )
-    常量定义与前一行的定义一致，则可以省略类型和值
-  - iota    
 - 注意事项
   - 无类型常量可通过字面量转换为对应类型的变量
   - 不能取址
@@ -100,22 +43,6 @@
   - 接口比较，一个接口覆盖另一个接口的所有方法，且实际类型不是同一种不可比较类型
 - 线程安全的类型
   channel、sync.Map
-
-运算符
-- 算术运算符  +、-、*、/、%、++、--
-- 关系运算符  >、>=、<、<=、==、!= 
-- 逻辑运算符  &&、||、!
-- 位运算符  &、|、^、&^、<<、>>
-
-流程控制 
-- 选择
-  - if else if else
-  - switch case default fallthrough
-- 循环
-  - for index continue break
-  - for range continue break
-- 跳转
-  - goto 只能在函数内跳转，需要配合标签一起使用，不能跳过内部变量声明语句，只能跳到同级作用域或者上层作用域内，不能跳到内部作用域内
 ```
 
 ## 数据结构 ##
@@ -490,20 +417,7 @@ make & new
 
 垃圾回收
 - 作用
-  Go语言中的垃圾回收器是自动管理内存的机制，用于回收不再使用的内存。垃圾回收器会自动检测不再使用的对象，并释放其占用的内存空间。
-- 示例
-  func createObject() {
-      for i := 0; i < 1000000; i++ {
-          _ = make([]byte, 1024)
-      }
-  }
-  func main() {
-      go createObject()
-      time.Sleep(1 * time.Second)
-      var stats runtime.MemStats
-      runtime.ReadMemStats(&stats)
-      fmt.Println("alloc memory ", stats.Alloc)
-  }
+  Go语言中的垃圾回收器是自动管理内存的机制，用于回收不再使用的内存。垃圾回收器会自动检测不再使用的对象，并释放其占用的内存空间  
 - 常见算法
   - 标记清扫
     - 流程
@@ -770,29 +684,7 @@ sync.Cond
   - cond.Wait()  放入Cond的等待队列中并阻塞
   - cond.Singal()  唤醒一个等待此Cond的goroutine
   - cond.BroadCast()  唤醒所有等待此Cond的goroutine
-- 示例
-  func main() {
-      cond := sync.NewCond(&sync.Mutex{})
-      var ready int
-      for i := 0; i < 10; i++ {
-          go func(i int) {
-              time.Sleep(time.Duration(rand.Intn(10)) * time.Second)
-              cond.L.Lock()
-              ready++
-              cond.L.Unlock()
-              log.Printf("运动员%d就位", i)
-              cond.Broadcast()
-          }(i)
-      }
-      cond.L.Lock()
-      for ready != 10 {
-          cond.Wait()
-          log.Println("裁判员收到")
-      }
-      cond.L.Unlock()
-      log.Println("所有运动员全部就绪")
-  }
-
+  
 context  
 用于在单个请求下多个goroutine之间同步数据、取消信号、超时控制
 - 结构
