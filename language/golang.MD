@@ -15,7 +15,6 @@
 ## 基础语法 ##
 ```
 变量
-- 匿名变量不会分配内存
 - 变量类型转换时允许溢出
 
 常量
@@ -57,25 +56,15 @@ string
   - string对应的底层字节数组不能修改
   - 转换成[]byte会发生内存拷贝，不发生拷贝*(*[]byte)(unsafe.Pointer(&a))
   - 高效拼接
-    - strings.Builder String()时不会另外申请内存
-    - bytes.Buffer  String()时会另外申请内存
+    - strings.Builder String()时不会另外申请内存存储字节数组
+    - bytes.Buffer  String()时会另外申请内存存储字节数组
 
 array
-固定长度集合
-- 使用
-  - [size]T{}、[...]T{}、[...][size]T
-  - for index、for range 
 - 注意事项
   - 多维数组只有第一层可以使用[...]来让编译器推导数组长度
   - 数组是值类型，赋值和传参会复制整个数组
 
 slice
-动态长度集合
-- 使用
-  - []T{}、make([]T, len[, cap])
-  - append、copy
-  - a[low:high:max]  0 <= low <= high <= max <= cap(a)，high默认是len(a)
-  - for index、for range在循环开始前会获取切片的长度，然后再执行len(切片)次数的循环  
 - 结构
   type slice struct {
       array unsafe.Pointer
@@ -98,22 +87,20 @@ slice
     - 如果原有slice长度大于等于256，那么每次扩容就扩为原来的1.25倍+3/4*256，直到新容量大于期望容量
     - 内存对齐(size_to_class&class_to_size)  CPU以字长访问内存，如果不进行内存对齐，很可能增加CPU访问内存的次数
 - 注意事项
+  - 切片表达式  a[low:high:max]  0 <= low <= high <= max <= cap(a)，high默认是len(a)
+  - for range在循环开始前会获取切片的长度，然后再执行len(切片)次数的循环  
   - 扩容前后的slice是否相同，原数组还有容量可以扩容则相同，原数组容量不够则不同
   - nil切片引用数组指针地址为0(无指向任何实际地址)，空切片引用数组指针地址是有的，且固定为一个值
   - 拷贝大切片跟小切片的代价是一样的
 
 map
-一种无序的键值对集合，也称为字典。map中的键必须是唯一的，而值可以重复。map提供了快速的查找和插入操作，适用于需要根据键快速检索值的场景
-- 使用 
-  - map[T]T、make(map[T]T[, cap])  
-  - delete(map, key)
-- 特点
-  - 无序
-    - 添加时无序
-    - 扩容时发生key的搬迁
-    - 读取时从一个随机序号的bucket开始遍历，并且是从这个bucket的一个随机序号的cell开始遍历
-  - 有序实现
-    创建切片保存键值，进行排序，然后遍历切片
+一种无序的键值对集合，也称为字典。map中的键必须是唯一的，而值可以重复。map提供了快速的查找和插入操作。
+- 无序
+  - 添加时无序
+  - 扩容时发生key的搬迁
+  - 读取时从一个随机序号的bucket开始遍历，并且是从这个bucket的一个随机序号的cell开始遍历
+- 有序实现
+  创建切片保存键值，进行排序，然后遍历切片
 - 结构
   type hmap struct {
       // 元素个数，调用 len(map) 时，直接返回此值
@@ -141,8 +128,7 @@ map
       pad      uintptr
       overflow uintptr
   }
-- 定位
-  - 查找
+- 查找
   - 计算key的hash值
   - 通过最后的B位来确定桶号
   - 根据key对应的hash值前8位快速确定是在这个桶的哪个位置
@@ -163,19 +149,20 @@ map
       - 1  cell已经搬迁完毕，空cell
       - 2  cell已经搬迁完毕，key在新bucket前半部分
       - 3  cell已经搬迁完毕，key在新bucket后半部分
-    - 新增|修改
+    - 写入
       定位到了某个bucket后，直接触发一次搬迁操作
     - 删除  
       定位到了某个bucket后，直接触发一次搬迁操作
     - 遍历
       定位到某个bucket后，通过新桶找旧桶，旧桶已经迁移，直接遍历新桶，旧桶没有迁移，遍历旧桶中会分到新桶中的元素
 - 操作
-  - 新增|修改
-    查找key，进行修改或者新增
+  - 写入
+    查找key，进行新增或修改
   - 删除  
     查找key，对key和value进行清空
   - 遍历
     遍历所有的bucket以及它后面挂的overflow bucket，遍历bucket中的所有cell  
+- panic是无法捕获的
 - 线程安全
   - map+sync.RWMutex
   - sync.Map
@@ -183,12 +170,6 @@ map
     - 倘若写操作过多，sync.Map基本等价于互斥锁+map  
 
 sync.map
-- 使用
-  - Store()  写入
-  - Load()  读取
-  - Delete()  删除
-  - Range()  遍历
-  - LoadOrStore()  key存在，就读取，否则写入
 - 结构
   type Map struct {
       mu Mutex
@@ -225,39 +206,14 @@ sync.map
     - 遍历read，取出entry 中的值，调用f(k, v)      
 
 struct
-用于定义一组属性
-- 使用
-  type name struct {  
-      name type 
-      name type  
-  }
-  - tag  丰富语义
-    - 转json  小写字段不能转，大写字段加了tag取别名，不加tag则json内的字段跟结构体字段原名一致
-- 扩展
-  - 嵌套结构体
-  - 匿名结构体
-  - 空结构体  不占内存，内存地址都是同一个，常用于占位
+- 注意事项
+  - 空结构体不占内存，内存地址都是同一个，常用于占位
 
 func  
-用户定义一组操作
-- 使用
-  func name(parameter type, parameter type) ([output] type, [output] type) {
-      return value, value
-  }
+- 注意事项
   - 返回值要么同时命名，要么不命名
 - 闭包  函数及其相关引用环境的组合体  
 - defer  延迟函数的执行，在函数退出前执行相应操作。defer通常用于解锁、关闭文件，释放资源等清理操作
-  - 示例
-    file, err := os.Open("test.txt")
-	if err != nil {
-		return
-	}
-	defer func() {
-		err := file.Close()
-		if err != nil {
-			return
-		}
-	}()   
   - 注意事项
     - 参数在defer声明时就决定了
     - 多个defer语句，按照先进后出的方式执行
@@ -269,22 +225,12 @@ func
   - init函数不可以被其他函数调⽤
 
 method
-- 使用
-  func (name type) name(parameter type, parameter type) ([output] type, [output] type) {
-      return value, value
-  }
-  - object.method()
 - 注意事项
   - 对于不可寻址的类型T，不能调用*T的方法
   - 方法接受者不能是接口，或者本身就是指针类型
 
 interface
 用于定义一组方法，可以由不同的类型实现，将抽象与实现分离
-- 使用
-  type name interface {  
-      name(name type) type  
-      name(name type) type  
-  }
 - 结构
   //非空接口
   type iface struct {
@@ -306,9 +252,6 @@ interface
       _type *_type  // 实体类型
       data  unsafe.Pointer
   }
-- 类型断言
-  - i.(T)
-  - i.(type)
 - 注意事项
   - 对于T类型的接口，可以使用T类型的方法
   - 对于*T类型的接口，可以使用T和*T类型的方法
@@ -327,15 +270,6 @@ pointer
   - 普通指针  *T
   - 通用指针  unsafe.Pointer
   - 指针地址  uintptr
-- 示例
-  func swap(a, b *int) {
-      *a, *b = *b, *a
-  }
-  func main() {
-      x, y := 10, 20
-      swap(&x, &y)
-      fmt.Println(x, y)
-  }
 - 比较
   - unsafe.Pointer只是单纯的通用指针类型，用于转换不同类型指针，它不可以参与指针运算
   - uintptr是用于指针运算的，uintptr不持有对象，会被GC回收
@@ -353,18 +287,6 @@ error&panic&recover
 - panic & recover
   当程序遇到无法处理的错误时，可以使用panic引发一个异常，中断程序的正常执行  
   recover用于捕获并处理panic引发的异常，使程序能够继续执行
-  - 示例
-    func divide(a, b int) int {
-        defer func() {
-            if err := recover(); err != nil {
-                fmt.Println("Error: ", err)
-            }
-        }()
-        if b == 0 {
-            panic("division by zero")
-        }
-        return a / b
-    }
   - 注意事项
     - 子协程的panic会导致主协程退出
     - 子协程的panic主协程无法捕获
@@ -382,6 +304,7 @@ make & new
 
 逃逸分析
 在函数中分配的对象，由于其生命周期需要延长，导致编译器将其分配到堆区而不是栈区
+go build -gcflags=-m
 - 场景
   - 指针被作用域之外所引用
   - 变量类型不确定(如接口)
@@ -402,10 +325,6 @@ make & new
   - mcache  每个工作线程都会绑定一个mcache，缓存可用的mspan资源，包含68*2个mspan
   - mcentral  为所有mcache提供mspan资源  
   - mheap  当mcentral没有空闲的mspan时，会向mheap申请, mheap没有资源时，会向操作系统申请新内存, mheap主要用于大对象的内存分配，以及管理未切割的mspan，用于给mcentral切割成小对象，包含68*2个mcentral
-- 分配条件
-  - 字面量
-  - make(T)
-  - new(T)
 - 分配流程  
   - >32KB的对象  直接从mheap上分配  
   - <=16B的对象(不含指针)  使用mcache的tiny分配器分配  
@@ -580,12 +499,6 @@ go语言的并发执行单元，可以同时执行多个goroutine，而不需要
 
 atomic  
 并发编程中的一种同步机制，保证单个指令操作的原子性
-- 使用
-  	- atomic.StoreInt64()
-	- atomic.LoadInt64()
-	- atomic.AddInt64()
-	- atomic.SwapInt64()
-	- atomic.CompareAndSwapInt64()
 - 与锁的区别
   - 访问粒度
     - 原子操作通常是针对单个变量或内存位置的操作
@@ -599,10 +512,6 @@ atomic
 
 channel  
 用于在goroutine之间进行通信和同步的机制
-- 使用
-  - 只读通道  <- ch
-  - 只写通道  ch <-
-  - 双向通道  ch
 - 结构
   type hchan struct {
       qcount   uint           // total data in the queue
@@ -649,7 +558,6 @@ channel
   |    读 <-ch     |     阻塞     | 成功或阻塞  |    读到零值     |
   |    写 ch<-     |     阻塞     | 成功或阻塞  |      panic      |
   | 关闭 close(ch) |    panic     |    成功     |      panic      |
-
 - 注意事项
   - 优雅关闭channel
     - defer + recover
@@ -671,20 +579,10 @@ select
 
 WaitGroup  
 同步等待组
-- 使用
-  wg := sync.WaitGroup{}
-  wg.Add()
-  wg.Done()
-  wg.Wait()
 
 sync.Cond  
 通常应用于等待某个条件的一组goroutine，当条件变为true的时候，其中一个goroutine或者所有的goroutine都会被唤醒执行
-- 使用
-  - cond := sync.NewCond()  初始化
-  - cond.Wait()  放入Cond的等待队列中并阻塞
-  - cond.Singal()  唤醒一个等待此Cond的goroutine
-  - cond.BroadCast()  唤醒所有等待此Cond的goroutine
-  
+
 context  
 用于在单个请求下多个goroutine之间同步数据、取消信号、超时控制
 - 结构
@@ -724,9 +622,6 @@ context
 
 sync.Once  
 函数只执行一次
-- 使用
-  - once := &sync.Once{}
-  - once.Do(f func())
 - 结构
   type Once struct {
       done uint32
@@ -735,10 +630,6 @@ sync.Once
 
 Pool  
 对象缓冲池
-- 使用
-  - New
-  - Get
-  - Put
 
 自旋
 线程在等待某个条件满足时，不会进入阻塞状态，而是通过不断地检查条件是否满足来进行忙等待
