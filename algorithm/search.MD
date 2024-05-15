@@ -9,8 +9,7 @@
 
 # 使用 #
 ## 二分搜索 ##
-```
-应用  
+``` 
 LeetCode
 - 875.爱吃香蕉的珂珂
 - 1011.在D天内送达包裹的能力
@@ -44,7 +43,6 @@ func BinarySearch(nums []int, target int) int {
 
 ## DFS ##
 ```
-应用  
 LeetCode 
 - 200.岛屿数量
 - 1254.统计封闭岛屿的数目
@@ -55,7 +53,6 @@ LeetCode
 
 ## BFS ##
 ```
-应用
 LeetCode
 - 111.二叉树的最小深度
 - 102.二叉树的层序遍历
