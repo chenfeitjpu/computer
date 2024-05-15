@@ -9,12 +9,12 @@
 ```
 数据结构
 - 请求
-  请求行  请求方法 URL 协议/版本
+  请求行  METHOD URL SCHEME/VERSION
   请求头  key: value
   空行
   请求体
 - 响应
-  响应行  协议/版本 状态码 描述 
+  响应行  SCHEME/VERSION CODE MESSAGE 
   响应头  key: value
   空行
   响应体
@@ -41,17 +41,11 @@
   - 503 服务器忙，暂时无法响应
   - 504 服务器作为网关或代理，服务器超时
 
-常见字段
-- Host 服务器主机
-- Connection 使用持久连接
-  超时控制
-  - 服务端可以设置keep-alive timeout
-  - 设置头信息keep-alive:timeout={time}
-- Accept 客户端接受的数据格式
-- Accept-Encoding 客户端接受的数据压缩方式
-- Content-Length 服务器返回的数据长度
-- Content-Type 服务器返回的数据格式
-- Content-Encoding 服务器返回数据的压缩方式
+长连接
+Connection: keep-alive  使用持久连接
+断开连接
+- 长时间没有请求
+- 请求数到达上限
 
 请求方法
 - 列表
