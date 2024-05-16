@@ -19,7 +19,7 @@
 
 常量
 - 注意事项
-  - 无类型常量可通过字面量转换为其它类型的变量(不能超过变量表示的数值范围)
+  - 无类型常量可直接转换为其它类型
   - 不能取址
   - 常量类型转换时不允许溢出
 
@@ -59,14 +59,16 @@ string
     - strings.Builder String()时不会另外申请内存存储字节数组
     - bytes.Buffer  String()时会另外申请内存存储字节数组
   - 获取长度
-    utf8.RuneCountInString()
+    - utf8.RuneCountInString()
 
 array
+固定长度集合
 - 注意事项
   - 多维数组只有第一层可以使用[...]来让编译器推导数组长度
   - 数组是值类型，赋值和传参会复制整个数组
 
 slice
+动态长度集合
 - 结构
   type slice struct {
       array unsafe.Pointer
@@ -96,13 +98,7 @@ slice
   - 拷贝大切片跟小切片的代价是一样的
 
 map
-一种无序的键值对集合，也称为字典。map中的键必须是唯一的，而值可以重复。map提供了快速的查找和插入操作。
-- 无序
-  - 添加时无序
-  - 扩容时发生key的搬迁
-  - 读取时从一个随机序号的bucket开始遍历，并且是从这个bucket的一个随机序号的cell开始遍历
-- 有序实现
-  创建切片保存键值，进行排序，然后遍历切片
+一种无序的键值对集合。map中的键必须是唯一的，而值可以重复。map提供了快速的查找和插入操作。
 - 结构
   type hmap struct {
       // 元素个数，调用 len(map) 时，直接返回此值
@@ -139,11 +135,10 @@ map
 - 扩容
   - 条件
     - 等量扩容(桶中空位过多)
-      - 当B<15 时，overflow的bucket数量超过2^B
-      - 当B>=15 时，overflow的bucket数量超过2^15
+      - 当B<15时，overflow的bucket数量超过2^B
+      - 当B>=15时，overflow的bucket数量超过2^15
     - 双倍扩容(桶不够用了)
-      - 装载因子>6.5
-        装载因子=count/(2^B) map中元素的个数/map中当前桶的个数
+      - 装载因子>6.5  装载因子=count/(2^B) map中元素的个数/map中当前桶的个数
   - 操作
     - minTopHash
       当一个cell的tophash值小于minTopHash时，标志这个cell的迁移状态
@@ -164,12 +159,17 @@ map
     查找key，对key和value进行清空
   - 遍历
     遍历所有的bucket以及它后面挂的overflow bucket，遍历bucket中的所有cell  
-- panic是无法捕获的
-- 线程安全
-  - map+sync.RWMutex
-  - sync.Map
-    - sync.Map适用于读多、更新多、删多、写少的场景  
-    - 倘若写操作过多，sync.Map基本等价于互斥锁+map  
+- 注意事项
+  - 无序
+    - 添加时无序
+    - 扩容时发生key的搬迁
+    - 读取时从一个随机序号的bucket开始遍历，并且是从这个bucket的一个随机序号的cell开始遍历
+  - 有序实现  创建切片保存键值，进行排序，然后遍历切片
+  - 线程不安全
+    - map+sync.RWMutex
+    - sync.Map
+      - sync.Map适用于读多、更新多、删多、写少的场景  
+      - 倘若写操作过多，sync.Map基本等价于互斥锁+map  
 
 sync.map
 - 结构
