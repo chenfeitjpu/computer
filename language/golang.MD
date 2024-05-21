@@ -15,13 +15,13 @@
 ## 基础语法 ##
 ```
 变量
-- 变量类型转换时允许溢出
+- 变量转换时允许溢出
 
 常量
 - 注意事项
   - 无类型常量可直接转换为其它类型
   - 不能取址
-  - 常量类型转换时不允许溢出
+  - 常量转换时不允许溢出
 
 数据类型
 - 分类
@@ -96,6 +96,7 @@ slice
   - 扩容前后的slice是否相同，原数组还有容量可以扩容则相同，原数组容量不够则不同
   - nil切片引用数组指针地址为0(无指向任何实际地址)，空切片引用数组指针地址是有的，且固定为一个值
   - 拷贝大切片跟小切片的代价是一样的
+  - 深拷贝copy()
 
 map
 一种无序的键值对集合。map中的键必须是唯一的，而值可以重复。map提供了快速的查找和插入操作。
@@ -210,16 +211,19 @@ sync.map
 struct
 - 注意事项
   - 空结构体不占内存，内存地址都是同一个，常用于占位
+  - json转结构体类型不同无法解析，超过表示范围无法解析
+  - 结构体拷贝  直接赋值、json转换、指针转换
 
 func  
 - 注意事项
   - 返回值要么同时命名，要么不命名
-- 闭包  函数及其相关引用环境的组合体  
-- defer  延迟函数的执行，在函数退出前执行相应操作。defer通常用于解锁、关闭文件，释放资源等清理操作
-  - 注意事项
-    - 参数在defer声明时就决定了
-    - 多个defer语句，按照先进后出的方式执行
-    - return赋值->执行defer->return返回
+- 闭包  
+  函数及其相关引用环境的组合体  
+- defer  
+  延迟函数的执行，在函数退出前执行相应操作。defer通常用于解锁、关闭文件，释放资源等清理操作
+  - 参数在defer声明时就决定了  
+  - 多个defer语句按照先进后出的方式执行  
+  - return赋值(返回值没有命名，就赋值给临时变量)->执行defer->return返回  
 - init  
   import->const->var->init->main
   - 一个包里可以包含多个init函数
@@ -259,7 +263,7 @@ interface
   - 对于*T类型的接口，可以使用T和*T类型的方法
 
 pointer
-指针是一种变量，存储了另一个变量的内存地址。通过指针，我们可以直接访问和修改变量的值，而不是对变量进行拷贝
+指针是一种变量，存储了另一个变量的内存地址。通过指针，我们可以直接访问和修改变量的值。
 - 使用
   - &取址
     - 不可寻址的类型
@@ -267,7 +271,7 @@ pointer
       - 常量
       - 字符串对应的字节数组
       - map对象中的元素
-  - *取值
+  - *取值  新建对象
 - 分类 
   - 普通指针  *T
   - 通用指针  unsafe.Pointer
@@ -280,6 +284,10 @@ pointer
 
 reflect
 程序在运行的时候能够观察并且修改自己的行为
+- 反射三定律
+  - 反射可以将interface类型变量转换成反射对象
+  - 反射可以将反射对象还原成interface对象
+  - 反射对象可修改，value值必须是可设置的
 - reflect慢的主要原因
   - 涉及到内存分配以及后续的GC
   - reflect实现里面有大量的枚举，也就是for循环，比如类型之类的
@@ -296,6 +304,7 @@ error&panic&recover
     - defer需要在函数里直接调用recover
     - panic的信息为nil时无法捕获
     - 不同goroutine间无法捕获
+    - 调用runtime.fatalthrow方法
 ```
 
 ## 内存管理 ##
@@ -303,6 +312,10 @@ error&panic&recover
 make & new
 - make  为slice、map、channel分配内存并初始化为非零值，返回值
 - new  为任意类型分配内存并初始化为零值，返回指针
+
+拷贝
+- 浅拷贝  值类型新建对象，引用类型复制地址
+- 深拷贝  值类型新建对象，引用类型新建对象
 
 逃逸分析
 在函数中分配的对象，由于其生命周期需要延长，导致编译器将其分配到堆区而不是栈区
@@ -315,26 +328,22 @@ go build -gcflags=-m
 
 内存分配
 - 核心思想(TCMalloc)  把内存分为多级管理，从而降低锁的粒度  
-  - mheap  全局的内存起源，访问要加全局锁
-  - mcentral  每种对象大小规格(全局共划分为68种)对应的缓存，锁的粒度也仅限于同一种规格以内
-  - mcache  每个P(正是GMP中的P)持有一份的内存缓存，访问时无锁
+  - mspan  内存分配单元  由一片连续的8KB的页组成的大块内存
+  - mcache  每个P持有一份的内存缓存，访问时无锁，包含68*2个mspan
+  - mcentral  每种对象规格对应的缓存，锁的粒度也仅限于同一种规格以内，为所有mcache提供mspan资源  
+  - mheap  全局的内存起源，访问要加全局锁，为所有mcentral提供mspan资源, 包含68*2个mcentral。mheap没有资源时，会向操作系统申请新内存, mheap主要用于大对象的内存分配，以及管理未切割的mspan。
 - 内存划分
   - arena  512G 把内存分割成8KB大小的页
   - bitmap  16G  标识arena区域哪些地址保存了对象 一个byte大小的内存对应arena区域中4个指针大小(指针大小为8B)的内存
   - spans  512M  存放mspan指针，每个指针对应一页
-- 内存管理组件
-  - mspan  由一片连续的8KB的页组成的大块内存
-  - mcache  每个工作线程都会绑定一个mcache，缓存可用的mspan资源，包含68*2个mspan
-  - mcentral  为所有mcache提供mspan资源  
-  - mheap  当mcentral没有空闲的mspan时，会向mheap申请, mheap没有资源时，会向操作系统申请新内存, mheap主要用于大对象的内存分配，以及管理未切割的mspan，用于给mcentral切割成小对象，包含68*2个mcentral
 - 分配流程  
-  - >32KB的对象  直接从mheap上分配  
   - <=16B的对象(不含指针)  使用mcache的tiny分配器分配  
   - (16B,32KB]的对象
     - 首先计算对象的规格大小，然后使用mcache中相应规格大小的mspan分配
     - 如果mcache没有相应规格大小的mspan，则向mcentral申请
     - 如果mcentral没有相应规格大小的mspan，则向mheap申请
     - 如果mheap中也没有合适大小的mspan，则向操作系统申请
+  - >32KB的对象  直接从mheap上分配  
 
 垃圾回收
 - 作用
@@ -366,10 +375,10 @@ go build -gcflags=-m
       - 对象每被删除引用一次，计数器减1
       - GC时，把计数器等于0的对象删除
     - 缺点
-      - 无法解决循环引用或者自引用问题
+      - 无法解决循环引用或者自引用问题(判断对象与GCRoots的可达性来解决循环引用的问题)
 
 - 版本迭代
-  - 1.3之前
+  - 1.0
     标记-清扫(全程需要STW)
     - 流程
       - 启动STW
@@ -381,7 +390,7 @@ go build -gcflags=-m
     - 缺点
       - STW程序会出现卡顿
       - 清除数据会产生碎片
-  - 1.3之后
+  - 1.3
     标记-清扫(标记过程需要STW)
     - 流程
       - 启动STW
@@ -393,7 +402,7 @@ go build -gcflags=-m
     - 缺点
       - STW程序会出现卡顿
       - 清除数据会产生碎片
-  - 1.5之后
+  - 1.5
     三色标记法+插入写屏障
     - 概念  
       - 对象分为三种颜色标记  黑、灰、白
@@ -432,18 +441,17 @@ go build -gcflags=-m
           - 黑色对象删除了灰色对象
           - 灰色对象是垃圾对象
   - 1.8之后
-    三色标记+混合写屏障
+    三色标记法+混合写屏障
     - GC开始时栈上的对象并标记为黑色(逐个暂停，逐个扫描，每个栈单独扫描, 无需STW整个程序)
     - GC期间，栈上创建的新对象标记为黑色
     - 堆对象正常启用插入写屏障
     - 堆对象正常启用删除写屏障
-    - 回收未标记对象
 - 触发时机
   - 定期触发，默认每隔两分钟触发一次GC
   - 新建对象，检测内存分配如果到达阀值触发GC
   - 手动触发，runtime.GC()
 - 注意事项
-  - 小对象多了会造成GC压力  小对象过多会导致GC消耗过多的CPU
+  - 小对象多了会造成GC压力
 ```
 
 ## 并发控制 ##
@@ -466,38 +474,55 @@ go语言的并发执行单元，可以同时执行多个goroutine，而不需要
         state int32
         sema  uint32
     }
-    - state
-      - 最右侧的一个bit位，标志是否上锁，0:未上锁，1:已上锁
-      - 最右数第二个bit位，标志是否有goroutine从阻塞中被唤醒，0:没有，1:有
-      - 最右数第三个bit位，标志Mutex是否处于饥饿模式，0:非饥饿，1:饥饿
-      - 剩余的29位，记录当前阻塞队列goroutine的数量
   - 实现
-    - 获取锁
-      首先采用自旋+CAS的策略争夺锁，尝试持续受挫达到一定条件后，判定当前过于激烈，则由自旋转为阻塞模式
-      自旋模式转为阻塞模式的具体条件
-      - CPU单核或仅有单个P调度器(此时自旋，其他goroutine根本没机会释放锁，自旋纯属空转)
-      - 当前P的执行队列中仍有待执行的G(避免因自旋影响到GMP调度效率)
-      - 自旋累计达到4次仍未取得锁
+    - 加锁
+      - CAS加锁，成功则返回
+      - 自旋+CAS抢锁
+        - 单CPU或单个P(此时自旋，其他goroutine根本没机会释放锁，自旋纯属空转)
+        - 当前P的执行队列中仍有待执行的G(避免因自旋影响到GMP调度效率)
+        - 自旋累计达到4次仍未取得锁
+      - 阻塞
+    - 解锁
+      - 如果没有加锁，直接抛出runtime error
+      - 解锁完成，没有协程阻塞等待加锁，直接返回
+      - 有协程阻塞，唤醒一个阻塞的协程
     - 唤醒
-      - 正常模式(性能较好)
+      - 正常模式
         当有goroutine从阻塞队列被唤醒时，会和此时先进入抢锁流程的goroutine进行锁资源的争夺，假如抢锁失败，会重新回到阻塞队列头部.
         此时被唤醒的老goroutine相比新goroutine是处于劣势地位，因为新goroutine已经在占用CPU时间片，且新goroutine可能存在多个，从而形成多对一的人数优势，因此形势对老goroutine不利
         当阻塞队列存在goroutine等锁超过1ms而不得，则进入饥饿模式
-      - 饥饿模式(严格公平)
+      - 饥饿模式
         锁的所有权按照阻塞队列的顺序进行依次传递，新goroutine进行流程时不得抢锁，而是进入队列尾部排队
         当阻塞队列已清空，或取得锁的goroutine等锁时间已低于1ms时，则回到正常模式
-  
 - 读写锁(sync.RWMutex)  
   同一时刻只能写操作，或者多个读操作
   - 结构
     type RWMutex struct {
         w           Mutex  // 复用互斥锁
-        writerSem   uint32 // 信号量，用于写等待读
-        readerSem   uint32 // 信号量，用于读等待写
+        writerSem   uint32 // 写阻塞等待信号量
+        readerSem   uint32 // 读阻塞等待信号量
         readerCount int32  // 当前执行读的goroutine数量
-        readerWait  int32  // 被阻塞的准备读的goroutine的数量
+        readerWait  int32  // 写阻塞时的读的goroutine的数量
     }
   - 实现
+    - Lock
+      - 先用Mutex的Lock()阻断其他写协程进入
+      - 将readerCount转为负数
+      - 将readerCount真正的正数值加到readerWait，记录一下排在写操作前的reader有多少
+      - 若已经有读协程了，或排在前面的reader还没完，阻塞等待信号量
+      - 若没有读协程了，或没有排在前面的reader了，就直接返回了，无需等待信号量
+    - Unlock
+      - 给readerCount还原回去，变成正数
+      - 看现在readerCount有几个，就释放几次信号量，这边release，reader那边就能acquire到了
+      - 调用Mutex的UnLock()彻底解锁，其他写协程可以进来了
+    - RLock
+      - 给readerCount加1
+      - 如果readerCount为负数（记得前面的结论么），说明此时已经有写协程在准备拿锁了，读这边等信号量吧
+      - 如果readerCount > 0，直接返回，说明此时没有写协程拿着锁，可以正常读
+    - RUnlock
+      - 给readerCount-1
+      - 如果readerCount为负数，说明有writer准备拿锁了，正在阻塞，将readerWait也减去1，看看轮没轮到writer，如果还没减到0，说明writer排位前还有别的reader，那就轮不到这次给他机会了，直接返回。如果减到0了，说明到人家writer了，释放writerSem信号量后再退出
+      - 如果readerCount >= 0，说明一切正常，writer没动静，解读锁成功，返回就行
 
 atomic  
 并发编程中的一种同步机制，保证单个指令操作的原子性
@@ -580,10 +605,24 @@ select
     将关闭通道置为nil
 
 WaitGroup  
-同步等待组
+同步等待组  
+- 结构
+  type WaitGroup struct {
+      noCopy noCopy
+      state atomic.Uint64 // high 32 bits are counter, low 32 bits are waiter count.
+      sema  uint32
+  }
+- 实现
+  - Add
+    增加counter 
+  - Done
+    减少counter，若为0，则释放信号量，唤醒等待的goroutine
+  - Wait
+    增加waiter，阻塞，等待信号量
 
 sync.Cond  
 通常应用于等待某个条件的一组goroutine，当条件变为true的时候，其中一个goroutine或者所有的goroutine都会被唤醒执行
+
 
 context  
 用于在单个请求下多个goroutine之间同步数据、取消信号、超时控制
@@ -687,7 +726,7 @@ go语言的调度模型，把大量的goroutine分配到少量线程上去执行
       }
 - 解决
   - 使用带超时的操作，比如select语句配合time.After
-  - 使用context包来传递取消信号
+  - 使用context来传递取消信号
   - 使用sync.WaitGroup等待所有的协程完成
 
 数据竞争
@@ -724,6 +763,7 @@ gmp
 [GMP原理与调度](https://www.topgoer.com/%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B/GMP%E5%8E%9F%E7%90%86%E4%B8%8E%E8%B0%83%E5%BA%A6.html)  
 [深入golang runtime的调度](https://zboya.github.io/post/go_scheduler/) 
 [GO：从进程启动到调度](https://zhuanlan.zhihu.com/p/607208932)  
+[16. Go调度器系列解读（三）：GMP 模型调度时机](https://juejin.cn/post/7330052230472663055)
 内存管理  
 [图解Go语言内存分配](https://juejin.cn/post/6844903795739082760)  
 [Golang内存模型与分配机制](https://zhuanlan.zhihu.com/p/603335718)  
@@ -738,3 +778,8 @@ sync.Once
 [通过 sync.Once 学习到 Go 的内存模型](https://studygolang.com/articles/25299)  
 sync.Mutex  
 [Golang 单机锁实现原理](https://zhuanlan.zhihu.com/p/599119674)
+[Golang Mutex 原理解析](https://juejin.cn/post/7086756462059323429)  
+[Golang RWMutex 原理解析](https://juejin.cn/post/7091236529959338015)  
+reflect
+[Go反射无敌了，彻底懂了](https://mp.weixin.qq.com/s/acu01W1Ch48OAjPRiZGKDw)
+[Go系列](https://lailin.xyz/)
