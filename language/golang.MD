@@ -226,8 +226,8 @@ func
   - return赋值(返回值没有命名，就赋值给临时变量)->执行defer->return返回  
 - init  
   import->const->var->init->main
-  - 一个包里可以包含多个init函数
   - 程序运⾏时，先执⾏依赖包的init函数，再执⾏当前包内的init函数
+  - 一个包里可以包含多个init函数
   - init函数不可以被其他函数调⽤
 
 method
@@ -285,7 +285,7 @@ pointer
 reflect
 程序在运行的时候能够观察并且修改自己的行为
 - 反射三定律
-  - 反射可以将interface类型变量转换成反射对象
+  - 反射可以将interface对象转换成反射对象
   - 反射可以将反射对象还原成interface对象
   - 反射对象可修改，value值必须是可设置的
 - reflect慢的主要原因
@@ -304,7 +304,6 @@ error&panic&recover
     - defer需要在函数里直接调用recover
     - panic的信息为nil时无法捕获
     - 不同goroutine间无法捕获
-    - 调用runtime.fatalthrow方法
 ```
 
 ## 内存管理 ##
@@ -780,6 +779,6 @@ sync.Mutex
 [Golang 单机锁实现原理](https://zhuanlan.zhihu.com/p/599119674)
 [Golang Mutex 原理解析](https://juejin.cn/post/7086756462059323429)  
 [Golang RWMutex 原理解析](https://juejin.cn/post/7091236529959338015)  
-reflect
-[Go反射无敌了，彻底懂了](https://mp.weixin.qq.com/s/acu01W1Ch48OAjPRiZGKDw)
-[Go系列](https://lailin.xyz/)
+reflect  
+[Go反射无敌了，彻底懂了](https://mp.weixin.qq.com/s/acu01W1Ch48OAjPRiZGKDw)  
+[Go系列](https://lailin.xyz/)  
