@@ -413,7 +413,8 @@ bin日志
 ```
 
 **两阶段提交**  
-![两阶段提交](./images/mysql/transaction-xa-commit.webp)
+保证主从数据一致  
+![两阶段提交](./images/mysql/transaction-xa-commit.webp)  
 
 ## 锁 ##
 ```
