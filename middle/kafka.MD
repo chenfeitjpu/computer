@@ -22,8 +22,8 @@ Kafka是一个分布式事件流平台
   - 消费者(Consumer)  读取消息
   - 消费者组(Consumer Group)  多个Consumer组成一个Group
   - 偏移量(Offset)  消息在分区的唯一标识  
-    - LEO  副本log文件下一条要写入的消息的位移
-    - HW  ISR集合中最小的LEO
+    - LEO 副本log文件下一条要写入的消息的位移
+    - HW  Leader会记录Follower同步过来的LEO，然后取最小的LEO值作为HW值，Follower获取数据时也带上Leader的HW，然后和自身的LEO值取一个较小的值作为自身的HW值
   - 服务节点(Broker)  一个独立的Kafka服务器就被称为Broker，Broker接收来自生产者的消息，为消息设置偏移量，并提交消息到磁盘保存
   - Broker集群  Broker是集群的组成部分，Broker集群由一个或多个Broker组成，每个集群都有一个Broker同时充当了集群控制器的角色
   - Zookeeper  保存着集群Broker、Topic、Partition等meta数据；负责Broker故障发现，Partition Leader选举，负载均衡等功能
@@ -50,11 +50,6 @@ Kafka是一个分布式事件流平台
     - 生产有序  生产者顺序写入
     - 消费有序  同一个分区内的消息只能被一个Group里的一个Consumer消费
   - 超时重试时，不一定有序
-
-语义
-- 至多一次  
-- 至少一次  
-- 精确一次 
 ```
 
 ## 读写 ##
@@ -70,34 +65,31 @@ Kafka是一个分布式事件流平台
   - 0  Producer不等待Broker的Ack
   - 1  Producer等待Broker的Ack，Partition的Leader写入成功后返回Ack
   - all  Producer等待Broker的Ack，Partition的Leader和Follower全部写入成功后才返回Ack
-- 去重
-  - 幂等性发送者(单一会话单一分区)
-    Broker会根据(Producter, Topic, Partition)保存一个SeqNumber
-  - 事务性发送者(跨会话跨分区)
+- 幂等性
+  Broker会为每个(Topic, Partition)保存一个(PID, SeqNumber)
 
 消费者
 - 模式
-  - kafka消费者采用pull拉模式从broker中消费数据  
-  - pull模式则可以根据consumer的消费能力以适当的速率消费消息
+  - Kafka消费者采用Pull拉模式从Broker中消费数据  
+  - Pull模式则可以根据Consumer的消费能力以适当的速率消费消息
   - 消费者可能会陷入循环中，一直返回空数据。为了避免这种情况，我们在我们的拉请求中有参数，允许消费者请求在等待数据到达的长轮询中进行阻塞
 - 消费者组
-  - 消费者是以consumer group消费者组的方式工作，由一个或者多个消费者组成一个组，共同消费一个topic  
-  - 每个分区在同一时间只能由group中的一个消费者读取，但是多个group可以同时消费这个partition
-  - 消费者组实现广播与单播的功能
+  - 消费者是以Consumer Group消费者组的方式工作，由一个或者多个消费者组成一个组，共同消费一个Topic  
+  - 每个Partition在同一时间只能由Group中的一个Consumer读取，但是多个Group可以同时消费这个Partition
 - 分区分配策略
-  - 轮询(RoundRobin)
+  - 轮询(Round Robin)
     把多个主题当成一个整体
-    消费者组里的消费者之间消费的消息个数最多相差1个
     - 实现
       对主题和分区进行排序，根据消费者进行轮询
     - 适用场景
       适用于消费者组中消费者订阅的主题相同的情况
-  - 范围方法(Range)
+  - 范围(Range)
     不会把多个主题当成一个整体
-    消费者组内的消费者消费的消息数量相差可能较大
     - 实现
-      计算每个consumer可以消费的分区个数，然后按照顺序将指定个数范围的分区分配给各个consumer
-  - Sticky
+      计算每个Consumer可以消费的分区个数，然后按照顺序将指定个数范围的分区分配给各个Consumer
+  - Sticky(粘性)
+    - 分区的分配尽可能均匀
+    - 分区的分配尽可能与上次分配的保持相同
 - 提交消费偏移量
   - 自动
   - 手动
@@ -108,6 +100,8 @@ Kafka是一个分布式事件流平台
     - 组成员数发生变更
     - 订阅主题发生变更
     - 订阅主题的分区数发生变更
+- 消费者数量大于分区数量
+  多出来的消费者会处于空闲状态，继续与Broker保持心跳，当其中一个消费者离开消费组后，其他消费者才会重新进行分区分配
 
 服务节点
 - 分区
@@ -130,15 +124,19 @@ Kafka是一个分布式事件流平台
     - Follower的LEO等于Leader的LEO的时候，OSR会加入ISR
 - 故障处理
     - Follower故障
-      Follower发生故障后会被临时踢出ISR，待该Follower恢复后，Follower会读取本地磁盘记录的上次的HW，并将log文件高于HW的部分截取掉，从HW开始向leader进行同步。等该follower的LEO大于等于该Partition的HW，即follower追上leader之后，就可以重新加入ISR了  
+      Follower发生故障后会被临时踢出ISR，待该Follower恢复后，Follower会读取本地磁盘记录的上次的HW，并将Log文件高于HW的部分截取掉，从HW开始向Leader进行同步。等该Lollower的LEO大于等于该Partition的HW，即Lollower追上leader之后，就可以重新加入ISR了  
     - Leader故障
-      leader发生故障之后，会从ISR中选出一个新的leader，之后为保证多个副本之间的数据一致性，其余的follower会先将各自的log文件高于HW的部分截掉，然后从新的leader同步数据  
+      Leader发生故障之后，会从ISR中选出一个新的Leader，之后为保证多个副本之间的数据一致性，其余的Follower会先将各自的Log文件高于HW的部分截掉，然后从新的Leader同步数据  
 - 刷盘机制
   - 配置
     - log.flush.interval.messages  //写入多少消息刷盘一次
     - log.flush.interval.ms  //间隔多长时间刷盘一次
     - log.flush.scheduler.interval.ms  //多长时间进行一次检查
   - 操作系统刷新Page Cache
+
+事务
+- 保持会话状态
+- 保证多分区操作的原子性
 ```
 
 ## 存储 ##
@@ -155,25 +153,20 @@ log结构
     - *.timeindex
       时间戳索引
   - 分段策略
-    - 数据大小(默认是1GB)
-      `log.segment.bytes`  
-    - 数据时间(默认7天)
-      `log.segment.ms`  
-- 消息结构
-  - record
-  - record batch
-  - record header
+    - 数据大小(默认是1GB)  `log.segment.bytes`  
+    - 数据时间(默认7天)  `log.segment.ms`  
 
 过期数据清理
+可以针对主题和分区设置
 - 启用清理
   `log.cleaner.enable=true`  
 - 策略
-  - 删除  
+  - 删除
     - 启用删除策略
       `log.cleanup.policy=delete`
-    - 清理超过指定时间的数据  
+    - 清理超过指定时间前的数据  
       `log.retention.hours=16`  
-    - 清理超过指定大小的消息
+    - 清理超过指定大小前的数据
       `log.retention.bytes=1073741824`  
   - 压缩  
     只保留每个key最后一个版本的数据
