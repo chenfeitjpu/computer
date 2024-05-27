@@ -120,18 +120,18 @@ Kafka是一个分布式事件流平台
     - AR  所有的Follower
   - 判断
     - Follower的LEO与Leader的LEO相等时更新lastCaughtUpTimeMs，当前时间Now减去Follower的LastCaughtUpTimeMs大于replica.log.time.max.ms，ISR就会加入OSR
-    - Follower的LEO等于Leader的LEO的时候，OSR会加入ISR
-- 故障处理
+    - Follower的LEO等于Leader的HW的时候，OSR会加入ISR
+  - 故障处理
     - Follower故障
       Follower发生故障后会被临时踢出ISR，待该Follower恢复后，Follower会读取本地磁盘记录的上次的HW，并将Log文件高于HW的部分截取掉，从HW开始向Leader进行同步。等该Lollower的LEO大于等于该Partition的HW，即Lollower追上leader之后，就可以重新加入ISR了  
     - Leader故障
       Leader发生故障之后，会从ISR中选出一个新的Leader，之后为保证多个副本之间的数据一致性，其余的Follower会先将各自的Log文件高于HW的部分截掉，然后从新的Leader同步数据  
-- 刷盘机制
-  - 配置
-    - log.flush.interval.messages  //写入多少消息刷盘一次
-    - log.flush.interval.ms  //间隔多长时间刷盘一次
-    - log.flush.scheduler.interval.ms  //多长时间进行一次检查
-  - 操作系统刷新Page Cache
+  - 刷盘机制
+    - 配置
+      - log.flush.interval.messages  //写入多少消息刷盘一次
+      - log.flush.interval.ms  //间隔多长时间刷盘一次
+      - log.flush.scheduler.interval.ms  //多长时间进行一次检查
+    - 操作系统刷新Page Cache
 
 事务
 - 保持会话状态
