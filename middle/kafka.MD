@@ -5,6 +5,7 @@
   - [读写](#读写)
   - [存储](#存储)
   - [对比](#对比)
+- [学习资料](#学习资料)
 
 # 定义 #
 Kafka是一个分布式事件流平台
@@ -18,20 +19,18 @@ Kafka是一个分布式事件流平台
   - 批次(BatchRecord)  一组消息，为了提高效率，消息会分批次写入Kafka
   - 主题(Topic)  消息分类  
   - 分区(Partition)  一个Topic可以包含多个Partition，Topic消息保存在各个Partition上，单一分区有序，主题中所有的分区是无序的  
+    - 副本(Replication)  同一Partition的数据可以在多Broker上存在多个副本
+    - Leader  负责消息的读取
+    - Follower  实时从Leader中同步数据，Leader发生故障时，某个Follow会成为新的Leader
   - 生产者(Producer)  发送消息
   - 消费者(Consumer)  读取消息
   - 消费者组(Consumer Group)  多个Consumer组成一个Group
   - 偏移量(Offset)  消息在分区的唯一标识  
-    - LEO 副本log文件下一条要写入的消息的位移
+    - LEO 下一条要写入的消息的位移
     - HW  Leader会记录Follower同步过来的LEO，然后取最小的LEO值作为HW值，Follower获取数据时也带上Leader的HW，然后和自身的LEO值取一个较小的值作为自身的HW值
   - 服务节点(Broker)  一个独立的Kafka服务器就被称为Broker，Broker接收来自生产者的消息，为消息设置偏移量，并提交消息到磁盘保存
   - Broker集群  Broker是集群的组成部分，Broker集群由一个或多个Broker组成，每个集群都有一个Broker同时充当了集群控制器的角色
   - Zookeeper  保存着集群Broker、Topic、Partition等meta数据；负责Broker故障发现，Partition Leader选举，负载均衡等功能
-  - 副本(Replication)  同一Partition的数据可以在多Broker上存在多个副本
-  - Leader  负责消息的读取
-  - Follower  实时从Leader中同步数据，Leader发生故障时，某个Follow会成为新的Leader
-  - 重平衡(Rebalance)  消费者组内某个消费者实例挂掉后，其他消费者实例自动重新分配订阅主题分区的过程
-
 特点
 - 优势
   - 多生产者
@@ -42,8 +41,8 @@ Kafka是一个分布式事件流平台
 - 高性能
   - 分批发送
   - 消息压缩
-  - 顺序读写
   - 页缓存  数据先写入Page Cache后写入磁盘
+  - 顺序读写
   - 零拷贝
 - 消息有序
   - kafka只保证同一个分区内的消息有序
@@ -57,10 +56,18 @@ Kafka是一个分布式事件流平台
 生产者
 - 写入流程
   - Producer先从Zookeeper找到该Partition的Leader
-  - producer将消息发送给该Leader
+  - Producer将消息发送给该Leader
   - Leader将消息写入本地Log
   - Followers从Leader中Pull消息，写入本地Log后向Leader发送Ack
   - Leader收到所有ISR中的Replication的Ack后，增加HW并向Producer发送Ack
+- 分区
+  - 目的
+    - 方便扩展  一个Topic可以有多个Partition，可以适应任意大小的数据
+    - 提高并发  以Partition为单位读写
+  - 选择
+    - 指明Partition的情况下，直接使用
+    - 没有指明Partition但有Key的情况下，将Key的Hash值与Topic的Partition数进行取余得到Partition  
+    - 既没有指明Partition值又没有Key值的情况下，第一次调用时随机生成一个整数(后面每次调用在这个整数上自增)，将这个值与Topic可用的Partition总数取余得到Partition
 - acks & retries
   - 0  Producer不等待Broker的Ack
   - 1  Producer等待Broker的Ack，Partition的Leader写入成功后返回Ack
@@ -104,14 +111,6 @@ Kafka是一个分布式事件流平台
   多出来的消费者会处于空闲状态，继续与Broker保持心跳，当其中一个消费者离开消费组后，其他消费者才会重新进行分区分配
 
 服务节点
-- 分区
-  - 目的
-    - 方便扩展  一个Topic可以有多个Partition，可以适应任意大小的数据
-    - 提高并发  以Partition为单位读写
-  - 选择
-    - 指明Partition的情况下，直接使用
-    - 没有指明Partition但有Key的情况下，将Key的Hash值与Topic的Partition数进行取余得到Partition  
-    - 既没有指明Partition值又没有Key值的情况下，第一次调用时随机生成一个整数(后面每次调用在这个整数上自增)，将这个值与Topic可用的Partition总数取余得到Partition
 - 副本
   - 目的  
     实现故障自动转移
@@ -184,7 +183,7 @@ kafka & rabbitmq
 - kafka会保留历史消息，rabbitmq消费完即删除
 ```
 
-学习资料  
+# 学习资料 #  
 [官网](https://kafka.apache.org/)  
 [真的，Kafka入门一篇文章就够了](https://juejin.cn/post/6844903495670169607)  
 [kafka是怎么实现顺序写磁盘的](https://www.zhihu.com/question/63408317/answer/3058280249)  
