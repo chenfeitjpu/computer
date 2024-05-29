@@ -68,10 +68,13 @@ Kafka是一个分布式事件流平台
     - 指明Partition的情况下，直接使用
     - 没有指明Partition但有Key的情况下，将Key的Hash值与Topic的Partition数进行取余得到Partition  
     - 既没有指明Partition值又没有Key值的情况下，第一次调用时随机生成一个整数(后面每次调用在这个整数上自增)，将这个值与Topic可用的Partition总数取余得到Partition
-- acks & retries
-  - 0  Producer不等待Broker的Ack
-  - 1  Producer等待Broker的Ack，Partition的Leader写入成功后返回Ack
-  - all  Producer等待Broker的Ack，Partition的Leader和Follower全部写入成功后才返回Ack
+- 可靠性
+  - acks & retries
+    - 0  Producer不等待Broker的Ack
+    - 1  Producer等待Broker的Ack，Partition的Leader写入成功后返回Ack
+    - all  Producer等待Broker的Ack，Partition的Leader和Follower全部写入成功后才返回Ack
+  - 允许重试的异常响应  重试
+  - 正常响应或不允许重试的异常响应  callback
 - 幂等性
   Broker会为每个(Topic, Partition)保存一个(PID, SeqNumber)
 
@@ -187,3 +190,4 @@ kafka & rabbitmq
 [官网](https://kafka.apache.org/)  
 [真的，Kafka入门一篇文章就够了](https://juejin.cn/post/6844903495670169607)  
 [kafka是怎么实现顺序写磁盘的](https://www.zhihu.com/question/63408317/answer/3058280249)  
+[kafka-producer源码分析](https://github.com/Raray-chuan/xichuan_note/blob/main/docs/big-data/kafka/kafka-producer%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90.md)  

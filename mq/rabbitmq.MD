@@ -8,6 +8,7 @@
 - [学习资料](#学习资料)
 
 # 定义 #
+消息和流式代理
 
 # 使用 #
 ## 架构 ##
@@ -29,7 +30,6 @@
 - 发布/订阅模式(Publish/Subscribe)  会把消息路由到所有与该交换器绑定的队列中
 - 路由模式(Routing) 会把消息路由到BindingKey和RoutingKey完全匹配的队列中
 - 专题模式(Topic)  会把消息路由到BingingKey和RoutintKey模糊匹配的队列中 *匹配单个单词 #匹配多个(可以是零个)
-- headers  通过headers属性进行消息匹配  x-match all 所有都匹配 any 任意一个匹配
 - RPC  
 ```
 
@@ -37,24 +37,35 @@
 ```
 生产者
 - 发送过程
-  - 创建连接
-  - 创建通道
-  - 声明交换器
-  - 发送消息至服务器
+  - Producer创建连接
+  - Producer开启信道
+  - Producer声明交换器
+  - Producer声明队列
+  - Producer绑定队列和交换器
+  - Producer发送消息至服务器
+  - Exchange根据路由键查找匹配的队列
+  - Producer关闭信道
+  - Producer关闭连接
 - 消息不丢
   - 事务机制(同步)
-  - 发送方确认机制(异步)
+  - confirm机制(异步)
 
 消费者
 - 接收过程
-  - 创建连接
-  - 创建通道
-  - 声明交换器
-  - 声明队列
-  - 绑定队列
-  - 订阅消息
+  - Consumer创建连接
+  - Consumer开启通道
+  - Consumer接收消息
+  - Consumer确认消息
+  - Broker从队列中删除消息
+  - Consumer关闭信道
+  - Consumer关闭连接
 - 消息不丢
   - ack机制
+
+交换器
+- 交换器无法根据自身类型和路由键找到符合条件队列
+  - 返回消息给生产者
+  - 直接丢弃
 
 有效期
 - 消息
