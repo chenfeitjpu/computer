@@ -42,7 +42,8 @@
   - 504 服务器作为网关或代理，未能及时从上游服务器收到响应
 
 长连接
-Connection: keep-alive  使用持久连接
+开启
+- Connection: keep-alive  使用持久连接
 断开连接
 - 长时间没有请求
 - 请求数到达上限
@@ -78,8 +79,8 @@ Connection: keep-alive  使用持久连接
     - 请求头部中的If-Modified-Since 
     Etag的优先级更高  
 
-HTTP1.1特性
-- 优点  
+HTTP1.1
+- 特点  
   - 简单 
   - 易扩展
   - 跨平台
@@ -88,14 +89,19 @@ HTTP1.1特性
     - 目的
       高效
     - 保持状态
-      - cookie
-        服务端产生，保存在客户端
-      - session
-        服务端产生，保存在服务端
+      - cookie  服务端产生，保存在客户端的数据
+      - session  服务端产生，保存在服务端的数据
         分布式session 
         - session复制
-        - session粘滞
         - session集中存储 
+      - 联系
+        Session通过Cookie的SessionID来实现
+      - 区别
+        - Cookie保存在客户端，Session保存在服务器端  
+        - Cookie存储在客户端，比较容易遭到不法获取，Session存储在服务端，安全性相对Cookie要好一些
+        - Cookie只能保存ASCII，Session可以存任意数据类型
+        - 单个Cookie保存的数据不能超过4K，Session无限制
+        - Cookie可设置为长时间保持，Session一般失效时间较短，客户端关闭或者Session超时都会失效
   - 不安全
     - 明文传输，内容可能会被窃听
     - 不验证通信身份，可能会被冒充
@@ -131,14 +137,14 @@ HTTPS
   - 客户端发情Client Key Exchange(客户端的椭圆曲线公钥)、Change Cipher Spec(加密算法改变通知)、Encrypted Handshake Message(摘要信息)
   - 服务端发送Change Cipher Spec(加密算法改变通知)、Encrypted Handshake Message(服务端握手结束通知)
 
-HTTP2特性
-- 优化 
+HTTP2
+- 特点
+  - 二进制帧
+    - 帧数据通过HPACK算法进行压缩
   - 头部压缩
     - 静态表编码
     - 动态表编码
     - Huffman编码
-  - 二进制格式
-    - 帧数据通过HPACK算法进行压缩
   - 并发传输
   - 服务器推送  
 - 缺点
@@ -154,14 +160,16 @@ HTTP2特性
 
 RESTFUL API 
 一套应用程序的API设计规范
+用URL定位资源，用HTTP动词描述操作，用HTTP状态码反馈结果
 https://domain/version/resource?filter(key=value)
 - 协议  总是使用https协议
 - 域名  使用api专用域名
 - 版本  放入URL中
 - 路径  使用资源表示
-- 过滤
-- 动词  GET、POST、PUT、PATCH、DELETE
-- 返回结果  使用JSON格式，根据请求资源返回单个或者多个
+- 过滤  
+- 操作  GET、POST、PUT、PATCH、DELETE
+- 返回结果  Status Code
+- 返回内容  使用JSON格式，根据请求资源返回单个或者多个
 ```
 
   
