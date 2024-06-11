@@ -127,8 +127,8 @@ func (l *LRUCache) Put(key int, value int) {
 
 # 使用 #
 ```
-- 应用  
-  - LeetCode  
-    - 146.LRU缓存 
+应用  
+- LeetCode  
+  - 146.LRU缓存 
 ```
 

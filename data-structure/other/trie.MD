@@ -63,8 +63,8 @@ func (this *Trie) StartsWith(prefix string) bool {
 
 # 使用 #
 ```
-- 应用
-  - LeetCode
-    - 208.实现Trie(前缀树)
+应用
+- LeetCode
+  - 208.实现Trie(前缀树)
 ```
 

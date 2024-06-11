@@ -165,7 +165,7 @@ func (l *LFUCache) DeleteLast() {
 
 # 使用 #
 ```
-- 应用  
-  - LeetCode  
-    - 460.LFU缓存
+应用  
+- LeetCode  
+  - 460.LFU缓存
 ```

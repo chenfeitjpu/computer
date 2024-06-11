@@ -158,8 +158,8 @@ func isDigit(char byte) bool {
 
 # 使用 #
 ```
-- 应用
-  - LeetCode
-    - 224.基本计算器
-    - 227.基本计算器 II
+应用
+- LeetCode
+  - 224.基本计算器
+  - 227.基本计算器 II
 ```
