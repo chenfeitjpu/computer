@@ -116,6 +116,6 @@ func (m *MedianFinder) FindMedian() float64 {
 # 使用 #
 ```
 应用
-LeetCode
-- 295.数据流的中位数
+- LeetCode
+  - 295.数据流的中位数
 ```
