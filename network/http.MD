@@ -88,8 +88,10 @@ HTTP1.1
       - cookie  客户端进行数据存储
       - session  服务端进行会话管理
         - 分布式session 
-          - session复制
-          - session集中存储 
+          - 客户端存储
+          - ip_hash  
+          - session复制  
+          - session集中存储  
       - 联系
         Session通过Cookie的SessionID来实现
       - 区别

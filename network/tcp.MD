@@ -56,11 +56,11 @@
   - SYN攻击  
     把TCP半连接队列打满，这样当TCP半连接队列满了，后续再在收到SYN报文就会丢弃，导致客户端无法和服务端建立连接
     - 避免SYN攻击方式
-      - 调大netdev_max_backlog，网卡接收更多的数据包
       - 增大TCP半连接队列
       - 开启tcp_syncookies，不使用syn队列
       - 减少SYN+ACK重传次数，尽早断开连接
-
+    - 全连接满了
+      - 增大TCP全连接队列
 四次挥手
 - 流程
   - 客户端(ESTABLISHED状态)发送FIN报文(FIN_WAIT_1状态)  
