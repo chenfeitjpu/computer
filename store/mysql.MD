@@ -78,13 +78,14 @@ SQL
 - DDL
   - engine
     - `show engines` 查看存储引擎
-      - InnoDB支持事务、行级锁、外键
-      - MyISAM查询性能高
+      - InnoDB  支持事务、行级锁、外键
+      - MyISAM  查询性能高
         - 通过offset直接定位到记录
         - 不需要做事务处理 
-      - MEMORY存储在内存，用于临时表
+      - MEMORY  存储在内存，用于临时表
   - database    
     - `show databases` 查看所有库
+    - `show create database 库名`  查看库定义
     - `create database [if not exists] 库名` 创建库
     - `drop database [if exists] 库名` 删除库
     - `use 库名` 选择库
@@ -113,24 +114,19 @@ SQL
       - 该列必须有unsigned zerofill的属性
       - 该列的实际值的位数必须小于显示宽度  
     - `primary key`  主键
-    - `unique [key] [约束名] (列名)`  唯一键
-    - `key`  普通索引
+    - `unique key [索引名](列名)`  唯一键
+    - `key [索引名](列名)`  普通索引
     - `foreign key [索引名](列1, 列2, ...) references 父表名 (父列1, 父列2, ...)`  外键
 - DML
-  - `insert into 表名 [(列名, 列名)] values (值, 值) [,(值, 值)]` 插入单条|多条数据
-  - `insert into 表名 select` 插入结果集
-  - `insert ignore into` 插入忽略错误
-  - `insert into ... on duplicate key update 列名 = 值|values(列名)` 插入重复值
+  - `insert [ignore] into 表名 (列名, 列名) values (值, 值) [on duplicate key update 列名 = 值|values(列名)]` 插入数据
   - `delete from 表名 [where 表达式]` 删除数据
   - `update 表名 set 列名=值 [where 表达式]` 更新数据 
 - DQL
-  - `select 列名 [as] [别名][, 列名 [as] [别名]] from 表名` 查询单个|多个列
-  - `select * from 表名` 查询所有列
-  - `select distinct 列名[, 列名] from 表名` 去除单列|多列的重复结果 
+  - `select [distinct] 列名 [as] [别名] from 表名` 查询
   - `limit [开始行,] 限制条数` 限制查询结果条数
   - `order by 列名 asc|desc[, 列名 asc|desc]` 按照单列|多列的值进行排序，默认升序
 - DCL
-  - `grant 权限 on 库名.表名 to 用户@主机 identified by 密码` 授权
+  - `grant 权限 on 库名.表名 to 用户@主机` 授权
   - `revoke 权限 on 库名.表名 to 用户@主机` 回收权限  
 
 查询
