@@ -15,22 +15,15 @@
 ## 基础使用 ##
 ```
 变量&状态
-- 系统变量
-  - `show [global|session] variables [LIKE 匹配的模式]` 查看系统变量
-  - `set [global|session] 变量名=值` 设置系统变量
-  - `set [@@global|session.] 变量名=值` 设置系统变量
-- 系统状态
-  - `show [global|session] status [LIKE 匹配的模式]` 查看系统状态
+- 系统变量  `show [global|session] variables [LIKE 匹配的模式]`
+- 系统状态  `show [global|session] status [LIKE 匹配的模式]`
 
 字符集&比较规则
 - 查看
-  - `show (character set | charset)` 查看字符集
-  - `show collation` 查看比较规则
+  - `show (character set | charset)`
+  - `show collation`
 - 字符集设置
-  - 服务器级别  
-  - 数据库级别  
-  - 表级别   
-  - 列级别  
+  服务器级别、数据库级别、表级别、列级别  
 - 字符集转换过程   
   - 客户端使用操作系统的字符集编码请求字符串，向服务器发送的是经过编码的一个字节串  
   - 服务器将客户端发送来的字节串采用character_set_client代表的字符集进行解码，将解码后的字符串再按照character_set_connection代表的字符集进行编码  
