@@ -1,7 +1,7 @@
 **MySQL**
 - [定义](#定义)
 - [使用](#使用)
-  - [基础使用](#基础使用)
+  - [系统架构](#系统架构)
   - [数据类型](#数据类型)
   - [数据操作](#数据操作)
   - [事务](#事务)
@@ -12,7 +12,7 @@
 关系型数据库
 
 # 使用 #
-## 基础使用 ##
+## 系统架构 ##
 ```
 变量&状态
 - 系统变量  `show [global|session] variables [LIKE 匹配的模式]`
@@ -64,12 +64,9 @@ year、date、time、datetime、timestamp
 char(M)、varchar(M)、tinytext、text、mediumtext、longtext、enum、set
 - varchar
   - varchar(50) vs varchar(100)
-    - 磁盘占用
-      磁盘占用空间大小是一样的
-    - 内存操作
-      使用固定大小的内存块来保存值，就是使用字符类型中定义的长度
-    - 建立索引
-      建立索引时没有限制索引的大小，索引长度会默认采用的该字段的长度     
+    - 磁盘占用  磁盘占用空间大小是一样的
+    - 内存操作  使用固定大小的内存块来保存值，就是使用字符类型中定义的长度
+    - 建立索引  建立索引时没有限制索引的大小，索引长度会默认采用的该字段的长度     
 
 二进制字符串
 bit(M)、binary(M)、varbinary(M)、tinyblob、blob、mediumblob、longblob
