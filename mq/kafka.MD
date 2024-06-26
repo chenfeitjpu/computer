@@ -22,15 +22,15 @@ Kafka是一个分布式事件流平台
     - 副本(Replication)  同一Partition的数据可以在多Broker上存在副本
     - Leader  负责消息的读取
     - Follower  定期从Leader中拉取数据，Leader发生故障时，某个Follower会成为新的Leader
-  - 生产者(Producer)  发送消息
-  - 消费者(Consumer)  读取消息
-  - 消费者组(Consumer Group)  多个Consumer组成一个Group
   - 偏移量(Offset)  消息在分区的唯一标识  
     - LEO 下一条要写入的消息的位移
     - HW  Leader会记录Follower同步过来的LEO，然后取最小的LEO值作为HW值，Follower获取Leader的HW，和自身的LEO取较小的作为自身的HW
   - 服务节点(Broker)  一个独立的Kafka服务器就被称为Broker，Broker接收来自生产者的消息，为消息设置偏移量，并提交消息到磁盘保存
   - Broker集群  Broker是集群的组成部分，Broker集群由一个或多个Broker组成，每个集群都有一个Broker同时充当了集群控制器的角色，负责Leader选举、分区分配
   - Zookeeper  保存着集群Broker、Topic、Partition等Meta数据
+  - 生产者(Producer)  发送消息
+  - 消费者(Consumer)  读取消息
+  - 消费者组(Consumer Group)  多个Consumer组成一个Group
 
 特点
 - 优势
