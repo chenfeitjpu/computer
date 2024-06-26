@@ -4,7 +4,7 @@
   - [架构](#架构)
   - [读写](#读写)
   - [存储](#存储)
-  - [对比](#对比)
+  - [常见问题](#常见问题)
 - [学习资料](#学习资料)
 
 # 定义 #
@@ -19,7 +19,7 @@ Kafka是一个分布式事件流平台
   - 批次(BatchRecord)  一组消息，为了提高效率，消息会分批次写入Kafka
   - 主题(Topic)  消息分类  
   - 分区(Partition)  一个Topic可以包含多个Partition，单一分区有序，所有分区无序  
-    - 副本(Replication)  同一Partition的数据可以在多Broker上存在多个副本
+    - 副本(Replication)  同一Partition的数据可以在多Broker上存在副本
     - Leader  负责消息的读取
     - Follower  定期从Leader中拉取数据，Leader发生故障时，某个Follower会成为新的Leader
   - 生产者(Producer)  发送消息
@@ -42,7 +42,7 @@ Kafka是一个分布式事件流平台
 - 高性能
   - 分批发送
   - 消息压缩
-  - 页缓存  数据先写入Page Cache后写入磁盘
+  - 页缓存
   - 顺序读写
   - 零拷贝
 - 消息有序
@@ -68,16 +68,19 @@ Kafka是一个分布式事件流平台
   - 选择
     - 指明Partition的情况下，直接使用
     - 没有指明Partition但有Key的情况下，将Key的Hash值与Topic的Partition数进行取余得到Partition  
-    - 既没有指明Partition值又没有Key值的情况下，第一次调用时随机生成一个整数(后面每次调用在这个整数上自增)，将这个值与Topic可用的Partition总数取余得到Partition
+    - 既没有指明Partition值又没有Key值的情况下，第一次调用时随机生成一个整数(后面每次调用在这个整数上自增)，将这个值与Topic可用的Partition总数取模得到Partition
 - 可靠性
-  - acks & retries
+  - acks 
     - 0  Producer不等待Broker的Ack
     - 1  Producer等待Broker的Ack，Partition的Leader写入成功后返回Ack
     - all  Producer等待Broker的Ack，Partition的Leader和Follower全部写入成功后才返回Ack
-  - 允许重试的异常响应  重试
-  - 正常响应或不允许重试的异常响应  callback
+  - retries
+    - 允许重试的异常响应  重试
+    - 正常响应或不允许重试的异常响应  callback
 - 幂等性
-  Broker会为每个(Topic, Partition)保存一个(PID, SeqNumber)
+  - 单会话单分区  幂等性生产者
+    Broker会为每个(Topic, Partition)保存一个(PID, SeqNumber)
+  - 多分区多会话  事务性生产者
 
 消费者
 - 模式
@@ -87,38 +90,30 @@ Kafka是一个分布式事件流平台
 - 消费者组
   - 消费者是以Consumer Group消费者组的方式工作，由一个或者多个消费者组成一个组，共同消费一个Topic  
   - 每个Partition在同一时间只能由Group中的一个Consumer读取，但是多个Group可以同时消费这个Partition
-- 分区分配策略
-  - 轮询(Round Robin)
-    把多个主题当成一个整体
-    - 实现
-      对主题和分区进行排序，根据消费者进行轮询
-    - 适用场景
-      适用于消费者组中消费者订阅的主题相同的情况
-  - 范围(Range)
-    不会把多个主题当成一个整体
-    - 实现
-      计算每个Consumer可以消费的分区个数，然后按照顺序将指定个数范围的分区分配给各个Consumer
-  - Sticky(粘性)
-    - 分区的分配尽可能均匀
-    - 分区的分配尽可能与上次分配的保持相同
-- 可靠性 
-  - 提交消费偏移量
-    - 自动
-    - 手动
-      - 同步
-      - 异步
-- 再平衡
-  - 发生条件
+- 分区分配
+  - 策略
+    - 轮询(Round Robin)  把多个主题当成一个整体
+      - 实现  对主题和分区进行排序，根据消费者进行轮询
+      - 适用场景  适用于消费者组中消费者订阅的主题相同的情况
+    - 范围(Range)  不会把多个主题当成一个整体
+      - 实现  计算每个Consumer可以消费的分区个数，然后按照顺序将指定个数范围的分区分配给各个Consumer
+    - Sticky(粘性)
+      - 分区的分配尽可能均匀
+      - 分区的分配尽可能与上次分配的保持相同
+  - 消费者数量大于分区数量
+    多出来的消费者会处于空闲状态，继续与Broker保持心跳，当其中一个消费者离开消费组后，其他消费者才会重新进行分区分配
+  - 再平衡
     - 组成员数发生变更
-    - 订阅主题发生变更
     - 订阅主题的分区数发生变更
-- 消费者数量大于分区数量
-  多出来的消费者会处于空闲状态，继续与Broker保持心跳，当其中一个消费者离开消费组后，其他消费者才会重新进行分区分配
+    - 订阅主题发生变更
+  - 消费过的消息如何再消费
+    - 重设offset
+- 可靠性      
+  - 手动提交消费偏移量
 
 服务节点
 - 副本
-  - 目的  
-    实现故障自动转移
+  - 目的  实现故障自动转移
   - 分类
     - ISR  和Leader保持同步进度的Follower
     - OSR  和Leader不保持同步进度的Follower
@@ -130,7 +125,7 @@ Kafka是一个分布式事件流平台
     - Follower故障
       Follower发生故障后会被临时踢出ISR，待该Follower恢复后，Follower会读取本地磁盘记录的上次的HW，并将Log文件高于HW的部分截取掉，从HW开始向Leader进行同步。等该Lollower的LEO大于等于该Partition的HW，即Lollower追上leader之后，就可以重新加入ISR了  
     - Leader故障
-      Leader发生故障之后，会从ISR中选出一个新的Leader，之后为保证多个副本之间的数据一致性，其余的Follower会先将各自的Log文件高于HW的部分截掉，然后从新的Leader同步数据  
+      Leader发生故障之后，会从ISR中选出一个新的Leader，之后为保证多个副本之间的数据一致性，其余的Follower会先将各自的Log文件高于Leader HW的部分截掉，然后从新的Leader同步数据  
   - 刷盘机制
     - 配置
       - log.flush.interval.messages  //写入多少消息刷盘一次
@@ -140,12 +135,12 @@ Kafka是一个分布式事件流平台
 
 事务
 - 保持会话状态
-- 保证多分区操作的原子性
+- 保证操作原子性
 ```
 
 ## 存储 ##
 ```
-log结构
+文件结构
 - 划分
   一个topic下有多个partition，一个partition下有多个segment文件
 - segment
@@ -160,25 +155,19 @@ log结构
     - 数据大小(默认是1GB)  `log.segment.bytes`  
     - 数据时间(默认7天)  `log.segment.ms`  
 
-过期数据清理
-可以针对主题和分区设置
-- 启用清理
-  `log.cleaner.enable=true`  
+过期清理
+- 可以针对主题和分区设置
+- 启用清理  `log.cleaner.enable=true`  
 - 策略
   - 删除
-    - 启用删除策略
-      `log.cleanup.policy=delete`
-    - 清理超过指定时间前的数据  
-      `log.retention.hours=16`  
-    - 清理超过指定大小前的数据
-      `log.retention.bytes=1073741824`  
-  - 压缩  
-    只保留每个key最后一个版本的数据
-    - 启用压缩策略
-    `log.cleanup.policy=compact` 
+    - 启用删除策略  `log.cleanup.policy=delete`
+    - 清理超过指定时间前的数据  `log.retention.hours=16`  
+    - 清理超过指定大小前的数据  `log.retention.bytes=1073741824`  
+  - 压缩  只保留每个key最后一个版本的数据
+    - 启用压缩策略  `log.cleanup.policy=compact` 
 ```
 
-## 对比 ##
+## 常见问题 ##
 ```
 kafka & rabbitmq
 - kafka配置复杂，吞吐量大，rabbitmq配置简单，吞吐量小
@@ -186,6 +175,10 @@ kafka & rabbitmq
 - rabbitmq可灵活配置路由，kafka只能监控topic
 - rabbitmq错误消息会重新入队，超时消息会进入死信队列
 - kafka会保留历史消息，rabbitmq消费完即删除
+
+消息积压
+- 消费能力不足  增加分区，增加消费者
+- 下游的数据处理不及时  提高每批次拉取的数量
 ```
 
 # 学习资料 #  
