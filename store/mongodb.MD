@@ -3,8 +3,9 @@ MongoDb
 - [使用](#使用)
   - [基础](#基础)
   - [查询](#查询)
-  - [存储引擎](#存储引擎)
+  - [存储](#存储)
   - [集群](#集群)
+  - [学习资料](#学习资料)
 
 # 定义 #
 文档数据库
@@ -12,6 +13,10 @@ MongoDb
 # 使用 #
 ## 基础 ##
 ```
+特点
+- 灵活性  数据模型是动态的
+- 横向扩展  通过分片实现数据的扩展
+
 数据库
 - `show dbs`  查看所有数据库
 - `db`  查看当前使用数据库
@@ -43,22 +48,14 @@ MongoDb
 ## 查询 ##
 ```
 运算符
-- 比较运算符
-  - $gt
-  - $gte
-  - $lt
-  - $lte
-  - $ne
+- 比较运算符  
+  $gt、$gte、$lt、$lte、$ne
 - 逻辑运算符
-  - $and
-  - $or
-  - $not
-  - $nor
+  $and、$or、$not、$nor
 - 类型操作符
-  - $type
+  $type
 - 正则
-  - //
-  - $regex
+  //、$regex
 
 结果集
 - sort(keys)
@@ -73,10 +70,15 @@ MongoDb
   - db.COLLECTION_NAME.aggregate   
 ```
 
-## 存储引擎 ##
+## 存储 ##
+```
+分片
+
+```
 
 ## 集群 ##
 
-学习资料  
+
+## 学习资料 ##  
 [官方文档](https://www.mongodb.com/docs/manual/)  
 [中文文档](https://www.mongodb.com/zh-cn/docs/manual/)  

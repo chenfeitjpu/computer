@@ -191,10 +191,9 @@ SQL
     - 为列的基数大的列创建索引
     - 索引列的类型尽量小
     - 可以只对字符串值的前缀建立索引
-    - 只有索引列在比较表达式中单独出现才可以使用索引
-    - 定位并删除表中的重复和冗余索引
     - 为了尽可能少的让聚簇索引发生页面分裂和记录移位的情况，建议让主键拥有AUTO_INCREMENT属性
     - 尽量使用覆盖索引进行查询，避免回表带来的性能损耗
+    - 只有索引列在比较表达式中单独出现才可以使用索引
   - 代价  
     - 占用额外的存储空间  
     - 增删改时需要维护索引值的顺序  
@@ -277,7 +276,7 @@ SQL
   - possible_keys  可能用到的索引
   - key  实际用到的索引  
   - key_len  索引记录的最大长度，由三个部分构成，主要用来区分某个使用联合索引的查询具体用了几个索引列  
-    - 索实际占用的存储空间的最大长度
+    - 索引实际占用的存储空间的最大长度
     - 如果该索引列可以存储NULL值，则key_len比不可以存储NULL值时多1个字节
     - 对于变长字段来说，都会有2个字节的空间来存储该变长列的实际长度
   - ref  与索引列作等值匹配的内容  
@@ -328,7 +327,6 @@ SQL优化
   - `COMMIT`  提交事务
   - `ROLLBACK`  手动中止事务 
   - `START TRANSACTION [READ ONLY|READ WRITE] [WITH CONSISTENT SNAPSHOT]`  开启事务  
-  - `AUTOCOMMIT` 自动提交 
 - 并发问题  
   - 脏写  一个事务修改了另一个未提交事务修改过的数据，那就意味着发生了脏写  
   - 脏读  一个事务读到了另一个未提交事务修改过的数据，那就意味着发生了脏读   
@@ -392,15 +390,23 @@ redo日志
 bin日志
 - 作用
   用于复制、备份 
+- 格式
+  - STATEMENT
+  - ROW
+  - MIXED
 - 主从复制过程
-  - 写入binlog  主库写binlog日志
-  - 同步binlog  把binlog复制到所有从库上
-  - 回放binlog  从库回放binlog
-```
+  - master服务器在数据变更时，会记录bin log⽇志
+  - slave服务器会定期通过I/O thread拉去master的bin log
+  - master 节点为每个I/O线程启动⼀个dump线程，⽤于向Slave发送⼆进制事件
+  - slave节点会将收到的⼆进制事件保存⾄本地的中继⽇志relay log中
+  - slave节点会启动SQL线程从中继⽇志relay log中读取⼆进制变更
+  - slave的SQL tread在本地重放中继⽇志，使得其数据和主节点的保持⼀致
 
-**两阶段提交**  
-保证主从数据一致  
-![两阶段提交](./images/mysql/transaction-xa-commit.webp)  
+两阶段提交
+
+buffer pool 
+
+```
 
 ## 锁 ##
 ```
@@ -429,24 +435,25 @@ InnoDB存储引擎中的锁
   | 间隙锁 | 兼容 | 不兼容 |
   | 插入意向锁 | 兼容 | 兼容 |
 - 加锁
-  - 读  
-    - 对读取的记录加S锁  `SELECT ... LOCK IN SHARE MODE`
-    - 对读取的记录加X锁  `SELECT ... FOR UPDATE`
   - 写操作
     - INSERT  不加锁  
+      - 待插入记录的下一条记录上已经被其他事务加了gap锁时，生成一个插入意向锁
+      - 重复键
+        - 主键值重复
+          插入新记录的事务会给已存在的主键值重复的聚簇索引记录添加S型正经记录锁
+        - 唯一二级索引列重复
+          插入新记录的事务会给已存在的二级索引列值重复的二级索引记录添加S型next-key锁
     - DELETE  记录加X锁，执行逻辑删除  
     - UPDATE
       - 不修改键值，原记录修改 记录加X锁
       - 不修改键值，新记录修改 记录加X锁彻底删除，再insert
       - 修改键值  记录加X锁逻辑删除再insert
-  - 不同隔离级别下
-    - read uncommitted | read committed
-      只会加record锁
-    - repeatable read
-      会加next-key锁
-    - 注意事项
-      如果是唯一二级索引列重复，那不论是哪个隔离级别，插入新记录的事务都会给已存在的二级索引列值重复的二级索引记录添加S型next-key锁
-      只要别的事务生成了一个显式的gap锁的锁结构，不论那个事务已经获取到了该锁(granted)，还是正在等待获取（waiting），当前事务的INSERT操作都应该被阻塞  
+  - 读  
+    - 对读取的记录加S锁  `SELECT ... LOCK IN SHARE MODE`
+    - 对读取的记录加X锁  `SELECT ... FOR UPDATE`
+    - 不同隔离级别下
+      - read uncommitted | read committed  只会加record锁
+      - repeatable read   会加next-key锁
 - 乐观锁和悲观锁
   - 悲观锁  对数据被其它事务的修改持保守态度，访问数据时加锁
   - 乐观锁  对数据被其它事务的修改持乐观态度，修改时对比版本
