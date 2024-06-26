@@ -29,8 +29,8 @@ Kafka是一个分布式事件流平台
     - LEO 下一条要写入的消息的位移
     - HW  Leader会记录Follower同步过来的LEO，然后取最小的LEO值作为HW值，Follower获取Leader的HW，和自身的LEO取较小的作为自身的HW
   - 服务节点(Broker)  一个独立的Kafka服务器就被称为Broker，Broker接收来自生产者的消息，为消息设置偏移量，并提交消息到磁盘保存
-  - Broker集群  Broker是集群的组成部分，Broker集群由一个或多个Broker组成，每个集群都有一个Broker同时充当了集群控制器的角色
-  - Zookeeper  保存着集群Broker、Topic、Partition等Meta数据；负责Broker故障发现，Partition Leader选举，负载均衡等功能
+  - Broker集群  Broker是集群的组成部分，Broker集群由一个或多个Broker组成，每个集群都有一个Broker同时充当了集群控制器的角色，负责Leader选举、分区分配
+  - Zookeeper  保存着集群Broker、Topic、Partition等Meta数据
 
 特点
 - 优势
@@ -123,9 +123,9 @@ Kafka是一个分布式事件流平台
     - Follower的LEO等于Leader的HW的时候，OSR会加入ISR
   - 故障处理
     - Follower故障
-      Follower发生故障后会被临时踢出ISR，待该Follower恢复后，Follower会读取本地磁盘记录的上次的HW，并将Log文件高于HW的部分截取掉，从HW开始向Leader进行同步。等该Lollower的LEO大于等于该Partition的HW，即Lollower追上leader之后，就可以重新加入ISR了  
+      Follower发生故障后会被临时踢出ISR，待该Follower恢复后，将Log文件高于HW的部分截取掉，从HW开始向Leader进行同步。等该Lollower的LEO大于等于该Partition的HW，即Lollower追上leader之后，就可以重新加入ISR了  
     - Leader故障
-      Leader发生故障之后，会从ISR中选出一个新的Leader，之后为保证多个副本之间的数据一致性，其余的Follower会先将各自的Log文件高于Leader HW的部分截掉，然后从新的Leader同步数据  
+      Leader发生故障之后，会从ISR中选出一个新的Leader，其余的Follower会先将各自的Log文件高于HW的部分截掉，然后从新的Leader同步数据  
   - 刷盘机制
     - 配置
       - log.flush.interval.messages  //写入多少消息刷盘一次
@@ -171,14 +171,13 @@ Kafka是一个分布式事件流平台
 ```
 kafka & rabbitmq
 - kafka配置复杂，吞吐量大，rabbitmq配置简单，吞吐量小
-- kafka消息严格有序，rabbitmq不一定
 - rabbitmq可灵活配置路由，kafka只能监控topic
 - rabbitmq错误消息会重新入队，超时消息会进入死信队列
 - kafka会保留历史消息，rabbitmq消费完即删除
 
 消息积压
-- 消费能力不足  增加分区，增加消费者
-- 下游的数据处理不及时  提高每批次拉取的数量
+- 优化消费性能
+- 增加分区，增加消费者
 ```
 
 # 学习资料 #  
