@@ -15,7 +15,7 @@ Kafka是一个分布式事件流平台
 ```
 概念
 - 术语
-  - 消息(Record)  Kafka中的数据单元，包括offset、key(可选)、value
+  - 消息(Record)  Kafka中的数据单元，包括offset、key(可选)、value、timestamp
   - 批次(BatchRecord)  一组消息，为了提高效率，消息会分批次写入Kafka
   - 主题(Topic)  消息分类  
   - 分区(Partition)  一个Topic可以包含多个Partition，单一分区有序，所有分区无序  
