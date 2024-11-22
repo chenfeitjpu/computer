@@ -8,9 +8,12 @@
 # 使用 #
 ## 基础 ##
 变量
+<details>
+<summary>点击展开/收起代码</summary>
 ```
 var name = value
 ```
+<details>
 
 DOM
 ```
