@@ -8,25 +8,26 @@
 # 使用 #
 ## 基础 ##
 变量
+```
+- 必须要声明
+```
 <details>
 <summary>code</summary>
 <pre>
 <code> 
-
 ```
 var name = value
 ```
 </code>
 </pre>
-</summary>
-<details>
+</details>
+
 
 DOM
 <details>
 <summary>code</summary>
 <pre>
 <code> 
-
 ```
 - document.getElementById
 - document.getElementsByName
@@ -39,5 +40,4 @@ DOM
 ```
 </code>
 </pre>
-</summary>
-<details
+</details>
