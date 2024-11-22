@@ -4,6 +4,7 @@
   - [基础](#基础)
     - [变量](#变量)
     - [数据类型](#数据类型)
+    - [DOM](#dom)
 
 # 定义 #
 
@@ -57,7 +58,7 @@ var name = value
 </details>
 
 
-DOM
+### DOM ###
 <details>
 <summary>code</summary>
 <pre>
