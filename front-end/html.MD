@@ -5,7 +5,7 @@
   - [语义标签](#语义标签)
 
 # 定义 #
-HTML(HyperText Markup Language，超文本标记语言)是一种用于创建网页的标准标记语言。
+HTML(HyperText Markup Language，超文本标记语言)是一种用于创建网页的标准标记语言。 
 它通过定义网页的结构和内容，使浏览器能够正确地显示和呈现信息。
 
 # 使用 #
