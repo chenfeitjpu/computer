@@ -7,17 +7,19 @@
 
 # 使用 #
 ## 基础 ##
+*变量*
 ```
-- 变量
-  var name = value
+var name = value
+```
 
-- DOM
-  - document.getElementById
-  - document.getElementsByName
-  - document.getElementsByTagName
-  - document.getElementsByClassName
-  - node.getAttribute
-  - node.setAttribute
-  - node.style
-  - node.innerHTML
+*DOM*
+```
+- document.getElementById
+- document.getElementsByName
+- document.getElementsByTagName
+- document.getElementsByClassName
+- node.getAttribute
+- node.setAttribute
+- node.style
+- node.innerHTML
 ```
