@@ -33,6 +33,28 @@ var name = value
 | Object | 对象 |
 | Function | 函数 |
 
+**对象**
+> 一组属性和方法集合
+
+<details>
+<summary>code</summary>
+<pre>
+<code> 
+- 定义
+  var person = {
+      firstName: "Kobe",
+      lastName : "Bryant",
+      job:"basketball star",
+      fullName : function() {
+          return this.firstName + " " + this.lastName;
+      }
+  };
+- 获取属性
+  - 对象.属性名
+  - 对象["属性名"];
+</code>
+</pre>
+</details>
 
 
 DOM
