@@ -1,16 +1,23 @@
-# JS #
+**JavaScript**
+- [定义](#定义)
+- [使用](#使用)
+  - [基础](#基础)
 
-## 定义 ##
+# 定义 #
 
-## 内容 ##
-### 事件循环(Event Loop) ###
-    - 同步任务
-    - 微任务 Promise
-    - 宏任务 setTimeout、setInterval
+# 使用 #
+## 基础 ##
+```
+- 变量
+  var name = value
 
-### 原型 ###
-#### 原型链 ####
-
-### 作用域 ###
-#### 作用域链 ####
-#### 闭包 ####
+- DOM
+  - document.getElementById
+  - document.getElementsByName
+  - document.getElementsByTagName
+  - document.getElementsByClassName
+  - node.getAttribute
+  - node.setAttribute
+  - node.style
+  - node.innerHTML
+```
