@@ -2,15 +2,16 @@
 - [定义](#定义)
 - [使用](#使用)
   - [基础](#基础)
+    - [变量](#变量)
+    - [数据类型](#数据类型)
 
 # 定义 #
 
 # 使用 #
 ## 基础 ##
-变量
-```
+### 变量 ###
 - 必须要声明
-```
+
 <details>
 <summary>code</summary>
 <pre>
@@ -19,6 +20,19 @@ var name = value
 </code>
 </pre>
 </details>
+
+### 数据类型 ###
+| 数据类型 | 描述 |
+| :--: | :--: |
+| Number | 数字  |
+| String | 字符串 |
+| Boolean | 布尔 |
+| Undefined | 未定义 |
+| Null | 空值 |
+| Array | 数组 |
+| Object | 对象 |
+| Function | 函数 |
+
 
 
 DOM
