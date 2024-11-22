@@ -7,12 +7,12 @@
 
 # 使用 #
 ## 基础 ##
-*变量*
+变量
 ```
 var name = value
 ```
 
-*DOM*
+DOM
 ```
 - document.getElementById
 - document.getElementsByName
