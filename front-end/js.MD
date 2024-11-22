@@ -9,10 +9,15 @@
 ## 基础 ##
 变量
 <details>
-<summary>点击展开/收起代码</summary>
+<summary></summary>
+<pre>
+<code> 
 ```
 var name = value
 ```
+</code>
+</pre>
+</summary>
 <details>
 
 DOM
