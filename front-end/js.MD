@@ -15,9 +15,7 @@
 <summary>code</summary>
 <pre>
 <code> 
-```
 var name = value
-```
 </code>
 </pre>
 </details>
@@ -28,7 +26,6 @@ DOM
 <summary>code</summary>
 <pre>
 <code> 
-```
 - document.getElementById
 - document.getElementsByName
 - document.getElementsByTagName
@@ -37,7 +34,6 @@ DOM
 - node.setAttribute
 - node.style
 - node.innerHTML
-```
 </code>
 </pre>
 </details>
