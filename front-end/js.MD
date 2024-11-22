@@ -12,6 +12,7 @@
 <summary>code</summary>
 <pre>
 <code> 
+
 ```
 var name = value
 ```
@@ -25,6 +26,7 @@ DOM
 <summary>code</summary>
 <pre>
 <code> 
+
 ```
 - document.getElementById
 - document.getElementsByName
