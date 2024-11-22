@@ -9,7 +9,7 @@
 ## 基础 ##
 变量
 <details>
-<summary></summary>
+<summary>code</summary>
 <pre>
 <code> 
 ```
@@ -21,6 +21,10 @@ var name = value
 <details>
 
 DOM
+<details>
+<summary>code</summary>
+<pre>
+<code> 
 ```
 - document.getElementById
 - document.getElementsByName
@@ -31,3 +35,7 @@ DOM
 - node.style
 - node.innerHTML
 ```
+</code>
+</pre>
+</summary>
+<details
