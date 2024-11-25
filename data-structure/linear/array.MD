@@ -36,14 +36,13 @@ LeetCode
 
 <details>
 <summary>code</summary>
-<pre>
-<code> 
+
+``` 
 LeetCode 
 - 370.区间加法
 - 1109.航班预订统计
 - 1094.拼车
-</code>
-</pre>
+```
 </details>
 
 ## 双指针 ##  
@@ -52,8 +51,8 @@ LeetCode
 
 <details>
 <summary>code</summary>
-<pre>
-<code> 
+
+```
 LeetCode  
 - 26.删除有序数组中的重复项
 - 27.移除元素
@@ -61,8 +60,7 @@ LeetCode
 - 167.两数之和 II - 输入有序数组
 - 31.下一个排列
 - 581.最短无序连续子数组
-</code>
-</pre>
+```
 </details>
 
 ## 滑动窗口 ##
@@ -70,15 +68,14 @@ LeetCode
 
 <details>
 <summary>code</summary>
-<pre>
-<code> 
+
+```
 LeetCode  
 - 76.最小覆盖子串
 - 567.字符串的排列
 - 438.找到字符串中所有字母异位词
 - 3.无重复字符的最长子串
-</code>
-</pre>
+```
 </details>
 
 ## 哈希 ##
@@ -86,22 +83,20 @@ LeetCode
 
 <details>
 <summary>code</summary>
-<pre>
-<code> 
+
+```
 LeetCode
-  - 448.找到所有数组中消失的数字
-</code>
-</pre>
+- 448.找到所有数组中消失的数字
+```
 </details>
 
 ## 矩阵 ##
 <details>
 <summary>code</summary>
-<pre>
-<code> 
+
+``` 
 LeetCode
 - 48.旋转图像
 - 240.搜索二维矩阵II
-</code>
-</pre>
+```
 </details>
