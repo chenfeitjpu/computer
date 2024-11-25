@@ -22,12 +22,12 @@
 
 <details>
 <summary>code</summary>
-<code> 
+```
 LeetCode  
 - 303.区域和检索-数组不可变
 - 304.二维区域和检索-矩阵不可变
 - 560.和为K的子数组
-</code>
+```
 </details>
 
 ## 差分数组 ##
