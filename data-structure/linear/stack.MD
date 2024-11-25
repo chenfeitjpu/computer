@@ -5,21 +5,26 @@
   - [单调栈](#单调栈)
 
 # 定义 #
-```
-只能在尾部插入、删除数据
-```
+> 只能在尾部插入、删除数据  
 
 # 使用 #
 ## 栈 ##
+
+<details>
+<summary>code</summary>
+
 ```
-应用  
 LeetCode  
 - 20.有效的括号
 ```
+</details>
 
 ## 单调栈 ## 
+
+<details>
+<summary>code</summary>
+
 ```
-应用  
 LeetCode  
 - 84.柱状图中最大的矩形
 - 85.最大矩形
@@ -30,3 +35,4 @@ LeetCode
 - 739.每日温度
 - 316.去除重复字母
 ```
+</details>
