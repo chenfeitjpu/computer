@@ -22,14 +22,12 @@
 
 <details>
 <summary>code</summary>
-<pre>
 <code> 
 LeetCode  
 - 303.区域和检索-数组不可变
 - 304.二维区域和检索-矩阵不可变
 - 560.和为K的子数组
 </code>
-</pre>
 </details>
 
 ## 差分数组 ##
@@ -48,7 +46,7 @@ LeetCode
 </details>
 
 ## 双指针 ##  
-> 左右指针 两个指针相向而行或者相背而行
+> 左右指针 两个指针相向而行或者相背而行  
 > 快慢指针 两个指针同向而行，一快一慢  
 
 <details>
