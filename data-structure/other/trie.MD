@@ -4,15 +4,11 @@
 - [使用](#使用)
 
 # 定义 #
-```
-字典树(前缀树)
-```
+> 字典树(前缀树)
 
 # 实现 #
 <details>
-<summary>代码</summary>
-<pre>
-<code>
+<summary>code</summary>
 
 ```
 type Trie struct {
@@ -57,14 +53,15 @@ func (this *Trie) StartsWith(prefix string) bool {
 	return this.SearchPrefix(prefix) != nil
 }
 ```
-</code>
-</pre>
 </details>
 
 # 使用 #
+<details>
+<summary>code</summary>
+
 ```
-应用
-- LeetCode
-  - 208.实现Trie(前缀树)
+LeetCode
+- 208.实现Trie(前缀树)
 ```
+</details>
 

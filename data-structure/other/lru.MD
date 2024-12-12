@@ -4,15 +4,11 @@
 - [使用](#使用)
 
 # 定义 #
-```
-最近最少使用
-```
+> 最近最少使用
 
 # 实现 #
 <details>
-<summary>代码</summary>
-<pre>
-<code>
+<summary>code</summary>
 
 ```
 type LinkedListNode struct {
@@ -121,14 +117,15 @@ func (l *LRUCache) Put(key int, value int) {
 	l.hashLinkedList.PutHead(node)
 }
 ```
-</code>
-</pre>
 </details>
 
 # 使用 #
+<details>
+<summary>code</summary>
+
+``` 
+LeetCode  
+- 146.LRU缓存 
 ```
-应用  
-- LeetCode  
-  - 146.LRU缓存 
-```
+</details>
 

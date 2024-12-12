@@ -4,15 +4,12 @@
 - [使用](#使用)
 
 # 定义 #
-```
-最不经常使用
-```
+> 最不经常使用
+
 
 # 实现 #
 <details>
-<summary>代码</summary>
-<pre>
-<code>
+<summary>code</summary>
 
 ```
 type LinkedListNode struct {
@@ -159,13 +156,14 @@ func (l *LFUCache) DeleteLast() {
 	hashLinkedList.Delete(tail)
 }
 ```
-</code>
-</pre>
 </details>
 
 # 使用 #
+<details>
+<summary>code</summary>
+
+```  
+LeetCode  
+- 460.LFU缓存
 ```
-应用  
-- LeetCode  
-  - 460.LFU缓存
-```
+</details>
