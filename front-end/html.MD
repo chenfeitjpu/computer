@@ -15,13 +15,27 @@
 ```
 <html>
     <head>
-	    <title></title>
-	</head>
+        <meta charset="UTF-8">
+        <meta http-equiv="refresh" content="30">  <!-- 控制浏览器行为 -->
+        <meta property="og:title" content="前端开发教程">  <!-- 提供社交元数据 -->
+        <meta name="robots" content="index, follow">  <!-- 提供页面元数据 -->
+        <title></title>
+    </head>
     <body></body>
 </html>
 ```
 
+**常见标签**
+== 标题 ==
+> <h1>
+> <h2>
+> <h3>
+> <h4>
+> <h5>
+> <h6>
+
 ## 常见标签 ##
+
 - 结构标签
   - \<html\>
   - \<head\>
