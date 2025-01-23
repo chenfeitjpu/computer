@@ -23,36 +23,26 @@
 </html>
 ```
 
-**常见标签**  
+**内容标签**  
 - 文本
-  - 标题
-    > \<h1\>  
-    > \<h2\>  
-    > \<h3\>  
-    > \<h4\>  
-    > \<h5\>  
-    > \<h6\>  
-  - 段落
-    > \<p\>  
+  > \<h1\>  
+  > \<h2\>  
+  > \<h3\>  
+  > \<h4\>  
+  > \<h5\>  
+  > \<h6\>  
+  > \<p\>  
 - 容器
-  - 块
-    > \<div\>
-  - 行内
-    > \<span\>
+  > \<div\>
+  > \<span\>
 - 多媒体
-  - 图片
-    > \<img\>
-  - 音频
-    > \<audio\>
-  - 视频
-    > \<video\>
+  > \<img\> 
+  > \<audio\>
+  > \<video\>
 - 交互标签
-  - 超链接
-    > \<a\>
-  - 按钮
-    > \<button\>
-  - 表单
-    > \<form\>
+  > \<a\>
+  > \<button\>
+  > \<form\>
 
 **语义标签**  
 > 增强可读性  
@@ -60,30 +50,25 @@
 > 实现无障碍  
 
 - 结构语义标签  
-  - \<header\>
-  - \<nav\>
-  - \<main\>
-  - \<section\>
-  - \<article\>
-  - \<aside\>
-  - \<footer\>
+  > \<header\>
+  > \<nav\>
+  > \<main\>
+  > \<section\>
+  > \<article\>
+  > \<aside\>
+  > \<footer\>
 - 文本语义标签  
-  - \<h1\>至\<h6\>
-  - \<p\>
-  - \<blockquote\>
-  - \<cite\>
-  - \<code\>
-  - \<strong\>
-  - \<em\>
+  > \<blockquote\>
+  > \<cite\>
+  > \<code\>
+  > \<strong\>
+  > \<em\>
 - 表格语义标签  
-  - \<table\>
-  - \<thead\>
-  - \<tbody\>
-  - \<tfoot\>
-  - \<th\>
-  - \<caption\>
+  > \<thead\>
+  > \<tbody\>
+  > \<tfoot\>
+  > \<caption\>
 - 表单语义标签  
-  - \<form\>
-  - \<label\>
-  - \<fieldset\>
-  - \<legend\>
+  > \<label\>
+  > \<fieldset\>
+  > \<legend\>
