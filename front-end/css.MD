@@ -41,11 +41,13 @@
     可以设置宽高  
     ```
 
-- box  
-  > content 内容  
-  > padding 内边距  
-  > border 边框  
-  > margin 外边距  
+- box 
+  ``` 
+  content  内容  
+  padding  内边距  
+  border  边框  
+  margin  外边距  
+  ```
 
 - float
   - 浮动的元素会脱离文档流，但仍保留在父容器的范围内
