@@ -23,52 +23,10 @@
 </html>
 ```
 
-**内容标签**  
-- 文本
-  > \<h1\>  
-  > \<h2\>  
-  > \<h3\>  
-  > \<h4\>  
-  > \<h5\>  
-  > \<h6\>  
-  > \<p\>  
-- 容器
-  > \<div\>
-  > \<span\>
-- 多媒体
-  > \<img\> 
-  > \<audio\>
-  > \<video\>
-- 交互标签
-  > \<a\>
-  > \<button\>
-  > \<form\>
+**结构标签**  
+> 组织页面元素，不提供关于内容的任何语义信息
 
 **语义标签**  
 > 增强可读性  
 > SEO友好  
 > 实现无障碍  
-
-- 结构语义标签  
-  > \<header\>
-  > \<nav\>
-  > \<main\>
-  > \<section\>
-  > \<article\>
-  > \<aside\>
-  > \<footer\>
-- 文本语义标签  
-  > \<blockquote\>
-  > \<cite\>
-  > \<code\>
-  > \<strong\>
-  > \<em\>
-- 表格语义标签  
-  > \<thead\>
-  > \<tbody\>
-  > \<tfoot\>
-  > \<caption\>
-- 表单语义标签  
-  > \<label\>
-  > \<fieldset\>
-  > \<legend\>
