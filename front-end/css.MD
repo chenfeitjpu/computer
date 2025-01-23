@@ -11,59 +11,15 @@
 # 使用 #
 ## 基础 ##
 - 样式引入
-  > 内联样式 
-  > 内部样式表 
-  > 外部样式表
+  > 内联样式  
+  > 内部样式表   
+  > 外部样式表  
 - 选择器
   - 单一选择器
-    > 通配选择器  *{}
-    > 标签选择器  .elementname{}
-    > 类选择器  .classname{}
-    > ID选择器  #id{}
-    > 属性选择器  [属性名=值] 包含(*=), 开头(^=), 结尾($=)
   - 复合选择器
-    > 交集选择器  选择器1选择器2
-    > 并集选择器  选择器1, 选择器2
   - 关系选择器
-    > 子元素选择器  父元素 > 子元素
-    > 后代元素选择器  祖先 后代
-    > 兄弟元素选择器  前一个 + 下一个, 前一个 ~ 下一组
   - 伪类选择器
-    > :first-child 第一个子元素
-    > :last-child 最后一个子元素
-    > :nth-child() 选中第n个子元素 
-    > :first-of-type 同类型中的第一个子元素
-    > :last-of-type 同类型中的最后一个子元素
-    > :nth-of-type() 选中同类型中的第n个子元素
-    > :link 未访问的链接
-    > :visited 已访问的链接 
-    > :hover 鼠标悬停的链接
-    > :active 鼠标点击的链接
-    > :not 否认伪类
   - 伪元素选择器
-    > ::first-letter  表示第一个字母
-    > ::first-line  表示第一行
-    > ::selection  表示选中的内容
-    > ::before  必须结合content属性来使用
-    > ::after  必须结合content属性来使用
-- 文本
-  - color  文字颜色
-  - font-size  文字大小
-  - font-family  字体
-  - text-align  对齐方式
-  - text-shadow  文本阴影
-  - line-height  行高
-- 背景
-  - background-color  背景颜色
-  - background-image  背景图片
-  - background-repeat  背景图片是否重复
-  - background-position  背景图片位置
-  - background-size  背景图片尺寸
-  - background-attachment  背景图片滚动控制
-- 过渡  指定状态变化所需要的时间
-  - transition: transition-property transition-duration transition-timing-function transition-delay  属性、时长、效果、延时
-- 动画  
-  - animation: 
 
 ## 布局 ##
 - display
