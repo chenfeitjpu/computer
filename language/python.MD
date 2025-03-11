@@ -6,6 +6,7 @@
     - [流程控制](#流程控制)
   - [数据结构](#数据结构)
     - [基础类型](#基础类型)
+    - [list](#list)
 
 # 定义 #
 
@@ -49,13 +50,9 @@
   while condition:
   
   continue 、break
-  终止外层循环 使用变量标志或raise结合异常处理
+  终止外层循环 使用变量标志
 ```
 </details>
-
-- if elif else
-- for in、while continue break
-
 
 ## 数据结构 ##
 ### 基础类型 ###
@@ -73,4 +70,31 @@ print('hello world')    # 字符串
 print(True)             # bool
 print(False)            # bool
 ```
+</details>
+
+### list ###
+<details>
+<summary>detail</summary>
+
+```
+- 定义
+  - 字面量
+    a = [1, 'a', True]
+    b = a[start:end:stride] # 开始、结束、跨度
+  - 生成式
+    a = [i ** 2 for i in range(10)]
+- 使用
+  - append
+  - insert
+  - remove  # 删除第一个
+  - pop
+  - clear
+  - index
+  - count
+  - sort
+  - reverse
+```
+</details>
+
+
 </details>
