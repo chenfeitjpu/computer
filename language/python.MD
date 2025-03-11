@@ -3,21 +3,15 @@
 - [使用](#使用)
   - [基础语法](#基础语法)
   - [数据结构](#数据结构)
+    - [基础类型](#基础类型)
 
 # 定义 #
 
 # 使用 #
 ## 基础语法 ##
-```
 变量
 - 受保护  _
 - 私有  __
-
-数据类型
-- int、float、complex
-- bool
-- str
-- list
 
 运算符
 - 算术运算符
@@ -34,55 +28,22 @@
 流程控制
 - if elif else
 - for in、while continue break
-```
+
 
 ## 数据结构 ##
-```
-str
-- 使用
-  - capitalize
-  - title
-  - upper
-  - lower
-  - find
-  - rfind
-  - index
-  - rindex
-  - startswith
-  - endwith
-  - isdigit
-  - isalpha
-  - isalnum
-  - center
-  - ljust
-  - rjust
-  - zfill
-  - f'{}'
-  - strip
-  - replace
-  - split
-  - join
-
-list
-- 使用
-  - len
-  - [start:end:stride]
-  - append
-  - insert
-  - remove
-  - pop
-  - clean
-  - index
-  - count
-  - sort
-  - reverse
-- 生成式
-
-tuple
-- 使用
-
-- set 
-
-- dict 
+### 基础类型 ###
+<details>
+<summary>example</summary>
 
 ```
+print(0b100)            # 二进制整数
+print(0o100)            # 八进制整数
+print(100)              # 十进制整数
+print(0x100)            # 十六进制整数
+print(123.456)          # 数学写法
+print(1.23456e2)        # 科学计数法
+print('hello world')    # 字符串
+print(True)             # bool
+print(False)            # bool
+```
+</details>
