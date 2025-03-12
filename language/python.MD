@@ -6,11 +6,12 @@
     - [流程控制](#流程控制)
   - [数据结构](#数据结构)
     - [基础类型](#基础类型)
+    - [str](#str)
     - [list](#list)
     - [tuple](#tuple)
-    - [str](#str)
     - [set](#set)
     - [frozenset](#frozenset)
+    - [dict](#dict)
 
 # 定义 #
 
@@ -76,6 +77,58 @@ print(False)            # bool
 ```
 </details>
 
+特点  
+- 基础类型都是不可变类型
+
+### str ###
+<details>
+<summary>detail</summary>
+
+```
+- 定义
+  s1 = 'hello, world!'
+  s2 = "你好，世界"
+  s3 = '''hello,    # 多行注释
+  wonderful
+  world!'''
+- 转义 & 原始字符串
+  a = r'a\r\nb'
+- 使用
+  - len  # 获取字符串长度
+  - capitalize  # 字符串首字母大写
+  - title  # 字符串每个单词首字母大写
+  - upper  # 字符串转大写
+  - lower  # 字符串转小写
+  - find  # 找不到指定的字符串会返回-1
+  - index  # 找不到指定的字符串会引发ValueError错误
+  - rfind  # 逆向查找
+  - rindex # 逆向查找
+  - startswith  # 以某个字符串开头
+  - endswith  # 以某个字符串结尾
+  - isdigit  # 字符串是不是完全由数字构成的
+  - isalpha  # 字符串是不是完全由字母构成的
+  - isalnum  # 字符串是不是由字母和数字构成的
+  - center  # 居中
+  - ljust  # 左对齐
+  - rjust  # 右对齐
+  - zfill  # 左侧补零
+  - %  # 格式化
+  - format  # 格式化
+  - f'  # 格式化
+  - strip  # 修剪掉左右两端指定字符
+  - lstrip
+  - rstrip
+  - replace  # 用新的内容替换字符串中指定的内容
+  - split  # 字符串拆分
+  - join  # 字符串合并
+  - encode  # 编码
+  - decode  # 解码
+```
+</details>
+
+特点  
+- 字符串是不可变类型  
+
 ### list ###
 <details>
 <summary>detail</summary>
@@ -127,55 +180,6 @@ print(False)            # bool
 - 不可变类型  
   - 适合多线程环境  
   - 在创建时间上优于对应的可变类型  
-  
-### str ###
-<details>
-<summary>detail</summary>
-
-```
-- 定义
-  s1 = 'hello, world!'
-  s2 = "你好，世界"
-  s3 = '''hello,    # 多行注释
-  wonderful
-  world!'''
-- 转义 & 原始字符串
-  a = r'a\r\nb'
-- 使用
-  - len  # 获取字符串长度
-  - capitalize  # 字符串首字母大写
-  - title  # 字符串每个单词首字母大写
-  - upper  # 字符串转大写
-  - lower  # 字符串转小写
-  - find  # 找不到指定的字符串会返回-1
-  - index  # 找不到指定的字符串会引发ValueError错误
-  - rfind  # 逆向查找
-  - rindex # 逆向查找
-  - startswith  # 以某个字符串开头
-  - endswith  # 以某个字符串结尾
-  - isdigit  # 字符串是不是完全由数字构成的
-  - isalpha  # 字符串是不是完全由字母构成的
-  - isalnum  # 字符串是不是由字母和数字构成的
-  - center  # 居中
-  - ljust  # 左对齐
-  - rjust  # 右对齐
-  - zfill  # 左侧补零
-  - %  # 格式化
-  - format  # 格式化
-  - f'  # 格式化
-  - strip  # 修剪掉左右两端指定字符
-  - lstrip
-  - rstrip
-  - replace  # 用新的内容替换字符串中指定的内容
-  - split  # 字符串拆分
-  - join  # 字符串合并
-  - encode  # 编码
-  - decode  # 解码
-```
-</details>
-
-特点  
-- 字符串是不可变类型  
 
 ### set ###
 <details>
@@ -217,5 +221,39 @@ print(False)            # bool
   - 不可变类型都是hashable类型
 
 ### frozenset ###
+<details>
+<summary>detail</summary>
 
+```
+- 定义
+  a = frozenset({1, 3, 5, 7})
+```
+</details>
+
+### dict ###
+<details>
+<summary>detail</summary>
+
+```
+- 定义
+  - 字面量
+    a = {'name': '王大锤'}
+  - 函数
+    b = dict(name='王大锤')
+  - 生成式
+    c = {x: x ** 3 for x in range(1, 6)}
+- 使用
+  - []  # 通过索引运算获取字典中的值时，如指定的键没有在字典中，将会引发KeyError异常
+  - get  # get方法在字典中没有指定的键时不会产生异常，而是返回None或指定的默认值
+  - keys  # 获取字典中所有的键
+  - values  # 获取字典中所有的值
+  - items  # 获取字典中的键值对
+  - update  # 合并两个字典
+  - |   # 合并两个字典
+  - pop  # 如果字典中不存在指定的键，会引发KeyError错误
+  - popitem  # 用来移除字典中的最后一个键值对，并以元组的形式返回
+  - clear  # 清除数据
+  - del  # 删除元素  如果指定的键索引不到对应的值，会引发KeyError错误
+```
+</details>
 
