@@ -172,11 +172,10 @@ print(False)            # bool
   - encode  # 编码
   - decode  # 解码
 ```
-<details>
+</details>
 
 特点  
 - 字符串是不可变类型  
-</details>
 
 ### set ###
 <details>
@@ -207,9 +206,13 @@ print(False)            # bool
   - clear  # 清空元素
   - isdisjoint  # 判断两个集合有没有相同的元素，如果没有相同元素，该方法返回True
 ```
-<details>
+</details>
 
-特点  
+特点
+- 要求
+  - 无序
+  - 互异
+  - 确定  
 - 集合中的元素必须是hashable类型
   - 不可变类型都是hashable类型
 
