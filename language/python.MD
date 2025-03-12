@@ -12,6 +12,7 @@
     - [set](#set)
     - [frozenset](#frozenset)
     - [dict](#dict)
+    - [函数](#函数)
 
 # 定义 #
 
@@ -145,7 +146,7 @@ print(False)            # bool
 - 使用
   - append
   - insert
-  - remove  # 删除第一个
+  - remove  # 删除第一个, 要删除的元素并不在列表中，会引发ValueError
   - pop
   - clear
   - index
@@ -256,4 +257,55 @@ print(False)            # bool
   - del  # 删除元素  如果指定的键索引不到对应的值，会引发KeyError错误
 ```
 </details>
+
+### 函数 ###
+<details>
+<summary>detail</summary>
+
+```
+定义  
+def functionName(arg1, arg2):
+    return 'hello'
+
+参数  
+- 位置参数
+  def add(a, b, c):
+      return a + b + c  
+  add(1, 2, 3)
+  - / 设置强制位置参数
+- 关键字参数  
+  def add(a, b, c):
+      return a + b + c  
+  add(b=1, a=2, c=3)
+  - * 设置命名关键字参数
+- 默认参数
+  def add(a, b = 0, c = 0):
+      return a + b + c  
+  - 带默认值的参数必须放在不带默认值的参数之后
+- 可变参数
+  - *args  通过元祖接收
+  - **kwargs  通过字典接收
+高阶函数
+一个函数作为其他函数的参数或返回值
+
+lambda(匿名函数)
+- 定义
+  lambda n: n % 2 == 0
+
+偏函数
+指固定函数的某些参数，生成一个新的函数
+- 定义
+  int2 = functools.partial(int, base=2)
+  print(int('1001'))    # 1001
+
+常见函数
+- filter  筛选数据
+- map  转换数据
+- sorted  排序数据  # 新生成一个列表
+- all 检查可迭代对象(如列表、元组、集合)中的所有元素是否都为True
+- functools.reduce  累积计算
+```
+</details>
+
+
 
