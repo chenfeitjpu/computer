@@ -8,6 +8,9 @@
     - [基础类型](#基础类型)
     - [list](#list)
     - [tuple](#tuple)
+    - [str](#str)
+    - [set](#set)
+    - [frozenset](#frozenset)
 
 # 定义 #
 
@@ -82,8 +85,10 @@ print(False)            # bool
   - 字面量
     a = [1, 'a', True]
     b = a[start:end:stride] # 开始、结束、跨度
+  - 函数
+    c = list('hello world')
   - 生成式
-    a = [i ** 2 for i in range(10)]
+    d = [i ** 2 for i in range(10)]
 - 使用
   - append
   - insert
@@ -116,8 +121,98 @@ print(False)            # bool
 
 特点  
 - 不可变类型  
-  - 元素不能再添加或删除，元素的值不能修改 
+  - 元素不能再添加或删除，元素的值不能修改  
+ 
 优点  
 - 不可变类型  
   - 适合多线程环境  
   - 在创建时间上优于对应的可变类型  
+  
+### str ###
+<details>
+<summary>detail</summary>
+
+```
+- 定义
+  s1 = 'hello, world!'
+  s2 = "你好，世界"
+  s3 = '''hello,    # 多行注释
+  wonderful
+  world!'''
+- 转义 & 原始字符串
+  a = r'a\r\nb'
+- 使用
+  - len  # 获取字符串长度
+  - capitalize  # 字符串首字母大写
+  - title  # 字符串每个单词首字母大写
+  - upper  # 字符串转大写
+  - lower  # 字符串转小写
+  - find  # 找不到指定的字符串会返回-1
+  - index  # 找不到指定的字符串会引发ValueError错误
+  - rfind  # 逆向查找
+  - rindex # 逆向查找
+  - startswith  # 以某个字符串开头
+  - endswith  # 以某个字符串结尾
+  - isdigit  # 字符串是不是完全由数字构成的
+  - isalpha  # 字符串是不是完全由字母构成的
+  - isalnum  # 字符串是不是由字母和数字构成的
+  - center  # 居中
+  - ljust  # 左对齐
+  - rjust  # 右对齐
+  - zfill  # 左侧补零
+  - %  # 格式化
+  - format  # 格式化
+  - f'  # 格式化
+  - strip  # 修剪掉左右两端指定字符
+  - lstrip
+  - rstrip
+  - replace  # 用新的内容替换字符串中指定的内容
+  - split  # 字符串拆分
+  - join  # 字符串合并
+  - encode  # 编码
+  - decode  # 解码
+```
+<details>
+
+特点  
+- 字符串是不可变类型  
+</details>
+
+### set ###
+<details>
+<summary>detail</summary>
+
+```
+-定义
+  - 字面量
+    a = {1, 2, 3}
+  - 函数
+    b = set('hello')
+    c = set([1, 2, 3])
+  - 生成式
+    d = {num for num in range(1, 20) if num % 3 == 0 or num % 7 == 0}
+- 使用
+  - &  交集
+  - |  并集
+  - ～  差集
+  - ^  对称差
+  - == !=  相等
+  - < <=  真子集|子集
+  - > >=  真超集｜超集
+  - issubset  子集
+  - issuperset  超集
+  - add  # 添加元素
+  - remove # 删除元素，不存在报KeyError错误
+  - discard  # 删除元素
+  - clear  # 清空元素
+  - isdisjoint  # 判断两个集合有没有相同的元素，如果没有相同元素，该方法返回True
+```
+<details>
+
+特点  
+- 集合中的元素必须是hashable类型
+  - 不可变类型都是hashable类型
+
+### frozenset ###
+
+
