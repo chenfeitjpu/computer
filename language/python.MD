@@ -7,6 +7,7 @@
   - [数据结构](#数据结构)
     - [基础类型](#基础类型)
     - [list](#list)
+    - [tuple](#tuple)
 
 # 定义 #
 
@@ -96,5 +97,26 @@ print(False)            # bool
 ```
 </details>
 
+### tuple ###
+<details>
+<summary>detail</summary>
 
+```
+- 定义
+  a = (1, 'a', True)
+- 打包&解包
+  a = 1, 'a', True, 100
+  b, *c, d = a
+- tuple & list互相转化
+  fruit = ['apple', 'banana', 'orange']
+  a = tuple(fruit)
+  b = list(a)
+```
 </details>
+特点
+- 不可变类型
+  - 元素不能再添加或删除，元素的值不能修改
+优点
+- 不可变类型
+  - 适合多线程环境
+  - 在创建时间上优于对应的可变类型
