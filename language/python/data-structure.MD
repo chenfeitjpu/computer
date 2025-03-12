@@ -5,8 +5,8 @@
 - [list](#list)
 - [tuple](#tuple)
 - [set](#set)
-  - [frozenset](#frozenset)
-  - [dict](#dict)
+- [frozenset](#frozenset)
+- [dict](#dict)
   - [函数](#函数)
 
 ## 基础类型 ##
@@ -22,7 +22,6 @@ print(123.456)          # 数学写法
 print(1.23456e2)        # 科学计数法
 print('hello world')    # 字符串
 print(True)             # bool
-print(False)            # bool
 ```
 
 ## str ##
@@ -175,97 +174,100 @@ b = list(a)
 - isdisjoint  # 判断两个集合有没有相同的元素，如果没有相同元素，该方法返回True
 ```
 
-
-
-### frozenset ###
-<details>
-<summary>detail</summary>
-
+## frozenset ##
+*定义*
 ```
-- 定义
-  a = frozenset({1, 3, 5, 7})
+a = frozenset({1, 3, 5, 7})
 ```
-</details>
 
-### dict ###
-<details>
-<summary>detail</summary>
+## dict ##
+*定义*
+- 字面量
+  ```
+  a = {'name': '王大锤'}
+  ```
+- 函数
+  ```
+  b = dict(name='王大锤')
+  ```
+- 生成式
+  ```
+  c = {x: x ** 3 for x in range(1, 6)}
+  ```
 
+*使用*
 ```
-- 定义
-  - 字面量
-    a = {'name': '王大锤'}
-  - 函数
-    b = dict(name='王大锤')
-  - 生成式
-    c = {x: x ** 3 for x in range(1, 6)}
-- 使用
-  - []  # 通过索引运算获取字典中的值时，如指定的键没有在字典中，将会引发KeyError异常
-  - get  # get方法在字典中没有指定的键时不会产生异常，而是返回None或指定的默认值
-  - keys  # 获取字典中所有的键
-  - values  # 获取字典中所有的值
-  - items  # 获取字典中的键值对
-  - update  # 合并两个字典
-  - |   # 合并两个字典
-  - pop  # 如果字典中不存在指定的键，会引发KeyError错误
-  - popitem  # 用来移除字典中的最后一个键值对，并以元组的形式返回
-  - clear  # 清除数据
-  - del  # 删除元素  如果指定的键索引不到对应的值，会引发KeyError错误
+- []  # 通过索引运算获取字典中的值时，如指定的键没有在字典中，将会引发KeyError异常
+- get  # get方法在字典中没有指定的键时不会产生异常，而是返回None或指定的默认值
+- keys  # 获取字典中所有的键
+- values  # 获取字典中所有的值
+- items  # 获取字典中的键值对
+- update  # 合并两个字典
+- |   # 合并两个字典
+- pop  # 如果字典中不存在指定的键，会引发KeyError错误
+- popitem  # 用来移除字典中的最后一个键值对，并以元组的形式返回
+- clear  # 清除数据
+- del  # 删除元素  如果指定的键索引不到对应的值，会引发KeyError错误
 ```
-</details>
 
 ### 函数 ###
-<details>
-<summary>detail</summary>
-
+*定义*  
 ```
-定义  
 def functionName(arg1, arg2):
     return 'hello'
+```
 
-参数  
+*参数*  
 - 位置参数
+  ```
   def add(a, b, c):
       return a + b + c  
   add(1, 2, 3)
   - / 设置强制位置参数
+  ```
 - 关键字参数  
+  ```
   def add(a, b, c):
       return a + b + c  
   add(b=1, a=2, c=3)
   - * 设置命名关键字参数
+  ```
 - 默认参数
+  ```
   def add(a, b = 0, c = 0):
       return a + b + c  
   - 带默认值的参数必须放在不带默认值的参数之后
+  ```
 - 可变参数
+  ```
   - *args  通过元祖接收
   - **kwargs  通过字典接收
-高阶函数
+  ```
+
+*高阶函数*  
+```
 一个函数作为其他函数的参数或返回值
+```
 
-lambda(匿名函数)
-- 定义
-  lambda n: n % 2 == 0
+*lambda(匿名函数)*
+```
+定义
+lambda n: n % 2 == 0
+```
 
-偏函数
+*偏函数*
+```
 指固定函数的某些参数，生成一个新的函数
 - 定义
   int2 = functools.partial(int, base=2)
   print(int('1001'))    # 1001
+```
 
-常见函数
+*常见函数*
+```
 - filter  筛选数据
 - map  转换数据
 - sorted  排序数据  # 新生成一个列表
 - all 检查可迭代对象(如列表、元组、集合)中的所有元素是否都为True
 - functools.reduce  累积计算
 ```
-</details>- [基础类型](#基础类型)
-- [str](#str)
-- [list](#list)
-- [tuple](#tuple)
-- [set](#set)
-- [frozenset](#frozenset)
-- [dict](#dict)
-- [函数](#函数)

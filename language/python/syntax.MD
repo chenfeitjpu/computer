@@ -52,5 +52,5 @@ for value in list:
 while condition:
 continue 、break
 
-终止外层循环 使用变量标志
+- 终止外层循环，使用变量标志
 ```

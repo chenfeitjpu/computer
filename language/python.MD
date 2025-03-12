@@ -9,9 +9,6 @@
 # 使用 #
 ## [基础语法](./python/syntax.MD)   ##
 
-
-## 数据结构 ##
-
-
+## [数据结构](./python/data-structrue.MD) ##
 
 
