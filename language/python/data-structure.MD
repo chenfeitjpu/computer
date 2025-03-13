@@ -7,7 +7,9 @@
 - [set](#set)
 - [frozenset](#frozenset)
 - [dict](#dict)
-  - [函数](#函数)
+- [函数](#函数)
+- [类](#类)
+- [json](#json)
 
 ## 基础类型 ##
 *特点*  
@@ -210,7 +212,7 @@ a = frozenset({1, 3, 5, 7})
 - del  # 删除元素  如果指定的键索引不到对应的值，会引发KeyError错误
 ```
 
-### 函数 ###
+## 函数 ##
 *定义*  
 ```
 def functionName(arg1, arg2):
@@ -263,6 +265,51 @@ lambda n: n % 2 == 0
   print(int('1001'))    # 1001
 ```
 
+*装饰器*
+```
+用一个函数装饰另外一个函数并为其提供额外的能力  
+
+定义
+- 原生
+  def record_time(func):
+      def wrapper(*args, **kwargs):
+          start = time.time()
+          result = func(*args, **kwargs)
+          end = time.time()
+          print(f'{func.__name__}执行时间: {end - start:.2f}秒')
+          return result
+      return wrapper
+
+
+  def download(filename):
+      print(f'开始下载{filename}.')
+      time.sleep(random.random() * 6)
+      print(f'{filename}下载完成.')
+
+  download = record_time(download)
+  download('test.txt') # 装饰器函数
+- @
+  def record_time(func):
+      @functools.wraps(func)
+      def wrapper(*args, **kwargs):
+          start = time.time()
+          result = func(*args, **kwargs)
+          end = time.time()
+          print(f'{func.__name__}执行时间: {end - start:.2f}秒')
+          return result
+      return wrapper
+
+
+  @record_time
+  def download(filename):
+      print(f'开始下载{filename}.')
+      time.sleep(random.random() * 6)
+      print(f'{filename}下载完成.')
+
+  download('test.txt') # 装饰器函数
+  download.__wrapped__('test.txt') # 原函数
+```
+
 *常见函数*
 ```
 - filter  筛选数据
@@ -271,3 +318,107 @@ lambda n: n % 2 == 0
 - all 检查可迭代对象(如列表、元组、集合)中的所有元素是否都为True
 - functools.reduce  累积计算
 ```
+
+## 类 ##
+*定义*
+```
+class Student:
+
+    def __init__(self, name, age):
+        self.name = name
+        self.age = age
+
+    def study(self, course_name):
+        print(f'{self.name}正在学习{course_name}.')
+
+    def play(self):
+        print(f'{self.name}正在玩游戏.')
+```
+
+*属性*
+- 可见性
+  ```
+  - _私有属性 
+    - 只能在类内部访问，外部无法直接访问
+    - 可以通过_类名__属性访问
+  - __受保护属性
+    - 约定上仅在子类中使用
+    - 仍可在类外部访问
+  ```
+- 动态属性
+  ```
+  __slot__ = () # 限制实例能拥有的属性
+  ```
+
+*方法*
+- 实例方法
+  ```
+  - 第一个参数必须是self，表示实例对象
+  - 访问和修改实例属性
+  - 只能通过实例对象调用
+  - @property 通过属性直接访问方法
+  ```
+- 类方法
+  ```
+  - 使用 @classmethod 装饰器，第一个参数是 cls，代表类本身
+  - 可以访问类属性（但不能访问实例属性）
+  - 既可以通过类调用，也可以通过实例调用
+  ```
+- 静态方法
+  ```
+  - 使用 @staticmethod 装饰器，没有 self 或 cls 参数
+  - 不能访问实例属性
+  - 不能访问类属性
+  - 既可以通过类调用，也可以通过实例调用
+  ```
+
+*继承*
+```
+class Person:
+    """人"""
+
+    def __init__(self, name, age):
+        self.name = name
+        self.age = age
+    
+    def eat(self):
+        print(f'{self.name}正在吃饭.')
+    
+    def sleep(self):
+        print(f'{self.name}正在睡觉.')
+
+
+class Student(Person):
+    """学生"""
+    
+    def __init__(self, name, age):
+        super().__init__(name, age)
+    
+    def study(self, course_name):
+        print(f'{self.name}正在学习{course_name}.')
+
+```
+
+## json ##
+- dict转json  
+  ```
+  p = {
+      'name': 'xiao',
+      'age': 12
+  }
+  print(json.dumps(p))
+
+  p = {
+      'name': 'xiao',
+      'age': 12
+  }
+  with open('example.txt', 'w') as file:
+      json.dump(p, file)
+  ```
+- json转dict  
+  ```
+  p = json.loads('{"name": "xiao", "age": 12}')
+
+  with open('example.txt', 'r') as file:
+      p = json.load(file)
+  ```
