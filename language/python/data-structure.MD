@@ -15,15 +15,16 @@
 *特点*  
 - 基础类型都是不可变类型
 
+
 ```
-print(0b100)            # 二进制整数
-print(0o100)            # 八进制整数
-print(100)              # 十进制整数
-print(0x100)            # 十六进制整数
-print(123.456)          # 数学写法
-print(1.23456e2)        # 科学计数法
-print('hello world')    # 字符串
-print(True)             # bool
+print(0b10)             # 二进制整数 
+print(0o10)             # 八进制整数
+print(10)               # 十进制整数 int() 将一个数值或字符串转换成整数，可以指定进制
+print(0x10)             # 十六进制整数  
+print(123.456)          # 数学写法 float() 将一个字符串转换成浮点数
+print(1.23456e2)        # 科学计数法 
+print('hello world')    # 字符串 str() 将指定的对象转换成字符串形式，可以指定编码方式
+print(True)             # bool  bool()
 ```
 
 ## str ##

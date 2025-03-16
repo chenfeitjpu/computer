@@ -15,17 +15,17 @@
 
 # 使用 #
 ## 前缀和 ##  
+*定义*
 ```
 原始数组不变，频繁查询某个区间的累加和  
-```
-
-应用场景
+```  
+*应用场景*
 - 求一维数组区间值
 - 求二维数组区间值
 - 查找指定区间值
 
 <details>
-<summary>code</summary>
+<summary>example</summary>
 
 ```
 LeetCode  
