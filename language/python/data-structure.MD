@@ -252,7 +252,7 @@ def functionName(arg1, arg2):
 一个函数作为其他函数的参数或返回值
 ```
 
-**lambda(匿名函数)**å
+**lambda(匿名函数)**
 ```
 定义
 lambda n: n % 2 == 0
@@ -260,7 +260,7 @@ lambda n: n % 2 == 0
 
 **偏函数**
 ```
-指固定函数的某些参数，生成一个新的函数
+固定函数的某些参数，生成一个新的函数
 - 定义
   int2 = functools.partial(int, base=2)
   print(int2('1001'))    # 1001
@@ -271,7 +271,7 @@ lambda n: n % 2 == 0
 用一个函数装饰另外一个函数并为其提供额外的能力  
 
 定义
-- 原生
+- 原生方式
   def record_time(func):
       def wrapper(*args, **kwargs):
           start = time.time()
@@ -289,8 +289,9 @@ lambda n: n % 2 == 0
 
   download = record_time(download)
   download('test.txt') # 装饰器函数
-- @
+- 注解方式
   def record_time(func):
+
       @functools.wraps(func)
       def wrapper(*args, **kwargs):
           start = time.time()
@@ -311,7 +312,7 @@ lambda n: n % 2 == 0
   download.__wrapped__('test.txt') # 原函数
 ```
 
-*常见函数*
+**常见函数**
 ```
 - filter  筛选数据
 - map  转换数据
@@ -321,7 +322,7 @@ lambda n: n % 2 == 0
 ```
 
 ## 类 ##
-*定义*
+**定义**
 ```
 class Student:
 
@@ -336,7 +337,7 @@ class Student:
         print(f'{self.name}正在玩游戏.')
 ```
 
-*属性*
+**属性**
 - 可见性
   ```
   - _私有属性 
@@ -351,7 +352,7 @@ class Student:
   __slot__ = () # 限制实例能拥有的属性
   ```
 
-*方法*
+**方法**
 - 实例方法
   ```
   - 第一个参数必须是self，表示实例对象
@@ -373,7 +374,7 @@ class Student:
   - 既可以通过类调用，也可以通过实例调用
   ```
 
-*继承*
+**继承**
 ```
 class Person:
     """人"""
