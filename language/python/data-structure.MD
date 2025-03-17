@@ -135,7 +135,7 @@ b = list(a)
 ```
 
 ## set ##
-*特点*
+**特性**  
 - 要求
   - 无序
   - 互异
@@ -143,7 +143,7 @@ b = list(a)
 - 集合中的元素必须是hashable类型
   - 不可变类型都是hashable类型
 
-*定义*
+**定义**
 - 字面量
   ```
   a = {1, 2, 3}
@@ -158,7 +158,7 @@ b = list(a)
   d = {num for num in range(1, 20) if num % 3 == 0 or num % 7 == 0}
   ```
 
-*使用*
+**使用**  
 ```
 - &  交集
 - |  并集
@@ -171,13 +171,14 @@ b = list(a)
 - issuperset  超集
 - add  # 添加元素
 - remove # 删除元素，不存在报KeyError错误
-- discard  # 删除元素
+- discard  # 删除元素，不存在不错误
+- pop()  # 随机删除一个，返回被删除的值
 - clear  # 清空元素
 - isdisjoint  # 判断两个集合有没有相同的元素，如果没有相同元素，该方法返回True
 ```
 
 ## frozenset ##
-*定义*
+**定义**  
 ```
 a = frozenset({1, 3, 5, 7})
 ```
