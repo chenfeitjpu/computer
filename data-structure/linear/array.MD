@@ -25,7 +25,7 @@
 - 查找指定区间值
 
 <details>
-<summary>example</summary>
+<summary>Example</summary>
 
 ```
 LeetCode  
@@ -36,12 +36,13 @@ LeetCode
 </details>
 
 ## 差分数组 ##
+**定义**
 ```
 频繁对原始数组的某个区间的元素进行增减  
 ```
 
 <details>
-<summary>code</summary>
+<summary>Example</summary>
 
 ``` 
 LeetCode 
