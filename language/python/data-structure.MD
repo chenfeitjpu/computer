@@ -27,34 +27,34 @@ print(True)             # bool  bool()
 ```
 
 ## str ##
-*特点*  
+**特性**  
 - 字符串是不可变类型  
 
-*定义*
+**定义**  
 ```
 s1 = 'hello, world!'
 s2 = "你好，世界"
-s3 = '''hello,    # 多行注释
+s3 = '''hello,    # 多行字符串
 wonderful
 world!'''
 ```
 
-*转义 & 原始字符串*
+**转义 & 原始字符串**  
 ```
 a = r'a\r\nb'
 ```
 
-*函数*
+**函数**  
 ```
 - len  # 获取字符串长度
 - capitalize  # 字符串首字母大写
 - title  # 字符串每个单词首字母大写
 - upper  # 字符串转大写
 - lower  # 字符串转小写
-- find  # 找不到指定的字符串会返回-1
 - index  # 找不到指定的字符串会引发ValueError错误
-- rfind  # 逆向查找
+- find  # 找不到指定的字符串会返回-1
 - rindex # 逆向查找
+- rfind  # 逆向查找
 - startswith  # 以某个字符串开头
 - endswith  # 以某个字符串结尾
 - isdigit  # 字符串是不是完全由数字构成的
@@ -66,7 +66,7 @@ a = r'a\r\nb'
 - zfill  # 左侧补零
 - %  # 格式化
 - format  # 格式化
-- f'  # 格式化
+- f  # 格式化
 - strip  # 修剪掉左右两端指定字符
 - lstrip
 - rstrip
@@ -78,11 +78,11 @@ a = r'a\r\nb'
 ```
 
 ## list ##
-*定义*
+**定义**  
 - 字面量
   ```
   a = [1, 'a', True]
-  b = a[start:end:stride] # 开始、结束、跨度
+  b = a[start:end:stride] # 切片运算 开始、结束、跨度
   ```
 - 函数
   ```
@@ -93,41 +93,41 @@ a = r'a\r\nb'
   d = [i ** 2 for i in range(10)]
   ```
 
-*函数*
+**函数**  
 ```
-- append
-- insert
+- append  # 尾部添加
+- insert  # 指定位置添加
 - remove  # 删除第一个, 要删除的元素并不在列表中，会引发ValueError
-- pop
-- clear
-- index
-- count
-- sort
-- reverse
+- pop  # 删除指定位置或者最后一个，如果索引的值超出了范围，会引发IndexError异常
+- clear  # 清空列表
+- index  # 可以查找某个元素在列表中的索引位置，如果找不到指定的元素，index方法会引发ValueError错误
+- count  # 统计一个元素在列表中出现的次数
+- sort  # 排序
+- reverse  # 反转列表
 ```
 
 ## tuple ##
-*特性* 
+**特性**  
 - 不可变类型  
   - 元素不能再添加或删除，元素的值不能修改  
  
-*优点*  
+**优点**  
 - 不可变类型  
   - 适合多线程环境  
   - 在创建时间上优于对应的可变类型  
 
-*定义*
+**定义**  
 ```
 a = (1, 'a', True)
 ```
 
-*打包&解包*
+**打包&解包**  
 ```
 a = 1, 'a', True, 100
 b, *c, d = a
 ```
 
-*tuple & list互相转化*
+**tuple & list互相转化**  
 ```
 fruit = ['apple', 'banana', 'orange']
 a = tuple(fruit)
