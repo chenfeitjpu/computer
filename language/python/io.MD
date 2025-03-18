@@ -1,11 +1,17 @@
 **IO操作**
 - [文件操作](#文件操作)
-  - [文本操作](#文本操作)
+  - [文本](#文本)
   - [CSV](#csv)
+  - [Excel](#excel)
+    - [xls](#xls)
+    - [xlsx](#xlsx)
+  - [Word](#word)
+  - [PowerPoint](#powerpoint)
+  - [PDF](#pdf)
 
 ## 文件操作 ##
-### 文本操作 ###
-*模式*
+### 文本 ###
+**模式**
 - 基本模式
   ```
   - r  # 只读	
@@ -22,7 +28,7 @@
   ```
 - 读写模式
   ```
-  r+	# 读 + 写	修改文件
+  r+	# 读 + 写	修改文件， 文件必须存在
   w+	# 读 + 写（清空文件）覆盖写入
   a+	# 读 + 追加写入	追加内容
   rb+   # 二进制读 + 写	二进制文件
@@ -30,7 +36,7 @@
   ab+	# 二进制读 + 追加写入
   ```
 
-*读写*
+**读写**
 - 读取所有
   ```
   file = open('example.txt', 'r', encoding='utf-8')
@@ -80,3 +86,56 @@
           for elem in data_list:
               print(elem, end='\t')
   ```
+
+### Excel ###
+
+#### xls ####
+**安装**
+```
+pip install xlwt xlrd xlutils
+```
+
+**读取**
+
+**写入**
+
+#### xlsx ####
+**安装**  
+```
+pip install openpyxl
+```
+
+**读取**  
+
+**写入**  
+
+### Word ###
+**安装**
+```
+pip install python-docx
+```
+
+**读取**
+
+**写入**
+
+### PowerPoint ###
+**安装**
+```
+pip install python-pptx
+```
+
+**读取**
+
+**写入**
+
+### PDF ###
+**安装**
+```
+pip install PyPDF2
+```
+
+**读取**
+
+**写入**
+
