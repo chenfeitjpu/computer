@@ -1,17 +1,23 @@
 **数据结构**
 
-- [基础类型](#基础类型)
-- [str](#str)
-- [list](#list)
-- [tuple](#tuple)
-- [set](#set)
-- [frozenset](#frozenset)
-- [dict](#dict)
-- [函数](#函数)
-- [类](#类)
-- [json](#json)
+- [常见类型](#常见类型)
+  - [基础类型](#基础类型)
+  - [str](#str)
+  - [list](#list)
+  - [tuple](#tuple)
+  - [set](#set)
+  - [frozenset](#frozenset)
+  - [dict](#dict)
+  - [函数](#函数)
+  - [类](#类)
+  - [json](#json)
+- [生成式](#生成式)
+- [迭代器\&生成器](#迭代器生成器)
+  - [迭代器](#迭代器)
+  - [生成器](#生成器)
 
-## 基础类型 ##
+## 常见类型 ##
+### 基础类型 ###
 **特性**  
 - 基础类型都是不可变类型
 
@@ -26,7 +32,7 @@ print('hello world')    # 字符串 str() 将指定的对象转换成字符串�
 print(True)             # bool  bool()
 ```
 
-## str ##
+### str ###
 **特性**  
 - 字符串是不可变类型  
 
@@ -77,7 +83,7 @@ a = r'a\r\nb'
 - decode  # 解码
 ```
 
-## list ##
+### list ###
 **定义**  
 - 字面量
   ```
@@ -106,7 +112,7 @@ a = r'a\r\nb'
 - reverse  # 反转列表
 ```
 
-## tuple ##
+### tuple ###
 **特性**  
 - 不可变类型  
   - 元素不能再添加或删除，元素的值不能修改  
@@ -134,7 +140,7 @@ a = tuple(fruit)
 b = list(a)
 ```
 
-## set ##
+### set ###
 **特性**  
 - 要求
   - 无序
@@ -177,13 +183,13 @@ b = list(a)
 - isdisjoint  # 判断两个集合有没有相同的元素，如果没有相同元素，该方法返回True
 ```
 
-## frozenset ##
+### frozenset ###
 **定义**  
 ```
 a = frozenset({1, 3, 5, 7})
 ```
 
-## dict ##
+### dict ###
 **定义**
 - 字面量
   ```
@@ -213,7 +219,7 @@ a = frozenset({1, 3, 5, 7})
 - del  # 删除元素  如果指定的键索引不到对应的值，会引发KeyError错误
 ```
 
-## 函数 ##
+### 函数 ###
 **定义**  
 ```
 def functionName(arg1, arg2):
@@ -321,7 +327,7 @@ lambda n: n % 2 == 0
 - functools.reduce  累积计算
 ```
 
-## 类 ##
+### 类 ###
 **定义**
 ```
 class Student:
@@ -401,7 +407,7 @@ class Student(Person):
 
 ```
 
-## json ##
+### json ###
 - dict转json  
   ```
   p = {
@@ -424,3 +430,56 @@ class Student(Person):
   with open('example.txt', 'r') as file:
       p = json.load(file)
   ```
+
+## 生成式 ##
+
+## 迭代器&生成器 ##
+### 迭代器 ###
+```
+class Fib(object):
+    """迭代器"""
+    
+    def __init__(self, num):
+        self.num = num
+        self.a, self.b = 0, 1
+        self.idx = 0
+   
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        if self.idx < self.num:
+            self.a, self.b = self.b, self.a + self.b
+            self.idx += 1
+            return self.a
+        raise StopIteration()
+```
+
+### 生成器 ###
+定义  
+```
+def fib(num):
+    """生成器"""
+    a, b = 0, 1
+    for _ in range(num):
+        a, b = b, a + b
+        yield a
+```
+发送消息   
+```
+def calc_avg():
+    """流式计算平均值"""
+    total, counter = 0, 0
+    avg_value = None
+    while True:
+        value = yield avg_value
+        total, counter = total + value, counter + 1
+        avg_value = total / counter
+
+
+gen = calc_avg()
+next(gen)
+print(gen.send(10))
+print(gen.send(20))
+print(gen.send(30))
+```
