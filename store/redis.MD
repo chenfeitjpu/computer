@@ -44,14 +44,16 @@ key
 string
 - 内部实现
   - int  存储8个字节的长整型(-2^63到2^63-1)
-  - embstr  字符串的长度<=44字节，redisObject和SDS内存是连续分配的
-  - raw  redisObject和SDS内存是随机分配的
+  - embstr(sds)  字符串的长度<=44字节，redisObject和SDS内存是连续分配的
+  - raw(sds)  redisObject和SDS内存是随机分配的
+  - 扩容
+    - sds 长度小于 1 MB，那么最后的扩容是按照翻倍扩容来执行的，即 2 倍的newlen
+    - sds 长度超过 1 MB，那么最后的扩容长度应该是 newlen + 1MB
 - 应用
   缓存、计数、分布式锁
 
 list 
 - 内部实现
-  - listpack  元素个数<512个且元素大小<64字节
   - quicklist  
 - 应用
   队列、栈
@@ -68,7 +70,7 @@ set
   - intset  元素个数<512个且元素都是整数
   - hashtable
 - 应用  
-  去重、交集、并集、差集
+  去重、集合计算、随机
 
 sorted set
 - 内部实现
@@ -85,7 +87,7 @@ bitmap
 
 hyperloglog
 - 内部实现
-  - string
+  - 寄存器数组
 - 应用  
   UV计数
 
@@ -150,113 +152,7 @@ struct __attribute__ ((__packed__)) sdshdr16 {
 - len  记录了字符串长度    
 - alloc  分配给字符数组的空间长度  
 - flags  不同容量的sds，sdshdr5、sdshdr8、sdshdr16、sdshdr32和sdshdr64  
-- buf[]  字符数组，用来保存实际数据  
-```
-
-**链表**  
-
-![redis-linked-list](./images/redis/redis-linked-list-struct.webp)
-```
-结构
-typedef struct listNode {
-    //前置节点
-    struct listNode *prev;
-    //后置节点
-    struct listNode *next;
-    //节点的值
-    void *value;
-}
-
-typedef struct list {
-    //链表头节点
-    listNode *head;
-    //链表尾节点
-    listNode *tail;
-    //节点值复制函数
-    void *(*dup)(void *ptr);
-    //节点值释放函数
-    void (*free)(void *ptr);
-    //节点值比较函数
-    int (*match)(void *ptr, void *key);
-    //链表节点数量
-    unsigned long len;
-}
-
-优点
-- 获取某个节点的前置节点或后置节点的时间复杂度只需O(1)
-- 获取链表的表头节点和表尾节点的时间复杂度只需O(1)
-- 获取链表中的节点数量的时间复杂度只需O(1)
-缺点
-- 随机内存，无法很好利用CPU缓存
-- 保存一个链表节点的值都需要一个链表节点结构头的分配，内存开销较大
-```
-
-**跳表**  
-
-![skiplist](./images/redis/redis-skiplist-struct.webp)
-```
-结构
-typedef struct zskiplistNode {
-    //Zset 对象的元素值
-    sds ele;
-    //元素权重值
-    double score;
-    //后向指针
-    struct zskiplistNode *backward;
-  
-    //节点的level数组，保存每层上的前向指针和跨度
-    struct zskiplistLevel {
-        struct zskiplistNode *forward;
-        unsigned long span;
-    } level[];
-}
-- span 上一个节点到当前节点之前的节点数
-
-typedef struct zskiplist {
-    struct zskiplistNode *header, *tail;
-    unsigned long length;
-    int level;
-}
-- 头尾节点  便于在O(1)时间复杂度内访问跳表的头节点和尾节点
-- 长度  便于在O(1)时间复杂度获取跳表节点的数量
-- 最大层数  便于在O(1)时间复杂度获取跳表中层高最大的那个节点的层数量
-
-查询过程
-- 如果当前节点的权重小于要查找的权重时，跳表就会访问该层上的下一个节点
-- 如果当前节点的权重等于要查找的权重时，并且当前节点的SDS类型数据小于要查找的数据时，跳表就会访问该层上的下一个节点
-- 下一个节点为空时，跳表就会使用目前遍历到的节点的level数组里的下一层指针，然后沿着下一层指针继续查找
-
-层数设置
-跳表在创建节点时候，会生成范围为[0-1]的一个随机数，如果这个随机数小于等于0.25（相当于概率25%），那么层数就增加1层，然后继续生成下一个随机数，直到随机数的结果大于0.25结束，最终确定该节点的层数
-
-为什么用跳表而不用平衡树
-- 内存占用，平衡树每个节点包含2个指针，跳表每个节点平均包含指针小于2
-- 范围查找，平衡二叉树无法直接查询，跳表直接遍历
-- 结构调整，跳表的插入和删除只需要修改相邻节点的指针，平衡树的插入和删除操作可能引发子树的调整
-```
-
-**ziplist**  
-
-![avatar](./images/redis/redis_ziplist_struct.webp) 
-```
-结构
-- zlbytes  记录整个压缩列表占用内存字节数
-- zltail  记录压缩列表「尾部」节点距离起始地址由多少字节 也就是列表尾的偏移量
-- zllen  记录压缩列表包含的节点数量
-- zlend  标记压缩列表的结束点，固定值0xFF(十进制255)
-
-entry
-- prevlen  记录了「前一个节点」的长度，目的是为了实现从后向前遍历
-  如果前一个节点的长度小于254字节，那么prevlen属性需要用1字节的空间来保存这个长度值  
-  如果前一个节点的长度大于等于254字节，那么prevlen属性需要用5字节的空间来保存这个长度值  
-- encoding  记录了当前节点实际数据的「类型和长度」，类型主要有两种：字符串和整数
-- data  记录了当前节点的实际数据，类型和长度都由 encoding 决定
-
-优点
-- 占用一块连续的内存空间，可以利用CPU缓存
-缺点
-- 不能保存过多的元素，否则查询效率就会降低
-- 新增或修改某个元素时，压缩列表占用的内存空间需要重新分配，甚至可能引发连锁更新的问题
+- buf[]  字节数组，用来保存实际数据  
 ```
 
 **listpack**  
@@ -318,6 +214,49 @@ typedef struct intset {
 - 整数集合升级的过程不会重新分配一个新对象，而是在原本的数组上扩展空间，然后在将每个元素按间隔类型大小分割
 好处
 - 节省内存资源
+```
+
+**跳表**  
+
+![skiplist](./images/redis/redis-skiplist-struct.webp)
+```
+结构
+typedef struct zskiplistNode {
+    //Zset 对象的元素值
+    sds ele;
+    //元素权重值
+    double score;
+    //后向指针
+    struct zskiplistNode *backward;
+  
+    //节点的level数组，保存每层上的前向指针和跨度
+    struct zskiplistLevel {
+        struct zskiplistNode *forward;
+        unsigned long span;
+    } level[];
+}
+- span 上一个节点到当前节点之前的节点数
+
+typedef struct zskiplist {
+    struct zskiplistNode *header, *tail;
+    unsigned long length;
+    int level;
+}
+- 头尾节点  便于在O(1)时间复杂度内访问跳表的头节点和尾节点
+- 长度  便于在O(1)时间复杂度获取跳表节点的数量
+- 最大层数  便于在O(1)时间复杂度获取跳表中层高最大的那个节点的层数量
+
+查询过程
+- 如果当前节点的权重小于要查找的权重时，跳表就会访问该层上的下一个节点
+- 如果当前节点的权重等于要查找的权重时，并且当前节点的SDS类型数据小于要查找的数据时，跳表就会访问该层上的下一个节点
+- 下一个节点为空时，跳表就会使用目前遍历到的节点的level数组里的下一层指针，然后沿着下一层指针继续查找
+
+层数设置
+跳表在创建节点时候，会生成范围为[0-1]的一个随机数，如果这个随机数小于等于0.25（相当于概率25%），那么层数就增加1层，然后继续生成下一个随机数，直到随机数的结果大于0.25结束，最终确定该节点的层数
+
+为什么用跳表而不用平衡树
+- 范围查找，平衡二叉树无法直接查询，跳表直接遍历
+- 结构调整，跳表的插入和删除只需要修改相邻节点的指针，平衡树的插入和删除操作可能引发子树的调整
 ```
 
 **哈希表**  
