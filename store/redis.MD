@@ -471,8 +471,8 @@ aof
 AOF重写机制
 读取当前数据库中的所有键值对，然后将每一个键值对用一条命令记录到新的AOF文件
 - 配置
-  `auto-aof-rewrite-min-size`  aof文件大小阀值
-  `auto-aof-rewrite-percentage`  aof文件扩展比例
+  `auto-aof-rewrite-min-size`  如果 AOF 文件大小小于该值，则不会触发 AOF 重写。默认值为 64 MB
+  `auto-aof-rewrite-percentage`  如果当前 AOF 文件大小增加了这个百分比值，将触发 AOF 重写
 - 手动重写
   bgrewriteaof(异步)
 - 实现过程
@@ -505,7 +505,7 @@ rdb&aof
 
 ## 集群 ##
 ```
-主从
+主从复制
 - 实现
   - 设置  
     replicaof <服务器的IP地址> <服务器的Redis端口号>
