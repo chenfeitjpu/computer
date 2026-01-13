@@ -577,10 +577,23 @@ rdb&aof
 
 Cluster
 - 实现
-  - Redis集群有2^14个哈希槽，每个节点负责一部分哈希槽
-  - 对键的CRC16值取模2^14计算出哈希槽，根据哈希槽找到节点
+  - redis集群有2^14个哈希槽，每个节点负责一部分哈希槽
+  - 对key的CRC16值取模2^14计算出哈希槽，根据哈希槽找到节点
+- 重定向
+  - Moved 重定向
+    客户端给一个Redis实例发送数据读写操作时，如果计算出来的槽不是在该节点上，这时候它会返回MOVED重定向错误，MOVED重定向错误中，会将哈希槽所在的新实例的IP和port端口带回去。这就是Redis Cluster的MOVED重定向机制。
+  - ASK 重定向
+    一般发生于集群伸缩的时候。集群伸缩会导致槽迁移。
+    - 当我们访问源节点，对于槽中不存在的Key，会返回ASK重定向以告知客户端该当前槽迁入的目的节点地址信息
+    - 当我们访问目的节点，每次访问属于迁移槽的Key时，没有先发送ASKING命令，其均会返回MOVED重定向。先发送ASKING命令，该Key迁入的话，则直接返回结果；如果该Key未迁入，则直接返回null
+- 故障转移
+  - 发现故障
+  - 经过多节点投票选举新主节点
+  - 然后更新集群拓扑
 ```
+
 学习资料  
 [图解Redis](https://xiaolincoding.com/redis/)  
 [面试官：介绍一下 Redis 三种集群模式](https://xie.infoq.cn/article/762492568e1b35f7227bcc115)
 [redis主从同步收到以下参数影响](https://www.cnblogs.com/wangcp-2014/p/15504775.html)  
+[浅谈Redis Cluster 集群的MOVED、ASK重定向](https://zhuanlan.zhihu.com/p/655514905)
