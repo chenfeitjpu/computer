@@ -1,22 +1,30 @@
 MongoDb
 - [定义](#定义)
 - [使用](#使用)
-  - [基础](#基础)
-  - [查询](#查询)
+  - [简介](#简介)
+  - [常用命令](#常用命令)
   - [存储](#存储)
   - [集群](#集群)
   - [学习资料](#学习资料)
 
 # 定义 #
-文档数据库
+基于分布式文件存储的开源NoSQL数据库系统，提供了面向文档的存储方式
 
 # 使用 #
-## 基础 ##
+## 简介 ##
 ```
 特点
 - 灵活性  数据模型是动态的
 - 横向扩展  通过分片实现数据的扩展
 
+组成
+- database
+- collection
+- document
+```
+
+## 常用命令 ##
+```
 数据库
 - `show dbs`  查看所有数据库
 - `db`  查看当前使用数据库
@@ -43,10 +51,7 @@ MongoDb
 - `db.COLLECTION_NAME.createIndex(keys, options)`  添加索引
 - `db.COLLECTION_NAME.dropIndexes()`  删除所有索引
 - `db.COLLECTION_NAME.dropIndex(name)`  删除索引
-```
 
-## 查询 ##
-```
 运算符
 - 比较运算符  
   $gt、$gte、$lt、$lte、$ne
@@ -70,6 +75,7 @@ MongoDb
   - db.COLLECTION_NAME.aggregate   
 ```
 
+
 ## 存储 ##
 ```
 分片
@@ -82,3 +88,4 @@ MongoDb
 ## 学习资料 ##  
 [官方文档](https://www.mongodb.com/docs/manual/)  
 [中文文档](https://www.mongodb.com/zh-cn/docs/manual/)  
+[MongoDB常见面试题总结](https://javaguide.cn/database/mongodb/mongodb-questions-01.html)
