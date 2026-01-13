@@ -2,10 +2,10 @@ MongoDb
 - [定义](#定义)
 - [使用](#使用)
   - [简介](#简介)
-  - [常用命令](#常用命令)
-  - [存储](#存储)
+  - [数据类型](#数据类型)
+  - [数据操作](#数据操作)
+  - [数据存储](#数据存储)
   - [集群](#集群)
-  - [学习资料](#学习资料)
 
 # 定义 #
 基于分布式文件存储的开源NoSQL数据库系统，提供了面向文档的存储方式
@@ -23,7 +23,12 @@ MongoDb
 - document
 ```
 
-## 常用命令 ##
+## 数据类型 ##
+```
+
+
+```
+## 数据操作 ##
 ```
 数据库
 - `show dbs`  查看所有数据库
@@ -75,17 +80,21 @@ MongoDb
   - db.COLLECTION_NAME.aggregate   
 ```
 
-
-## 存储 ##
+## 数据存储 ##
 ```
-分片
+bson
 
 ```
 
 ## 集群 ##
+```
+主从
+
+分配
+```
 
 
-## 学习资料 ##  
+学习资料  
 [官方文档](https://www.mongodb.com/docs/manual/)  
 [中文文档](https://www.mongodb.com/zh-cn/docs/manual/)  
 [MongoDB常见面试题总结](https://javaguide.cn/database/mongodb/mongodb-questions-01.html)
