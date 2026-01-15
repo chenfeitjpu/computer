@@ -16,10 +16,6 @@
 # 使用 #
 ## 系统架构 ##
 ```
-变量&状态
-- 系统变量  `show [global|session] variables [LIKE 匹配的模式]`
-- 系统状态  `show [global|session] status [LIKE 匹配的模式]`
-
 字符集&比较规则
 - 查看
   - `show (character set | charset)`
