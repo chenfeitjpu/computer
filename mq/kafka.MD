@@ -5,14 +5,13 @@
   - [读写](#读写)
   - [存储](#存储)
   - [常见问题](#常见问题)
-- [学习资料](#学习资料)
 
 # 定义 #
 Kafka是一个分布式事件流平台
 
 # 使用 #
 ## 基础 ##
-![sds](./images/kafka/arch.webp)
+![kafka](./images/kafka/arch.webp)
 
 ```
 概念
@@ -170,8 +169,8 @@ Kafka是一个分布式事件流平台
 - 增加分区，增加消费者
 ```
 
-# 学习资料 #  
-[官网](https://kafka.apache.org/)  
+学习资料
+[官网](https:/*/kafka.apache.org/)  
 [真的，Kafka入门一篇文章就够了](https://juejin.cn/post/6844903495670169607)  
 [kafka是怎么实现顺序写磁盘的](https://www.zhihu.com/question/63408317/answer/3058280249)  
 [kafka-producer源码分析](https://github.com/Raray-chuan/xichuan_note/blob/main/docs/big-data/kafka/kafka-producer%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90.md)  
