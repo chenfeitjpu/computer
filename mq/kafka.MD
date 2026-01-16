@@ -16,9 +16,9 @@ Kafka是一个分布式事件流平台
 ```
 概念
 - Zookeeper  保存 broker 集群元数据和消费者信息(偏移量)
-- Produce  生产者负责创建消息，将消息发送到 Broker
+- Producer  生产者负责创建消息，将消息发送到 Broker
 - Broker: 一个独立的 Kafka 服务器被称作 Broker，Broker 负责接收来自生产者的消息，为消息设置偏移量，并将消息存储在磁盘。Broker 为消费者提供服务，对读取分区的请求作出响应，返回已经提交到磁盘上的消息
-- Consume  消费者负责从 Broker 订阅并消费消息。
+- Consumer  消费者负责从 Broker 订阅并消费消息。
 - Consumer Group  一个消费者组可以包含一个或多个 Consumer
 - Topic  Kafka 中的消息 以 Topic 为单位进行划分
 - Partition  一个 Topic 可以细分为多个分区，每个分区只属于单个主题。同一个主题下不同分区包含的消息是不同的，分区在存储层面可以看作一个可追加的 日志（Log）文件，消息在被追加到分区日志文件的时候都会分配一个特定的 偏移量（offset）
@@ -27,7 +27,7 @@ Kafka是一个分布式事件流平台
 - Record  实际写入 Kafka 中并可以被读取的消息记录。每个 record 包含了 key、value 和 timestamp
 - Leader  每个分区多个副本的 "主" Leader，生产者发送数据的对象，以及消费者消费数据的对象都是 Leader。
 - Follower  每个分区多个副本中的"从" Follower,实时从 Leader 中同步数据，保持和 Leader 数据的同步。Leader 发生故障时，某个 Follower 会成为新的 Leader。
-/Users/zfr/Downloads/arch.webp
+
 特点
 - 高吞吐量、低延迟  每秒可以处理几十万条消息，它的延迟最低只有几毫秒
 - 可扩展  每个主题(Topic)包含多个分区(Partition)，主题中的分区可以分布在不同的主机(Broker)中
@@ -45,6 +45,7 @@ Kafka是一个分布式事件流平台
   - 生产有序  生产者顺序写入
   - 消费有序  同一个分区内的消息只能被一个Group里的一个Consumer消费
 - 超时重试时，不一定有序
+  - 限制最大未完成请求，前一条消息未 ack，下一条消息不会发送
 ```
 
 ## 读写 ##
@@ -55,7 +56,7 @@ Kafka是一个分布式事件流平台
   - Producer将消息发送给该Leader
   - Leader将消息写入本地Log
   - Followers从Leader中Pull消息，写入本地Log后向Leader发送Ack
-  - Leader收到所有ISR中的Replication的Ack后，增加HW并向Producer发送Ack
+  - Leader收到所有ISR中的Replication的Ack后，向Producer发送Ack
 - 分区
   - 目的
     - 方便扩展  一个Topic可以有多个Partition，可以适应任意大小的数据
@@ -70,9 +71,10 @@ Kafka是一个分布式事件流平台
     - 1  Producer等待Broker的Ack，Partition的Leader写入成功后返回Ack
     - -1  Producer等待Broker的Ack，Partition的Leader和Follower全部写入成功后才返回Ack
 - 幂等性
-  - 单会话单分区  幂等性生产者
-    Broker会为每个(Topic, Partition)保存一个(PID, SeqNumber)
-  - 多分区多会话  事务性生产者
+  - 单会话单分区  
+    幂等性生产者，Broker会为每个(Topic, Partition)保存一个(PID, SeqNumber)
+  - 多分区多会话 
+    事务性生产者
 
 消费者
 - 模式
@@ -84,10 +86,10 @@ Kafka是一个分布式事件流平台
   - 每个Partition在同一时间只能由Group中的一个Consumer读取，但是多个Group可以同时消费这个Partition
 - 分区分配
   - 策略
-    - 轮询(Round Robin)  把多个主题当成一个整体
+    - 轮询(Round Robin)
       - 实现  对主题和分区进行排序，根据消费者进行轮询
       - 适用场景  适用于消费者组中消费者订阅的主题相同的情况
-    - 范围(Range)  不会把多个主题当成一个整体
+    - 范围(Range)
       - 实现  计算每个Consumer可以消费的分区个数，然后按照顺序将指定个数范围的分区分配给各个Consumer
     - Sticky(粘性)
       - 分区的分配尽可能均匀
@@ -113,11 +115,11 @@ Kafka是一个分布式事件流平台
     - OSR  和Leader不保持同步进度的Follower
     - AR  所有的Follower
   - 判断
-    - Follower的LEO与Leader的LEO相等时更新lastCaughtUpTimeMs，当前时间Now减去Follower的LastCaughtUpTimeMs大于replica.log.time.max.ms，ISR就会加入OSR
+    - Follower拉取数据时，会上报自己的LEO，Leader对比自己的的LEO与Follower的LEO，相等时更新lastCaughtUpTimeMs，Leader定期计算当前时间Now减去Follower的LastCaughtUpTimeMs大于replica.log.time.max.ms，ISR就会加入OSR
     - Follower的LEO等于Leader的HW的时候，OSR会加入ISR
   - 故障处理
     - Follower故障
-      Follower发生故障后会被临时踢出ISR，待该Follower恢复后，将Log文件高于HW的部分截取掉，从HW开始向Leader进行同步。等该Lollower的LEO大于等于该Partition的HW，即Lollower追上leader之后，就可以重新加入ISR了  
+      Follower发生故障后会被临时踢出ISR，待该Follower恢复后，将Log文件高于HW的部分截取掉，从HW开始向Leader进行同步。 
     - Leader故障
       Leader发生故障之后，会从ISR中选出一个新的Leader，其余的Follower会先将各自的Log文件高于HW的部分截掉，然后从新的Leader同步数据  
   - 刷盘机制
@@ -169,7 +171,7 @@ Kafka是一个分布式事件流平台
 - 增加分区，增加消费者
 ```
 
-学习资料
+学习资料  
 [官网](https:/*/kafka.apache.org/)  
 [真的，Kafka入门一篇文章就够了](https://juejin.cn/post/6844903495670169607)  
 [kafka是怎么实现顺序写磁盘的](https://www.zhihu.com/question/63408317/answer/3058280249)  
