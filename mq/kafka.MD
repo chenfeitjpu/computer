@@ -179,4 +179,4 @@ Kafka是一个分布式事件流平台
 [真的，Kafka入门一篇文章就够了](https://juejin.cn/post/6844903495670169607)  
 [kafka是怎么实现顺序写磁盘的](https://www.zhihu.com/question/63408317/answer/3058280249)  
 [kafka-producer源码分析](https://github.com/Raray-chuan/xichuan_note/blob/main/docs/big-data/kafka/kafka-producer%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90.md)  
-[干货总结！Kafka 面试大全（万字长文，37 张图，28 个知识点）](https://zhuanlan.zhihu.com/p/473172655)
+[干货总结！Kafka 面试大全（万字长文，37 张图，28 个知识点](https://mp.weixin.qq.com/s/O_1ztfA8CLcYXLdxTa7tgw)
