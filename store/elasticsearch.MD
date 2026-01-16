@@ -89,3 +89,4 @@
 [【ES从入门到实战】完整合集版，带思维导图](https://juejin.cn/post/6844904181325627400)  
 [Elasticsearch8（ES）保姆级菜鸟入门教程](https://blog.csdn.net/TinpeaV/article/details/149352335)
 [面试官：你真的认为ElasticSearch比MySQL快](https://zhuanlan.zhihu.com/p/705332207)
+[ElasticSearch 深度分页详解与场景选择](https://juejin.cn/post/7303065935228993590)
