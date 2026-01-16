@@ -1,7 +1,8 @@
 **Kafka**
 - [定义](#定义)
 - [使用](#使用)
-  - [架构](#架构)
+  - [架构图](#架构图)
+  - [基础](#基础)
   - [读写](#读写)
   - [存储](#存储)
   - [常见问题](#常见问题)
@@ -11,45 +12,44 @@
 Kafka是一个分布式事件流平台
 
 # 使用 #
-## 架构 ##
+## 架构图 ##
+![sds](./images/kafka/arch.jpg)
+
 ```
 概念
-- 术语
-  - 消息(Record)  Kafka中的数据单元，包括offset、key(可选)、value、timestamp
-  - 批次(BatchRecord)  一组消息，为了提高效率，消息会分批次写入Kafka
-  - 主题(Topic)  消息分类  
-  - 分区(Partition)  一个Topic可以包含多个Partition，单一分区有序，所有分区无序  
-    - 副本(Replication)  同一Partition的数据可以在多Broker上存在副本
-    - Leader  负责消息的读取
-    - Follower  定期从Leader中拉取数据，Leader发生故障时，某个Follower会成为新的Leader
-  - 偏移量(Offset)  消息在分区的唯一标识  
-    - LEO 下一条要写入的消息的位移
-    - HW  Leader会记录Follower同步过来的LEO，然后取最小的LEO值作为HW值，Follower获取Leader的HW，和自身的LEO取较小的作为自身的HW
-  - 服务节点(Broker)  一个独立的Kafka服务器就被称为Broker，Broker接收来自生产者的消息，为消息设置偏移量，并提交消息到磁盘保存
-  - Broker集群  Broker是集群的组成部分，Broker集群由一个或多个Broker组成，每个集群都有一个Broker同时充当了集群控制器的角色，负责Leader选举、分区分配
-  - Zookeeper  保存着集群Broker、Topic、Partition等Meta数据
-  - 生产者(Producer)  发送消息
-  - 消费者(Consumer)  读取消息
-  - 消费者组(Consumer Group)  多个Consumer组成一个Group
+- Zookeeper  保存 broker 集群元数据和消费者信息(偏移量)
+- Produce  生产者负责创建消息，将消息发送到 Broker
+- Broker: 一个独立的 Kafka 服务器被称作 Broker，Broker 负责接收来自生产者的消息，为消息设置偏移量，并将消息存储在磁盘。Broker 为消费者提供服务，对读取分区的请求作出响应，返回已经提交到磁盘上的消息
+- Consume  消费者负责从 Broker 订阅并消费消息。
+- Consumer Group  一个消费者组可以包含一个或多个 Consumer
+- Topic  Kafka 中的消息 以 Topic 为单位进行划分
+- Partition  一个 Topic 可以细分为多个分区，每个分区只属于单个主题。同一个主题下不同分区包含的消息是不同的，分区在存储层面可以看作一个可追加的 日志（Log）文件，消息在被追加到分区日志文件的时候都会分配一个特定的 偏移量（offset）
+- Offset  Offset 是消息在分区中的唯一标识，Kafka 通过它来保证消息在分区内的顺序性，不过 offset 并不跨越分区，也就是说，Kafka保证的是分区有序性而不是主题有序性
+- Replication  副本是 Kafka 保证数据高可用的方式，Kafka 同一 Partition 的数据可以在多 Broker 上存在多个副本，通常只有主副本对外提供读写服务，当主副本所在 Broker 崩溃或发生网络异常，Kafka 会在 Controller 的管理下会重新选择新的 Leader 副本对外提供读写服务
+- Record  实际写入 Kafka 中并可以被读取的消息记录。每个 record 包含了 key、value 和 timestamp
+- Leader  每个分区多个副本的 "主" Leader，生产者发送数据的对象，以及消费者消费数据的对象都是 Leader。
+- Follower  每个分区多个副本中的"从" Follower,实时从 Leader 中同步数据，保持和 Leader 数据的同步。Leader 发生故障时，某个 Follower 会成为新的 Leader。
+```
 
+## 基础 ##
+```
 特点
-- 优势
-  - 多生产者
-  - 多消费者
-  - 基于磁盘存储  
-  - 伸缩性  每个主题(Topic)包含多个分区(Partition)，主题中的分区可以分布在不同的主机(Broker)中
-  - 高可用  某个节点宕机，Kafka集群能够正常工作
-- 高性能
-  - 分批发送
-  - 消息压缩
-  - 页缓存
-  - 顺序读写
-  - 零拷贝
-- 消息有序
-  - kafka只保证同一个分区内的消息有序
-    - 生产有序  生产者顺序写入
-    - 消费有序  同一个分区内的消息只能被一个Group里的一个Consumer消费
-  - 超时重试时，不一定有序
+- 高吞吐量、低延迟  每秒可以处理几十万条消息，它的延迟最低只有几毫秒
+- 可扩展  每个主题(Topic)包含多个分区(Partition)，主题中的分区可以分布在不同的主机(Broker)中
+- 高可用  某个节点宕机，Kafka集群能够正常工作
+
+高性能
+- 批量发送
+- 消息压缩
+- 操作系统的页缓存
+- 磁盘顺序写入
+- 零拷贝
+
+消息有序
+- kafka只保证同一个分区内的消息有序
+  - 生产有序  生产者顺序写入
+  - 消费有序  同一个分区内的消息只能被一个Group里的一个Consumer消费
+- 超时重试时，不一定有序
 ```
 
 ## 读写 ##
@@ -70,13 +70,10 @@ Kafka是一个分布式事件流平台
     - 没有指明Partition但有Key的情况下，将Key的Hash值与Topic的Partition数进行取余得到Partition  
     - 既没有指明Partition值又没有Key值的情况下，第一次调用时随机生成一个整数(后面每次调用在这个整数上自增)，将这个值与Topic可用的Partition总数取模得到Partition
 - 可靠性
-  - acks 
+  - 消息确认机制(ack应答) 
     - 0  Producer不等待Broker的Ack
     - 1  Producer等待Broker的Ack，Partition的Leader写入成功后返回Ack
-    - all  Producer等待Broker的Ack，Partition的Leader和Follower全部写入成功后才返回Ack
-  - retries
-    - 允许重试的异常响应  重试
-    - 正常响应或不允许重试的异常响应  callback
+    - -1  Producer等待Broker的Ack，Partition的Leader和Follower全部写入成功后才返回Ack
 - 幂等性
   - 单会话单分区  幂等性生产者
     Broker会为每个(Topic, Partition)保存一个(PID, SeqNumber)
@@ -108,8 +105,10 @@ Kafka是一个分布式事件流平台
     - 订阅主题发生变更
   - 消费过的消息如何再消费
     - 重设offset
-- 可靠性      
-  - 手动提交消费偏移量
+- 消费模式
+  - at most once(最多一次) 保证每一条消息 commit 成功之后，再进行消费处理，消息可能会丢失，但不会重复
+  - at least once(至少一次)  保证每一条消息处理成功之后，再进行commit。消息不会丢失，但可能会重复
+  - exactly once(精确一次)  消息只会处理一次，不丢失也不会重复
 
 服务节点
 - 副本
@@ -146,35 +145,30 @@ Kafka是一个分布式事件流平台
 - segment
   - 文件结构
     - *.log  
-      数据
+      baseOffset | batchLength | records
     - *.index  
-      偏移量索引
+      offset | position
     - *.timeindex
-      时间戳索引
+      timestamp | offset 
   - 分段策略
-    - 数据大小(默认是1GB)  `log.segment.bytes`  
-    - 数据时间(默认7天)  `log.segment.ms`  
+    - 按数据大小(默认是1GB)  `log.segment.bytes`  
+    - 按数据时间(默认7天)  `log.segment.ms`  
 
-过期清理
-- 可以针对主题和分区设置
-- 启用清理  `log.cleaner.enable=true`  
+数据清理
+可以针对主题和分区设置，启用清理 `log.cleaner.enable=true`  
 - 策略
   - 删除
     - 启用删除策略  `log.cleanup.policy=delete`
     - 清理超过指定时间前的数据  `log.retention.hours=16`  
     - 清理超过指定大小前的数据  `log.retention.bytes=1073741824`  
-  - 压缩  只保留每个key最后一个版本的数据
+  - 压缩  
+    只保留每个key最后一个版本的数据
     - 启用压缩策略  `log.cleanup.policy=compact` 
+    - segment必须先roll(关闭)
 ```
 
 ## 常见问题 ##
 ```
-kafka & rabbitmq
-- kafka配置复杂，吞吐量大，rabbitmq配置简单，吞吐量小
-- rabbitmq可灵活配置路由，kafka只能监控topic
-- rabbitmq错误消息会重新入队，超时消息会进入死信队列
-- kafka会保留历史消息，rabbitmq消费完即删除
-
 消息积压
 - 优化消费性能
 - 增加分区，增加消费者
@@ -185,3 +179,4 @@ kafka & rabbitmq
 [真的，Kafka入门一篇文章就够了](https://juejin.cn/post/6844903495670169607)  
 [kafka是怎么实现顺序写磁盘的](https://www.zhihu.com/question/63408317/answer/3058280249)  
 [kafka-producer源码分析](https://github.com/Raray-chuan/xichuan_note/blob/main/docs/big-data/kafka/kafka-producer%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90.md)  
+[干货总结！Kafka 面试大全（万字长文，37 张图，28 个知识点）](https://zhuanlan.zhihu.com/p/473172655)
