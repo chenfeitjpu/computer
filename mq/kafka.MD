@@ -12,7 +12,7 @@ Kafka是一个分布式事件流平台
 
 # 使用 #
 ## 基础 ##
-![sds](./images/kafka/arch.jpg)
+![sds](./images/kafka/arch.webp)
 
 ```
 概念
@@ -28,7 +28,7 @@ Kafka是一个分布式事件流平台
 - Record  实际写入 Kafka 中并可以被读取的消息记录。每个 record 包含了 key、value 和 timestamp
 - Leader  每个分区多个副本的 "主" Leader，生产者发送数据的对象，以及消费者消费数据的对象都是 Leader。
 - Follower  每个分区多个副本中的"从" Follower,实时从 Leader 中同步数据，保持和 Leader 数据的同步。Leader 发生故障时，某个 Follower 会成为新的 Leader。
-
+/Users/zfr/Downloads/arch.webp
 特点
 - 高吞吐量、低延迟  每秒可以处理几十万条消息，它的延迟最低只有几毫秒
 - 可扩展  每个主题(Topic)包含多个分区(Partition)，主题中的分区可以分布在不同的主机(Broker)中
