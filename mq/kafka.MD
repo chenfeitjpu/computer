@@ -71,9 +71,9 @@ Kafka是一个分布式事件流平台
     - 1  Producer等待Broker的Ack，Partition的Leader写入成功后返回Ack
     - -1  Producer等待Broker的Ack，Partition的Leader和Follower全部写入成功后才返回Ack
 - 幂等性
-  - 单会话单分区  
+  - 单分区  
     幂等性生产者，Broker会为每个(Topic, Partition)保存一个(PID, SeqNumber)
-  - 多分区多会话 
+  - 多分区 
     事务性生产者
 
 消费者
