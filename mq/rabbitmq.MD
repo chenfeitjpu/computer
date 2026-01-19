@@ -11,6 +11,7 @@
 
 # 使用 #
 ## 基础 ##
+[rabbitmq](./images/rabbitmq/arch.webp)
 
 ```
 术语
