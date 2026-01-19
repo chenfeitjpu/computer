@@ -70,6 +70,7 @@ Kafka是一个分布式事件流平台
     - 0  Producer不等待Broker的Ack
     - 1  Producer等待Broker的Ack，Partition的Leader写入成功后返回Ack
     - -1  Producer等待Broker的Ack，Partition的Leader和Follower全部写入成功后才返回Ack
+  - 事务性生产者
 - 幂等性
   - 单分区  
     幂等性生产者，Broker会为每个(Topic, Partition)保存一个(PID, SeqNumber)
@@ -106,6 +107,8 @@ Kafka是一个分布式事件流平台
   - at most once(最多一次) 保证每一条消息 commit 成功之后，再进行消费处理，消息可能会丢失，但不会重复
   - at least once(至少一次)  保证每一条消息处理成功之后，再进行commit。消息不会丢失，但可能会重复
   - exactly once(精确一次)  消息只会处理一次，不丢失也不会重复
+- 可靠性
+  - 消费完再上报offset
 
 服务节点
 - 副本
@@ -128,10 +131,9 @@ Kafka是一个分布式事件流平台
       - log.flush.interval.ms  //间隔多长时间刷盘一次
       - log.flush.scheduler.interval.ms  //多长时间进行一次检查
     - 操作系统刷新Page Cache
-
-事务
-- 保持会话状态
-- 保证操作原子性
+- 可靠性
+  - 持久化
+  - 多副本
 ```
 
 ## 存储 ##
