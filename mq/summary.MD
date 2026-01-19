@@ -34,8 +34,9 @@
 - 增加消费者
 
 kafka & rabbitmq
-- kafka配置复杂，吞吐量大，rabbitmq配置简单，吞吐量小
-- rabbitmq可灵活配置路由，kafka只能监控topic
-- rabbitmq错误消息会重新入队，超时消息会进入死信队列
-- kafka会保留历史消息，rabbitmq消费完即删除
+- 消费模型，rabbitmq是推模型(push)，kafka是拉模型(pull)
+- 数据模型，rabbitmq是用完即删，kafka是长期追加
+- 数据粒度，rabbitmq是以单条消息为最小粒度，kafka是以offset为粒度
+- 投递控制，rabbitmq是exchange、queue、优先级队列，kafka是topic、partition
+- 生命周期，rabbitmq可设置TTL，DLX，kafka是过期清理
 ```
