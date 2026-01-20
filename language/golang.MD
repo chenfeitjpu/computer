@@ -532,7 +532,6 @@ GMP是Go运行时的调度器模型，把大量的goroutine分配到少量线程
 - 解决
   - 使用带超时的操作，比如select语句配合time.After
   - 使用context来控制声明周期
-  - 使用sync.WaitGroup等待所有的协程完成
 ```
 
 ## 框架和库  ##
