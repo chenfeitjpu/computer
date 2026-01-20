@@ -41,11 +41,15 @@
 ## 数据结构 ##
 ```
 string 
-- 运行时结构
-  type StringHeader struct {
-      Data uintptr
-      Len  int
+- 结构
+  // runtime/string.go
+  type stringStruct struct {
+      str unsafe.Pointer  // 指向底层字节数组的指针
+      len int             // 字符串的长度(字节数)
   }
+  string占用16个字节  
+  - str  指向底层数组的指针，占用8个字节  
+  - len  切片的长度，占用8个字节  
 - 注意事项
   - string对应的底层字节数组不能修改
   - 转换成[]byte会发生内存拷贝，不发生拷贝*(*[]byte)(unsafe.Pointer(&a))
@@ -56,6 +60,9 @@ string
     - utf8.RuneCountInString()
 
 array
+- 结构
+  // 数组在内存中是连续存储的
+  var a [5]int  // 在栈上分配 5 * 8 字节(64位系统)的连续内存
 - 注意事项
   - 固定长度集合
   - 多维数组只有第一层可以使用[...]来让编译器推导数组长度
@@ -63,10 +70,11 @@ array
 
 slice
 - 结构
+  // runtime/slice.go
   type slice struct {
-      array unsafe.Pointer
-      len   int
-      cap   int
+      array unsafe.Pointer  // 指向底层数组的指针
+      len   int             // 切片长度
+      cap   int             // 切片容量
   }
   slice占用24个字节  
   - array  指向底层数组的指针，占用8个字节  
@@ -94,39 +102,30 @@ slice
 
 map
 - 结构
+  // runtime/map.go
   type hmap struct {
-      // 元素个数，调用 len(map) 时，直接返回此值
-      count     int
-      flags     uint8
-      // buckets 的对数 log_2
-      B         uint8
-      // overflow 的 bucket 近似数
-      noverflow uint16
-      // 计算 key 的哈希的时候会传入哈希函数
-      hash0     uint32
-      // 指向 buckets 数组，大小为 2^B
-      buckets    unsafe.Pointer
-      // 等量扩容的时候，buckets 长度和 oldbuckets 相等
-      // 双倍扩容的时候，buckets 长度会是 oldbuckets 的两倍
-      oldbuckets unsafe.Pointer
-      // 指示扩容进度，小于此地址的 buckets 迁移完成
-      nevacuate  uintptr
-      extra *mapextra // optional fields
+      count     int    // map 中的元素个数
+      flags     uint8  // 状态标志
+      B         uint8  // buckets 数组的长度为 2^B
+      noverflow uint16 // 溢出桶的数量
+      hash0     uint32 // 哈希种子
+      
+      buckets    unsafe.Pointer // 指向 buckets 数组，长度为 2^B
+      oldbuckets unsafe.Pointer // 扩容时指向旧的 buckets
+      nevacuate  uintptr        // 扩容进度
+      
+      extra *mapextra // 溢出桶相关信息
   }
+  // 每个 bucket 可以存储 8 个键值对
   type bmap struct {
-      topbits  [8]uint8
-      keys     [8]keytype
-      values   [8]valuetype
-      pad      uintptr
-      overflow uintptr
+      topbits  [8]uint8   // 存储每个 key 的哈希值的高 8 位
+      keys     [8]keytype   // 后面是 8 个 key
+      values   [8]valuetype  // 然后是 8 个 value
+      overflow uintptr  // 最后是指向溢出桶的指针
   }
 - 查找
   - 计算key的hash值，通过最后的B位来确定桶号，通过前8位快速确定是在这个桶的哪个位置
   - 对比key是否匹配，如果都没有找到，就去连接的下一个溢出桶中找
-- 操作
-  - 写入  查找key，进行新增或修改
-  - 删除  查找key，对key和value进行清空
-  - 遍历  遍历所有的bucket以及它后面挂的overflow bucket，遍历bucket中的所有cell  
 - 扩容
   - 条件
     - 等量扩容(桶中空位过多)
@@ -141,9 +140,7 @@ map
       - 1  cell已经搬迁完毕，空cell
       - 2  cell已经搬迁完毕，key在新bucket前半部分
       - 3  cell已经搬迁完毕，key在新bucket后半部分
-    - 查询  
-    - 写入  定位到了某个bucket后，通过新桶找旧桶，旧桶未迁移，触发一次搬迁操作
-    - 删除  定位到了某个bucket后，通过新桶找旧桶，旧桶未迁移， 触发一次搬迁操作
+    - crud  定位到了某个bucket后，通过新桶找旧桶，旧桶未迁移，触发一次搬迁操作(当前访问的桶 + nevacuate 指向的桶)，执行后续操作
     - 遍历  定位到某个bucket后，通过新桶找旧桶，旧桶已经迁移，直接遍历新桶，旧桶没有迁移，遍历旧桶中会分到新桶中的元素
 - 注意事项
   - 一种无序的键值对集合。map中的键必须是唯一的，而值可以重复。map提供了快速的查找和插入操作。
@@ -154,53 +151,67 @@ map
   - 有序实现  
     - 创建切片保存键值，进行排序，然后遍历切片
   - 线程不安全
-    - map+sync.RWMutex
+    - map+锁
     - sync.Map
       - sync.Map适用于读多、更新多、删多、写少的场景  
-      - 倘若写操作过多，sync.Map基本等价于互斥锁+map  
+      - 倘若写操作过多，sync.Map基本等价于map+互斥锁  
 
 sync.map
+- 实现
+  read无锁访问，dirty加锁访问，entry使用 atomic操作，减少锁粒度
 - 结构
+  // sync/map.go
   type Map struct {
-      mu Mutex
-      read atomic.Value
-      dirty map[any]*entry
+      mu Mutex  // 保护 dirty 的互斥锁
+      
+      // read 是只读 map，无锁访问
+      read atomic.Value // 实际存储 readOnly 结构
+      
+      // dirty 是读写 map，需要加锁访问
+      dirty map[interface{}]*entry
+      
+      // misses 记录 read 未命中的次数
+      // 当 misses >= len(dirty) 时，将 dirty 提升为 read
       misses int
   }
+
+  // read 中实际存储的结构
+  type readOnly struct {
+      m       map[interface{}]*entry  // 只读 map
+      amended bool                     // dirty 中是否有 read 中没有的键
+  }
+
+  // entry 是实际存储值的结构
   type entry struct {
+      // p 指向实际存储的值
+      // p 有三种状态：
+      // 1. p == nil: 键已被删除，且dirty == nil，或dirty != nil且在dirty中
+      // 2. p == expunged: 键已被删除，且dirty != nil，且不在dirty中
+      // 3. 其他: 正常值
       p unsafe.Pointer // *interface{}
   }
-  - p的值
-    - 当p == nil时，说明这个键值对已被删除，并且m.dirty == nil，或m.dirty[k]指向该entry
-    - 当p == expunged时，说明这条键值对已被删除，并且m.dirty != nil，且m.dirty中没有这个key
-    - 正常值
-- 实现
-  - sync.Map设置了两个map(read map和dirty map)，read map并发读，dirty map并发读写，两个map的key指向同一个entry，通过CAS原子操作更新entry
 - 操作
   - 写入
-    - 如果在read里能够找到待存储的key，并且对应的entry的值不为expunged，也就是没被删除时，直接更新对应的entry即可
-    - 第一步没有成功，要么read中没有这个key，要么key被标记为删除。则先加锁，再进行后续的操作
-    - 再次在read中查找是否存在这个key，也就是double check一下，这也是lock-free编程里的常见套路。如果read中存在该key，但p == expunged，说明m.dirty != nil并且m.dirty中不存在该key值，dirty map插入key，直接更新对应的value
-    - 如果read中没有此key，那就查看dirty中是否有此key，如果有，则直接更新对应的value，这时read中还是没有此key
-    - 最后一步，如果read和dirty中都不存在该key，如果dirty为空，则需要创建dirty，并从read中拷贝未被删除的元素，更新amended字段，标识dirty map中存在read map中没有的key，将k-v写入dirty map中
+    - key在read中，直接更新entry，entry的值为expunged，则不能更新
+    - 先加锁，key在read中，且entry的值为expunged，把key添加到dirty，更新entry的值
+    - key在dirty中，更新entry
+    - read&dirty中都没有，如果dirty为空，从read中拷贝未被删除的元素到dirty，更新amended字段，将k-v写入dirty
   - 删除
-    - 先从read里查是否有这个key，如果有则执行entry.delete方法，将p置为nil，这样read和dirty都能看到这个变化
-    - 如果没在read中找到这个key，并且dirty不为空，那么就要操作dirty了，操作之前，还是要先上锁。然后进行double check，如果仍然没有在read里找到此key，则从dirty中直接删掉这个key。
-    - read中没有这个key，且amended为fase，说明dirty为空，那直接返回空和false
+    - 先从read中查找，如果read中没有，并且dirty有新数据，先上锁，双重检查，从dirty中直接删掉这key 
+    - 将entry标记为nil
   - 读取
-    - 直接在read中找，如果找到了直接调用entry的load方法，取出其中的值
-    - 如果read中没有这个key，且amended为true，说明dirty中可能存在我们要找的key。当然要先上锁，再尝试去dirty中查找。在这之前，仍
-      然有一个double check的操作。若还是没有在read中找到，那么就从dirty中找。不管dirty中有没有找到，都要"记一笔"，因为在dirty被提升为read之前，都会进入这条路径，直接将misses的值加1，表示一次未命中，如果misses值小于m.dirty 的长度，就直接返回。否则将m.dirty晋升为read，并清空dirty，清空misses计数值
-    - read中没有这个key，且amended为fase，说明dirty为空，那直接返回空和false
+    - key在read中，直接返回
+    - 如果read中没有，且dirty有新数据，先上锁，双重检查，防止在加锁期间dirty已提升为read，从dirty中读取
+    - 记录miss，如果miss值等于dirty的长度，提升dirty为read，并清空dirty，清空miss
   - 遍历
-    - 当amended为true时，说明dirty中含有read中没有的key，将dirty提升为read
-    - 遍历read，取出entry 中的值，调用f(k, v)      
+    - 如果dirty有新数据，需要加锁并提升为read
+    - 遍历read(此时包含所有数据)    
 
-struct
+struct  
 - 注意事项
   - 空结构体不占内存，内存地址都是同一个，常用于占位
   - json转结构体类型不同无法解析，超过表示范围无法解析
-  - 结构体拷贝  直接赋值、json转换、指针转换
+  - 结构体拷贝，可使用直接赋值、json转换、指针转换
 
 func  
 - 注意事项
@@ -227,27 +238,6 @@ method
 
 interface
 用于定义一组方法，可以由不同的类型实现，将抽象与实现分离
-- 结构
-  //非空接口
-  type iface struct {
-      tab  *itab
-      data unsafe.Pointer
-  }
-  type itab struct {
-      inter  *interfacetype // 接口类型
-      _type  *_type  //实体类型
-      link   *itab
-      hash   uint32 // copy of _type.hash. Used for type switches.
-      bad    bool   // type does not implement interface
-      inhash bool   // has this itab been added to hash?
-      unused [2]byte
-      fun    [1]uintptr // variable sized
-  }
-  //空接口
-  type eface struct {
-      _type *_type  // 实体类型
-      data  unsafe.Pointer
-  }
 - 注意事项
   - 对于T类型的接口，可以使用T类型的方法
   - 对于*T类型的接口，可以使用T和*T类型的方法
@@ -256,10 +246,8 @@ pointer
 指针是一种变量，存储了另一个变量的内存地址。通过指针，我们可以直接访问和修改变量的值。
 - 使用
   - &取址
-    - 不可寻址的类型
-      字面量、常量、字符串对应的字节数组、map对象中的元素
-  - *取值
-    新建对象
+    - 不可寻址的类型  字面量、常量、字符串对应的字节数组、map对象中的元素
+  - *取值 新建对象
 - 分类 
   - 普通指针  *T
   - 通用指针  unsafe.Pointer
@@ -272,10 +260,6 @@ pointer
 
 reflect
 程序在运行的时候能够观察并且修改自己的行为
-- 反射三定律
-  - 反射可以将interface对象转换成反射对象
-  - 反射可以将反射对象还原成interface对象
-  - 反射对象可修改，value值必须是可设置的
 - reflect慢的主要原因
   - 涉及到内存分配以及后续的GC
   - reflect实现里面有大量的枚举，也就是for循环，比如类型之类的
@@ -296,33 +280,31 @@ error & panic & recover
 
 ## 内存管理 ##
 ```
-make & new
-- make  为slice、map、channel分配内存并初始化为非零值，返回值
-- new  为任意类型分配内存并初始化为零值，返回指针
-
 拷贝
 - 浅拷贝  值类型新建对象，引用类型复制地址
 - 深拷贝  值类型新建对象，引用类型新建对象
 
-逃逸分析
-在函数中分配的对象，由于其生命周期需要延长，导致编译器将其分配到堆区而不是栈区
-go build -gcflags=-m
-- 场景
-  - 指针被作用域之外所引用
-  - 变量类型不确定(如接口)
-  - 变量大小不确定(如slice长度或容量不定)
-  - 变量较大(栈空间不足)
+make & new
+- make  为slice、map、channel分配内存并初始化为非零值，返回的值
+- new  为任意类型分配内存并初始化为零值，返回的是指针
 
 内存分配
-- 核心思想(TCMalloc)  把内存分为多级管理，从而降低锁的粒度  
-  - mspan  内存分配单元  由一片连续的8KB的页组成的大块内存
+go的内存分配器基于TCMalloc(Thread-Caching Malloc)设计，采用多级缓存和分级管理策略
+- 层级结构
+  应用程序
+      ↓
+  mcache(线程缓存，每个P一个)
+      ↓
+  mcentral(中心缓存，每个spanClass一个)
+      ↓
+  mheap(堆内存管理器，全局唯一)
+      ↓
+  操作系统
+- 概念
+  - mspan  内存分配单元，由一片连续的8KB的页组成的大块内存
   - mcache  每个P持有一份的内存缓存，访问时无锁，包含68*2个mspan
   - mcentral  每种对象规格对应的缓存，锁的粒度也仅限于同一种规格以内，为所有mcache提供mspan资源  
   - mheap  全局的内存起源，访问要加全局锁，为所有mcentral提供mspan资源, 包含68*2个mcentral。mheap没有资源时，会向操作系统申请新内存, mheap主要用于大对象的内存分配，以及管理未切割的mspan。
-- 内存划分
-  - arena  512G 把内存分割成8KB大小的页
-  - bitmap  16G  标识arena区域哪些地址保存了对象 一个byte大小的内存对应arena区域中4个指针大小(指针大小为8B)的内存
-  - spans  512M  存放mspan指针，每个指针对应一页
 - 分配流程  
   - <=16B的对象(不含指针)  使用mcache的tiny分配器分配  
   - (16B,32KB]的对象
@@ -333,183 +315,143 @@ go build -gcflags=-m
   - >32KB的对象  直接从mheap上分配  
 
 垃圾回收
-- 作用
-  Go语言中的垃圾回收器是自动管理内存的机制，用于回收不再使用的内存。垃圾回收器会自动检测不再使用的对象，并释放其占用的内存空间  
-- 常见算法
-  - 标记清扫
-    - 流程
-      - 标记  标记出当前还存活的对象
-      - 清扫  清扫掉未被标记到的垃圾对象
-    - 缺点
-      - 会产生内存碎片
-  - 标记压缩
-    - 流程
-      - 标记  标记出当前还存活的对象
-      - 压缩  清扫掉未被标记到的垃圾对象，对存活对象进行压缩整合，使得整体空间更为紧凑，从而解决内存碎片问题
-    - 缺点
-      - 实现时会有很高的复杂度
-  - 半空间复制
-    - 流程
-      - 分配两片相等大小的空间，称为fromspace和tospace
-      - 每轮只使用fromspace空间，以GC作为分水岭划分轮次
-      - GC时，将fromspace存活对象转移到tospace中，并以此为契机对空间进行压缩整合
-      - GC后，交换fromspace和tospace，开启新的轮次
-    - 缺点
-      - 比较浪费空间
-  - 引用计数
-    - 流程
-      - 对象每被引用一次，计数器加1
-      - 对象每被删除引用一次，计数器减1
-      - GC时，把计数器等于0的对象删除
-    - 缺点
-      - 无法解决循环引用或者自引用问题(判断对象与GCRoots的可达性来解决循环引用的问题)
-
-- 版本迭代
-  - 1.0
-    标记-清扫(全程需要STW)
-    - 流程
-      - 启动STW
-      - 标记
-        - 标记可达对象
-        - 标记垃圾对象
-      - 清扫
-      - 停止STW
-    - 缺点
-      - STW程序会出现卡顿
-      - 清除数据会产生碎片
-  - 1.3
-    标记-清扫(标记过程需要STW)
-    - 流程
-      - 启动STW
-      - 标记
-        - 标记可达对象
-        - 标记垃圾对象
-      - 停止STW
-      - 清扫
-    - 缺点
-      - STW程序会出现卡顿
-      - 清除数据会产生碎片
-  - 1.5
-    三色标记法+插入写屏障
-    - 概念  
-      - 对象分为三种颜色标记  黑、灰、白
-      - 白对象代表，对象尙未被标记到，或者是垃圾对象
-      - 灰对象代表，对象自身存活，但其指向对象还未标记完成
-      - 黑对象代表，对象自身存活，且其指向对象都已标记完成
-    - 流程
-      - 所有对象放入白色集合(需要STW)
-      - 从GC Root对象出发，扫描所有可达对象并标记为灰色
-      - 从队列取出一个灰色对象并标记为黑色，将其引用对象标记为灰色放入队列
-      - 重复上一步骤，直到灰色对象队列为空
-      - 此时所有剩下的白色对象就是垃圾对象 
-    - 并发问题
-      用户协程运行时可能对对象间的引用关系进行调整，这会严重打乱GC三色标记时的标记秩序
-      - 漏标
-        - 产生条件
-          - 灰、白对象删除了白色对象
-          - 黑色对象指向了白色对象
-        - 解决
-          - 强三色不变式
-            白色对象不能被黑色对象直接引用 
-            - 实现
-              - 插入写屏障
-                保证当一个黑色对象指向一个白色对象前，会先触发屏障将白色对象置为灰色  
-                - 栈上对象处理
-                  STW扫描栈上对象，重新三色标记
-          - 弱三色不变式
-            白色对象可以被黑色对象引用，但要从某个灰对象出发仍然可达该白对象  
-            - 实现  
-              - 删除写屏障
-                当一个白色对象即将被上游删除引用前，会触发屏障将其置灰，之后再删除上游指向其的引用
-                - 栈上对象处理
-                  STW扫描整个栈，保证所有堆上在用的对象都处于灰色保护下
-      - 错标
-        - 产生条件
-          - 黑色对象删除了灰色对象
-          - 灰色对象是垃圾对象
-  - 1.8之后
-    三色标记法+混合写屏障
-    - GC开始时栈上的对象并标记为黑色(逐个暂停，逐个扫描，每个栈单独扫描, 无需STW整个程序)
-    - GC期间，栈上创建的新对象标记为黑色
-    - 堆对象正常启用插入写屏障
-    - 堆对象正常启用删除写屏障
+三色标记法+混合写屏障
+- 三色标记
+  - 对象分为三种颜色标记  黑、灰、白
+  - 白对象 未被扫描的对象(GC开始时)，或者是垃圾对象(GC结束时)
+  - 灰对象，已被扫描，但其引用子对象还没扫描
+  - 黑对象，已被扫描，且其引用子对象已被扫描
+- 并发问题
+  - 漏标
+    一个已经扫描完成的黑对象，指向了一个被灰\白对象删除引用的白色对象，且该白色对象上游没有灰色对象，白色对象会被回收
+    漏标的情况不能容忍，因为删除了程序正在使用的对象，会造成程序异常
+  - 错标
+    一个灰色对象被上游对象删除引用，灰色对象不会被回收
+    错标对象在下一轮 GC 就会被正确回收
+- 解决并发
+  - 强弱三色不变式
+    - 强三色不变式
+      不允许黑色对象引用白色对象
+    - 弱三色不变式
+      黑色对象可以引用白色对象，但白色对象上游必须有灰色对象
+  - 写屏障
+    - 插入写屏障
+      规则维护了强三色不变式，保证当一个黑色对象指向一个白色对象前，会先触发屏障，将白色对象置为灰色，再建立引用
+    - 删除写屏障
+      实现了弱三色不变式，保证当一个白色对象即将被上游删除引用前，会触发屏障将其置灰，之后再删除上游指向其的引用
+- 实现
+  - 初始事件
+    - 暂停所有Goroutines
+    - 开启混合写屏障机制
+    - 准备根对象列表(只统计，不扫描)
+    - 恢复所有Goroutines
+  - 并发标记
+    - 对象标记
+      - 分批扫描Goroutines栈帧，标记栈局部)变量为黑色，标记栈局部变量引用的堆对象为灰色，GC期间，任何在栈上新创建的对象，均为黑色
+      - 标记其他根对象为灰色
+        - 全局变量
+        - 寄存器中的变量
+      - 递归处理灰色对象
+    - 混合写屏障
+      - 记录对象引用的修改
+    - 标记完成STW事件
+      - 暂停所有Goroutines
+      - 处理剩余的写屏障记录
+      - 关闭混合写屏障机制
+      - 恢复所有Goroutines
+  - 并发清除
+    - 遍历堆内存  垃圾回收器会遍历整个堆内存，查找所有未被标记的白色对象
+    - 释放内存  垃圾回收器会释放所有未被标记的白色对象的内存
+    - 更新空闲列表  在清除未标记的对象后，垃圾回收器会更新内存管理的数据结构
+     
 - 触发时机
   - 定期触发，默认每隔两分钟触发一次GC
-  - 新建对象，检测内存分配如果到达阀值触发GC
+  - 新建对象触发，检测内存分配如果到达阀值触发GC
   - 手动触发，runtime.GC()
-- 注意事项
-  - 小对象多了会造成GC压力
 ```
 
 ## 并发控制 ##
 ```
-并发安全性
-- 概念 
-  多个goroutine对共享资源的访问不会导致数据竞争
-- 实现  
-  Mutex、RWMutex、automic、channel
-
 goroutine 
-go语言的并发执行单元，可以同时执行多个goroutine，而不需要显式地管理线程的生命周期
+go语言的并发执行单元，可以同时执行多个goroutine，由Go runtime调度
+- 使用
+  go func() {
+	
+  }()
+
+WaitGroup  
+同步等待组  
+- 实现
+  - Add 增加任务
+  - Done 减少任务
+  - Wait 等待任务完成
+
+channel  
+用于在goroutine之间进行通信和同步的机制
+- 结构
+  // runtime/chan.go
+  type hchan struct {
+      qcount   uint           // 当前队列中的元素个数
+      dataqsiz uint           // 环形队列的大小（容量）
+      buf      unsafe.Pointer // 指向环形队列的指针
+      elemsize uint16         // 元素大小
+      closed   uint32         // 是否关闭
+      elemtype *_type         // 元素类型
+      sendx    uint           // 发送索引
+      recvx    uint           // 接收索引
+      recvq    waitq          // 接收等待队列
+      sendq    waitq          // 发送等待队列
+      
+      lock mutex              // 互斥锁，保护所有字段
+  }
+- 操作
+  |      操作      | nil的channel | 正常channel | 已关闭的channel |
+  | :------------: | :----------: | :---------: | :-------------: |
+  |    读 <-ch     |     阻塞     | 成功或阻塞  |    读到零值     |
+  |    写 ch<-     |     阻塞     | 成功或阻塞  |      panic      |
+  |    close(ch)   |    panic     |    成功     |      panic      |
+  - 发送
+    - 空通道，阻塞
+    - 加锁，已关闭通道，直接panic
+    - recvq不为空，移出第一个协程接收数据
+    - 循环队列未满，数据添加到buf中
+    - 阻塞，并放入sendq中
+  - 读取
+    - 空通道，阻塞
+    - 加锁，通道关闭且缓冲为空，返回空值
+    - 发送队列不为空，发送者出队，通道是非缓冲类型通道，直接将发送者数据传送给接收者
+    - 发送队列不为空，发送者出队，通道是缓冲类型通道，从循环队列取出一条数据，将发送者数据传递至循环队列
+    - 通道缓冲有数据，从buf中取出值
+    - 通道缓冲无数据，阻塞，并放入recvq中
+  - 关闭
+    - 空通道，直接panic
+    - 加锁，已关闭通道，直接panic
+    - 唤醒接收者队列中所有接受者
+    - 唤醒发送者队列中所有发送者
+- 优雅关闭channel
+  - defer + recover
+  - sync.Once
+  - channel
+    - 一个发送者，一个接收者，发送者关闭
+    - 一个发送者，多个接收者，发送者关闭
+    - 多个发送者，一个接收者，接收者关闭，发送者进行关闭通道的监控
+    - 多个发送者，多个接收者，发送者和接收者把关闭请求发送给中间人，中间人进行关闭，发送者和接收者进行关闭通道的监控
+
+select  
+同时监听多个通道的读写操作，并在其中任意一个通道就绪时执行相应的操作
+- 注意事项 
+  - 通道关闭
+    如果其中一个case通道已经关闭，则每次都会执行到这个case  
+    如果select里边只有一个case，而这个case被关闭了，则会出现死循环  
+  - 不读关闭后通道
+    将关闭通道置为nil
 
 锁
 并发编程中一种同步机制，用于保护共享资源的访问
 - 互斥锁(sync.Mutex)  
   同一时刻只能有一个锁操作
-  - 结构
-    type Mutex struct {
-        state int32
-        sema  uint32
-    }
-  - 实现
-    - 加锁
-      - CAS加锁，成功则返回
-      - 自旋+CAS抢锁
-        - 单CPU或单个P(此时自旋，其他goroutine根本没机会释放锁，自旋纯属空转)
-        - 当前P的执行队列中仍有待执行的G(避免因自旋影响到GMP调度效率)
-        - 自旋累计达到4次仍未取得锁
-      - 阻塞
-    - 解锁
-      - 如果没有加锁，直接抛出runtime error
-      - 解锁完成，没有协程阻塞等待加锁，直接返回
-      - 有协程阻塞，唤醒一个阻塞的协程
-    - 唤醒
-      - 正常模式
-        当有goroutine从阻塞队列被唤醒时，会和此时先进入抢锁流程的goroutine进行锁资源的争夺，假如抢锁失败，会重新回到阻塞队列头部.
-        此时被唤醒的老goroutine相比新goroutine是处于劣势地位，因为新goroutine已经在占用CPU时间片，且新goroutine可能存在多个，从而形成多对一的人数优势，因此形势对老goroutine不利
-        当阻塞队列存在goroutine等锁超过1ms而不得，则进入饥饿模式
-      - 饥饿模式
-        锁的所有权按照阻塞队列的顺序进行依次传递，新goroutine进行流程时不得抢锁，而是进入队列尾部排队
-        当阻塞队列已清空，或取得锁的goroutine等锁时间已低于1ms时，则回到正常模式
 - 读写锁(sync.RWMutex)  
   同一时刻只能写操作，或者多个读操作
-  - 结构
-    type RWMutex struct {
-        w           Mutex  // 复用互斥锁
-        writerSem   uint32 // 写阻塞等待信号量
-        readerSem   uint32 // 读阻塞等待信号量
-        readerCount int32  // 当前执行读的goroutine数量
-        readerWait  int32  // 写阻塞时的读的goroutine的数量
-    }
-  - 实现
-    - Lock
-      - 先用Mutex的Lock()阻断其他写协程进入
-      - 将readerCount转为负数
-      - 将readerCount真正的正数值加到readerWait，记录一下排在写操作前的reader有多少
-      - 若已经有读协程了，或排在前面的reader还没完，阻塞等待信号量
-      - 若没有读协程了，或没有排在前面的reader了，就直接返回了，无需等待信号量
-    - Unlock
-      - 给readerCount还原回去，变成正数
-      - 看现在readerCount有几个，就释放几次信号量，这边release，reader那边就能acquire到了
-      - 调用Mutex的UnLock()彻底解锁，其他写协程可以进来了
-    - RLock
-      - 给readerCount加1
-      - 如果readerCount为负数（记得前面的结论么），说明此时已经有写协程在准备拿锁了，读这边等信号量吧
-      - 如果readerCount > 0，直接返回，说明此时没有写协程拿着锁，可以正常读
-    - RUnlock
-      - 给readerCount-1
-      - 如果readerCount为负数，说明有writer准备拿锁了，正在阻塞，将readerWait也减去1，看看轮没轮到writer，如果还没减到0，说明writer排位前还有别的reader，那就轮不到这次给他机会了，直接返回。如果减到0了，说明到人家writer了，释放writerSem信号量后再退出
-      - 如果readerCount >= 0，说明一切正常，writer没动静，解读锁成功，返回就行
 
 atomic  
 并发编程中的一种同步机制，保证单个指令操作的原子性
@@ -524,92 +466,8 @@ atomic
     - 原子操作通常具有较低的性能开销，因为它们是在硬件级别上实现的，无需额外的同步机制
     - 锁通常具有较高的性能开销，因为它们需要进行上下文切换和线程同步等操作
 
-channel  
-用于在goroutine之间进行通信和同步的机制
-- 结构
-  type hchan struct {
-      qcount   uint           // total data in the queue
- 	  dataqsiz uint           // size of the circular queue
-  	  buf      unsafe.Pointer // points to an array of dataqsiz elements
-      elemsize uint16
-  	  closed   uint32
-  	  elemtype *_type // element type
-	  sendx    uint   // send index
- 	  recvx    uint   // receive index
-	  recvq    waitq  // list of recv waiters
-	  sendq    waitq  // list of send waiters
-	  lock mutex
-  }
-  - buf  指向一个环形数组，用来实现循环队列
-  - sendx  循环队列的队尾指针
-  - recvx  循环队列的队头指针
-  - recvq  等待从通道中接收数据的goroutine  双向链表
-  - sendq  等待发送数据到通道的goroutine  双向链表
-- 操作
-  - 发送
-    - 空通道，阻塞
-    - 加锁
-    - 已关闭通道，直接panic
-    - recvq不为空，移出第一个协程接收数据
-    - 循环队列未满，数据添加到buf中
-    - 当前队列阻塞，并放入sendq中
-  - 读取
-    - 空通道，阻塞
-    - 加锁
-    - 通道关闭且缓冲为空，返回空值
-    - 发送队列不为空，发送者出队，通道是非缓冲类型通道，直接将发送者数据传送给接收者
-    - 发送队列不为空，发送者出队，通道是缓冲类型通道，从循环队列取出一条数据，将发送者数据传递至循环队列
-    - 通道缓冲有数据，从buf中取出值
-    - 通道缓冲无数据，当前协程阻塞，并放入recvq中
-  - 关闭
-    - 空通道，直接panic
-    - 加锁
-    - 已关闭通道，直接panic
-    - 唤醒接收者队列中所有接受者
-    - 唤醒发送者队列中所有发送者
-  |      操作      | nil的channel | 正常channel | 已关闭的channel |
-  | :------------: | :----------: | :---------: | :-------------: |
-  |    读 <-ch     |     阻塞     | 成功或阻塞  |    读到零值     |
-  |    写 ch<-     |     阻塞     | 成功或阻塞  |      panic      |
-  | 关闭 close(ch) |    panic     |    成功     |      panic      |
-- 注意事项
-  - 优雅关闭channel
-    - defer + recover
-    - sync.Once
-    - channel
-      - 一个发送者，一个接收者，发送者关闭
-      - 一个发送者，多个接收者，发送者关闭
-      - 多个发送者，一个接收者，接收者关闭，发送者进行关闭通道的监控
-      - 多个发送者，多个接收者，发送者和接收者把关闭请求发送给中间人，中间人进行关闭，发送者和接收者进行关闭通道的监控
-
-select  
-同时监听多个通道的读写操作，并在其中任意一个通道就绪时执行相应的操作
-- 注意事项 
-  - 通道关闭
-    如果其中一个case通道已经关闭，则每次都会执行到这个case  
-    如果select里边只有一个case，而这个case被关闭了，则会出现死循环  
-  - 不读关闭后通道
-    将关闭通道置为nil
-
-WaitGroup  
-同步等待组  
-- 结构
-  type WaitGroup struct {
-      noCopy noCopy
-      state atomic.Uint64 // high 32 bits are counter, low 32 bits are waiter count.
-      sema  uint32
-  }
-- 实现
-  - Add
-    增加counter 
-  - Done
-    减少counter，若为0，则释放信号量，唤醒等待的goroutine
-  - Wait
-    增加waiter，阻塞，等待信号量
-
 sync.Cond  
 通常应用于等待某个条件的一组goroutine，当条件变为true的时候，其中一个goroutine或者所有的goroutine都会被唤醒执行
-
 
 context  
 用于在单个请求下多个goroutine之间同步数据、取消信号、超时控制
@@ -626,70 +484,37 @@ context
   }
 - 分类
   - emptyCtx
-    type emptyCtx int
   - valueCtx
-    type valueCtx struct {
-        Context
-        key, val any
-    }
   - cancelCtx
-    type cancelCtx struct {
-        Context
-        mu       sync.Mutex         
-        done     atomic.Value          
-        children map[canceler]struct{} 
-        err      error                 
-        cause    error                
-      }
   - timerCtx
-    type timerCtx struct {
-        *cancelCtx
-        timer *time.Timer
-        deadline time.Time
-    }
-
+  
 sync.Once  
 函数只执行一次
-- 结构
-  type Once struct {
-      done uint32
-      m    Mutex
-  } 
 
 Pool  
 对象缓冲池
 
-自旋
-线程在等待某个条件满足时，不会进入阻塞状态，而是通过不断地检查条件是否满足来进行忙等待
-可以减少线程切换的开销，但会导致CPU资源的浪费
-
 GMP
-go语言的调度模型，把大量的goroutine分配到少量线程上去执行
+GMP是Go运行时的调度器模型，把大量的goroutine分配到少量线程上去执行
 - 概念
-  - G  goroutine协程
-  - P  processor处理器
-  - M  thread线程
+  - G  即goroutine，是golang中对协程的抽象，需要绑定在m上执行
+  - P  即processor，是golang中的调度器
+  - M  即machine，是golang中对线程的抽象，需要和p进行结合，从而进入到gmp调度体系之中，m的运行目标始终在g0和g之间进行切换，寻找任务(执行g0)，执行任务(执行g)
 - 初始化
   - 进程启动，会新建M0和G0，并且互相绑定
   - 初始化p数组，P的个数和系统的CPU核数一致，把数组中第一个P和M0绑定
   - 把runtime.main函数作为groutine的执行函数，新建一个G，这个G会放到M0绑定的P的可执行队列上
+  - 创建新M时(动态生成g0)
 - 调度
-  - 全局队列  存放等待运行的G  
-  - 本地队列  存放等待运行的G，数量有限，不超过256个，新创建的G优先放在P的本地队列中，如果队列满了，会把本地队列中一半的G移动到全局队列，在创建G时，如果没有自旋的M且有空闲的P，则唤醒M或新建M
-  - P列表  程序启动时创建，有GOMAXPROCS个
-  - M 
-    - 线程想运行G就得获取P，从P的本地队列获取G，P队列为空时，M也会尝试从全局队列拿一批G放到P的本地队列，或从其他P的本地队列偷一半放到自己P的本地队列。M运行G，G执行之后，M会从P获取下一个G，不断重复下去  
-    - 数量限制
-      - go语言本身的限制M的最大数量10000
-      - runtime/debug中的SetMaxThreads来设置
-    - M执行完所有G，会进入自旋状态，系统中最多有忙碌P/2个自旋的线程，多余的线程会让它们休眠，长时间休眠等待GC回收销毁
-- 策略  
-  - work stealing
-    当线程无可运行的G时，尝试从全局队列或者其他线程绑定的P偷取G，而不是销毁线程
-  - hand off机制
-    - M执行G发生了系统调用，M和P立即解绑，如果P本地队列有G，全局队列有G，P会绑定M，否则P则会加入到空闲列表
-    - 当M系统调用结束时候，这个G会尝试获取一个空闲的P执行，并放入到这个P的本地队列。如果获取不到P，那么这个线程M变成休眠状态，加入到
-      空闲线程中，然后这个G会被放入全局队列中
+  - put g  当某个g中通过go func(){...}操作创建子g时，会先尝试将子g添加到当前所在p的lrq中(无锁化)；如果lrq满了，则会将g追加到grq中(全局锁). 此处采取的思路是“就近原则”
+  - get g  gmp调度流程中，m和p结合后，运行的g0会不断寻找合适的g用于执行，此时会采取“负载均衡”的思路，遵循如下实施步骤：
+    - 优先从当前p的lrq中获取g(无锁化-CAS)
+    - 从全局的grq中获取g(全局锁)
+    - 取io就绪的g(netpoll 机制)
+    - 从其他p的lrq中窃取g(无锁化-CAS)
+  - 阻塞
+    - M执行G发生了系统调用，M和P立即解绑，如果P本地队列有G或者全局队列有G，P会绑定新的M，否则P则会加入到空闲列表
+    - 当M系统调用结束时候，会尝试获取一个空闲的P执行，把G放入到这个P的本地队列。如果获取不到P，那么这个线程M变成休眠状态，加入到空闲线程中，然后这个G会被放入全局队列中
 - 调度时机
   - 正常调度  G顺利执行完成
   - 主动调度  程序主动调用runtime.Gosched()
@@ -704,23 +529,10 @@ go语言的调度模型，把大量的goroutine分配到少量线程上去执行
   - 遍历未关闭通道
   - 读写不同步
   - 资源无法释放  加锁/解锁未同步、网络访问超时、写入大文件、数据库读写产生死锁  
-- 检测
-  - goleak
-    - defer goleak.VerifyNone(t)  单个测试用例集成
-    - func TestMain(m *testing.M) {  单个测试包集成，一个包里面只能有一个TestMain方法
-          goleak.VerifyTestMain(m)
-      }
 - 解决
   - 使用带超时的操作，比如select语句配合time.After
-  - 使用context来传递取消信号
+  - 使用context来控制声明周期
   - 使用sync.WaitGroup等待所有的协程完成
-
-数据竞争
-- 检测
-  - go build -race  在编译的时候检测DATA RACE
-  - go run -race  在运行的时候检测DATA RACE
-  - go test -race  在测试的时候检测DATA RACE
-  - go install -race  在安装的时候检测DATA RACE
 ```
 
 ## 框架和库  ##
@@ -757,9 +569,11 @@ gmp
 垃圾回收  
 [Golang 垃圾回收原理分析](https://zhuanlan.zhihu.com/p/605315127)  
 [golang 垃圾回收（五）混合写屏障](https://liqingqiya.github.io/golang/gc/%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6/%E5%86%99%E5%B1%8F%E9%9A%9C/2020/07/24/gc5.html)  
+[Golang 垃圾回收：一次 GC 周期的详细过程](https://juejin.cn/post/7388842078798807049)
 并发  
 [Go 语言如何进行竞态分析](https://liqiang.io/post/how-golang-detect-data-race)  
 [goroutine 泄漏与检测](https://dbwu.tech/posts/golang_goroutine_leak/)  
+[温故知新——Golang GMP 万字洗髓经](https://zhuanlan.zhihu.com/p/869632834)
 sync.Once  
 [通过 sync.Once 学习到 Go 的内存模型](https://studygolang.com/articles/25299)  
 sync.Mutex  
