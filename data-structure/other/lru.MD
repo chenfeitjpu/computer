@@ -11,110 +11,84 @@
 <summary>code</summary>
 
 ```
-type LinkedListNode struct {
-	key   int
-	value int
-	prev  *LinkedListNode
-	next  *LinkedListNode
+import "fmt"
+
+type DoubleListNode struct {
+	key  int
+	val  int
+	prev *DoubleListNode
+	next *DoubleListNode
 }
 
-type DoubleLinkedList struct {
-	head *LinkedListNode
-	tail *LinkedListNode
+type DoubleList struct {
+	head *DoubleListNode
+	tail *DoubleListNode
 }
 
-type HashLinkedList struct {
-	linkedList *DoubleLinkedList
-	data       map[int]*LinkedListNode
-}
-
-func ConstructorHashLinkedList() *HashLinkedList {
-	head, tail := &LinkedListNode{}, &LinkedListNode{}
+func ConstructorDoubleList() *DoubleList {
+	head, tail := &DoubleListNode{}, &DoubleListNode{}
 	head.next = tail
 	tail.prev = head
-	return &HashLinkedList{
-		linkedList: &DoubleLinkedList{
-			head: head,
-			tail: tail,
-		},
-		data: make(map[int]*LinkedListNode),
+	return &DoubleList{
+		head: head,
+		tail: tail,
 	}
 }
 
-func (h *HashLinkedList) Get(key int) *LinkedListNode {
-	return h.data[key]
+type LRUCache struct {
+	capacity int
+	data     map[int]*DoubleListNode
+	lru      *DoubleList
 }
 
-func (h *HashLinkedList) Put(cur, node *LinkedListNode) {
-	h.data[node.key] = node
-	node.prev = cur.prev
-	node.next = cur
-	cur.prev.next = node
-	cur.prev = node
-}
-
-func (h *HashLinkedList) Delete(node *LinkedListNode) {
-	if node == nil {
-		return
-	}
-	delete(h.data, node.key)
+func (this *DoubleList) delete(node *DoubleListNode) {
 	node.prev.next = node.next
 	node.next.prev = node.prev
 }
 
-func (h *HashLinkedList) PutHead(node *LinkedListNode) {
-	h.Put(h.linkedList.head.next, node)
-}
-
-func (h *HashLinkedList) DeleteTail() {
-	if h.Len() == 0 {
-		return
-	}
-	node := h.linkedList.tail.prev
-	h.Delete(node)
-}
-
-func (h *HashLinkedList) Len() int {
-	return len(h.data)
-}
-
-type LRUCache struct {
-	hashLinkedList *HashLinkedList
-	capacity       int
+func (this *DoubleList) insertHead(node *DoubleListNode) {
+	this.head.next.prev = node
+	node.next = this.head.next
+	node.prev = this.head
+	this.head.next = node
 }
 
 func Constructor(capacity int) LRUCache {
 	return LRUCache{
-		hashLinkedList: ConstructorHashLinkedList(),
-		capacity:       capacity,
+		capacity: capacity,
+		data:     make(map[int]*DoubleListNode, capacity),
+		lru:      ConstructorDoubleList(),
 	}
 }
 
-func (l *LRUCache) Get(key int) int {
-	node := l.hashLinkedList.Get(key)
-	if node == nil {
+func (this *LRUCache) Get(key int) int {
+	node, ok := this.data[key]
+	if !ok {
 		return -1
 	}
-	l.hashLinkedList.Delete(node)
-	l.hashLinkedList.PutHead(node)
-	return node.value
+	this.lru.delete(node)
+	this.lru.insertHead(node)
+	return node.val
 }
 
-func (l *LRUCache) Put(key int, value int) {
-	node := l.hashLinkedList.Get(key)
-	if node != nil {
-		node.value = value
-		l.hashLinkedList.Delete(node)
+func (this *LRUCache) Put(key int, value int) {
+	node, ok := this.data[key]
+	if !ok {
+		if len(this.data) == this.capacity {
+			tail := this.lru.tail.prev
+			this.lru.delete(tail)
+			delete(this.data, tail.key)
+		}
+		node = &DoubleListNode{
+			key: key,
+			val: value,
+		}
+		this.data[key] = node
 	} else {
-		if l.capacity == l.hashLinkedList.Len() {
-			l.hashLinkedList.DeleteTail()
-		}
-		node = &LinkedListNode{
-			key:   key,
-			value: value,
-		}
+		node.val = value
+		this.lru.delete(node)
 	}
-	l.hashLinkedList.PutHead(node)
+	this.lru.insertHead(node)
 }
 ```
 </details>
