@@ -15,7 +15,7 @@
 ```
 变量 & 常量
 - 变量转换时允许溢出
-- 常量转换时不允许溢出，无类型常量可直接转换为其它类型，常量不能取值
+- 常量转换时不允许溢出，无类型常量可直接转换为其它类型(允许溢出)，常量不能取址
 
 数据类型
 - 分类
@@ -26,14 +26,14 @@
   - byte、rune
   - string
   - array、slice、map、channel 
-  - struct、func、interface 
+  - func、struct、interface 
   - pointer、uintptr
 - 引用类型 
   slice、map、channel、func、interface、pointer
 - 类型比较
   - 不同类型不能比较
-  - 不可比较类型不能比较  slice、map、function，但可以与nil进行比较
-  - 接口比较，一个接口覆盖另一个接口的所有方法但实际类型不是同一种不可比较类型
+  - 同一类型且都是不可比较类型不能比较  slice、map、function，但可以与nil进行比较
+  - 接口比较，看接口指向的实际类型
 - 线程安全的类型
   channel、sync.Map
 ```
