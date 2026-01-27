@@ -3,6 +3,9 @@
 - [内容](#内容)
   - [数据结构](#数据结构)
   - [参数详解](#参数详解)
+  - [协议特点](#协议特点)
+  - [安全问题](#安全问题)
+  - [RESTFUL API](#restful-api)
 
 # 定义 #
 超文本传输协议(HyperText Transfer Protocol)
@@ -74,36 +77,42 @@
   - 开启  Connection: keep-alive HTTP/1.1 默认开启
   - 断开  Connection: close
 - 断开连接
-  - 空闲超时，长时间没有请求，服务器会主动关闭连接
-  - 请求数到达上限，一个连接内最多处理N个请求，超过后关闭
+  - 客户端
+    - 空闲超时(几十秒到几分钟)
+    - 进程退出
+  - 服务端
+    - 空闲超时(几十秒到几分钟)，长时间没有请求，服务器会主动关闭连接
+    - 请求数到达上限，一个连接内最多处理N个请求，超过后关闭
 
 缓存技术
+把响应结果存起来
 - 强制缓存  
-  - Cache-Control 是一个相对时间
+  - Cache-Control 是一个相对时间，max-age=600，资源600秒内直接用本地缓存
   - Expires 是一个绝对时间  
   Cache-Control的优先级高于Expires
 - 协商缓存  
-  - 基于内容
-    - 响应头部中Etag  唯一标识资源
-    - 请求头部中的If-None-Match
-  - 基于时间  
-    - 响应头部中的Last-Modified  标示资源的最后修改时间
-    - 请求头部中的If-Modified-Since 
+  - 基于内容(ETag / If-None-Match)
+    - 响应：ETag: "v1.2.3"
+    - 下次请求：If-None-Match: "v1.2.3"
+    - 若内容没变 → 返回 304
+  - 基于时间(Last-Modified / If-Modified-Since)  
+    - 响应：Last-Modified: Tue, 26 Jan 2026 12:00:00 GMT
+    - 下次请求：If-Modified-Since: Tue, 26 Jan 2026 12:00:00 GMT
+    - 若没变 → 服务器返回 304
     Etag的优先级更高  
+```
 
+## 协议特点 ##
+```
 HTTP1.1
-- 特点  简单、易扩展、跨平台
+- 特点  
+  简单、易扩展、跨平台
 - 缺点  
   - 无状态(上下文环境)
     - 目的  高效
     - 保持状态
       - cookie  客户端进行数据存储
       - session  服务端进行会话管理
-        - 分布式session 
-          - 客户端存储
-          - ip_hash  
-          - session复制  
-          - session集中存储  
       - 联系
         Session通过Cookie的SessionID来实现
       - 区别
@@ -118,7 +127,7 @@ HTTP1.1
 - 性能  
   HTTP协议是基于TCP/IP，并且使用了「请求-应答」的通信模式  
   - 长连接 减少了TCP连接的重复建立和断开所造成的额外开销，减轻了服务器端的负载
-  - HTTP队头阻塞
+  - HTTP队头阻塞  上一个请求没有得到相应，其它请求需要阻塞等待
 - 优化    
   - 尽量避免发送HTTP请求(缓存)
   - 在需要发送HTTP请求时，考虑如何减少请求次数(减少重定向、合并、延迟)
@@ -136,40 +145,45 @@ HTTPS
 - RSA握手流程  
   - 客户端发送Client Hello(客户端使用的SSL/TLS协议版本&随机数&可用密码套件列表)
   - 服务端发送Server Hello(服务端支持的SSL/TLS协议版本&随机数&选定的密码套件)、Certificate(CA证书)、Server Hello Done请求
-  - 客户端发情Client Key Exchange(随机数)、Change Cipher Spec(加密算法改变通知)、Encrypted Handshake Message(摘要信息)
+  - 客户端发情Client Key Exchange(随机数、公钥加密)、Change Cipher Spec(加密算法改变通知)、Encrypted Handshake Message(摘要信息)
   - 服务端发送Change Cipher Spec(加密算法改变通知)、Encrypted Handshake Message(服务端握手结束通知)
   缺点
   - 不支持前向保密
 - ECDHE握手流程 
   - 客户端发送Client Hello(客户端使用的SSL/TLS协议版本&随机数&可用密码套件列表)
-  - 服务端发送Server Hello(服务端支持的SSL/TLS协议版本&随机数&密码套件列表)、Certificate(CA证书)、Server Key Exchange(服务端的椭圆曲线公钥)、Server Hello Done请求
+  - 服务端发送Server Hello(服务端支持的SSL/TLS协议版本&随机数&密码套件列表)、Certificate(CA证书)、Server Key Exchange(服务端的椭圆曲线公钥、私钥加密)、Server Hello Done请求
   - 客户端发情Client Key Exchange(客户端的椭圆曲线公钥)、Change Cipher Spec(加密算法改变通知)、Encrypted Handshake Message(摘要信息)
   - 服务端发送Change Cipher Spec(加密算法改变通知)、Encrypted Handshake Message(服务端握手结束通知)
 
 HTTP2
 - 特点
-  - 二进制帧
-    - 帧数据通过HPACK算法进行压缩
-  - 头部压缩
-    - 静态表编码
-    - 动态表编码
-    - Huffman编码
-  - 并发传输
-  - 服务器推送  
+  - 二进制帧  HTTP/2不再用纯文本报文，而是把请求/响应拆成很多帧(frame)，用二进制编码
+  - 头部压缩  对重复度很高的HTTP头进行压缩
+  - 并发传输  多个请求在同一条TCP连接上的不同流(stream)并发发送
+  - 服务器推送  服务器可以在客户端请求HTML时，主动推送相关资源(CSS/JS)
 - 缺点
-  - TCP队头阻塞
+  - TCP队头阻塞  一旦这条TCP连接上有丢包，底层TCP必须按序重传
 
-安全问题
-- XSS 
-  - 转义
-  - 过滤
-- CSRF
-  - Referer校验
-  - Token校验
+HTTP3
+```
+## 安全问题 ##
+```
+XSS(跨站脚本攻击)
+恶意脚本被注入页面并在浏览器执行
+- 转义  对输出到HTML的数据做转义
+- 过滤  过滤掉敏感内容
+- 开启CSP(Content-Security-Policy) 限制可执行脚本来源
 
-RESTFUL API 
-一套应用程序的API设计规范
-用URL定位资源，用HTTP动词描述操作，用HTTP状态码反馈结果
+CSRF(跨站请求伪造)
+利用用户已登录状态伪造请求
+- Token校验 服务端生成随机token，放在页面中，每次提交时带上，服务端校验token是否正确
+- Referer校验  检查请求是否来自可信域名
+- 设置SameSite Cookie
+```
+
+## RESTFUL API ##
+```
+一种设计Web接口的风格，把系统中的对象当作资源，通过统一的URL和HTTP方法来操作这些资源
 https://domain/version/resource?filter(key=value)
 - 协议  总是使用https协议
 - 域名  使用api专用域名
@@ -180,5 +194,4 @@ https://domain/version/resource?filter(key=value)
 - 返回结果  Status Code
 - 返回内容  使用JSON格式，根据请求资源返回单个或者多个
 ```
-
   
