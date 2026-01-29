@@ -12,7 +12,7 @@
 # 使用 #
 ## 栈 ##
 
-<details>
+<details open>
 <summary>LeetCode</summary>
 
 ```
@@ -23,7 +23,7 @@
 
 ## 单调栈 ## 
 
-<details>
+<details open>
 <summary>LeetCode</summary>
 
 ```  
