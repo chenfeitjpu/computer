@@ -6,17 +6,16 @@
 
 # 定义 #
 ```
-只能在尾部插入、删除数据  
+元素只允许在一端进行插入和删除，后进先出
 ```
 
 # 使用 #
 ## 栈 ##
 
 <details>
-<summary>code</summary>
+<summary>LeetCode</summary>
 
 ```
-LeetCode  
 - 20.有效的括号
 - 394.字符串解码
 ```
@@ -25,10 +24,9 @@ LeetCode
 ## 单调栈 ## 
 
 <details>
-<summary>code</summary>
+<summary>LeetCode</summary>
 
-```
-LeetCode  
+```  
 - 155.最小栈
 - 739.每日温度
 - 316.去除重复字母
