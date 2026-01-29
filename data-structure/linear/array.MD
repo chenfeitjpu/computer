@@ -28,7 +28,7 @@
 - 查找指定区间值
 ``` 
 
-<details>
+<details open>
 <summary>LeetCode</summary>
 
 ```
@@ -47,7 +47,7 @@
 频繁对原始数组的某个区间的元素进行增减  
 ```
 
-<details>
+<details open>
 <summary>LeetCode</summary>
 
 ``` 
@@ -64,7 +64,7 @@
 快慢指针 两个指针同向而行，一快一慢  
 ```
 
-<details>
+<details open>
 <summary>LeetCode</summary>
 
 ```
@@ -81,7 +81,7 @@
 通过快慢指针，不停滑动搜索区间  
 ```
 
-<details>
+<details open>
 <summary>LeetCode</summary>
 
 ```
@@ -96,7 +96,7 @@
 通过数组下标模拟哈希表  
 ```
 
-<details>
+<details open>
 <summary>LeetCode</summary>
 
 ```
@@ -105,7 +105,7 @@
 </details>
 
 ## 矩阵 ##
-<details>
+<details open>
 <summary>LeetCode</summary>
 
 ``` 
