@@ -3,20 +3,20 @@
 - [使用](#使用)
 
 # 定义 #
-> 通过关键字访问元素
+```
+定义
+通过关键字访问元素
 
 哈希冲突
 - 链地址法
 - 开放寻址法
-  - 线性探测
-  - 二次探测  +k^2、-k^2
+```
 
 # 使用 #
-<details>
-<summary>code</summary>
+<details open>
+<summary>LeetCode</summary>
 
-```
-LeetCode  
+```  
 - 1.两数之和
 - 128.最长连续序列
 - 149.直线上最多的点数

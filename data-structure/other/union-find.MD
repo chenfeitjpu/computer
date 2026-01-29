@@ -5,11 +5,14 @@
 
 
 # 定义 #
-> 不相交集合的合并及查询问题  
+```
+定义
+不相交集合的合并及查询问题  
+```
 
 # 实现 #
-<details>
-<summary>code</summary>
+<details open>
+<summary>Struct</summary>
 
 ```
 type UF struct {
@@ -52,11 +55,10 @@ func (u *UF) Count() int {
 </details>
 
 # 使用 #
-<details>
-<summary>code</summary>
+<details open>
+<summary>LeetCode</summary>
 
-```
-LeetCode  
+```  
 - 323.无向图中的连通分量数目
 - 990.等式方程的可满足性
 ```

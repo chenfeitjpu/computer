@@ -9,8 +9,8 @@
 ```
 
 # 实现 #
-<details>
-<summary>code</summary>
+<details open>
+<summary>Struct</summary>
 
 ```
 import "fmt"
@@ -96,11 +96,10 @@ func (this *LRUCache) Put(key int, value int) {
 </details>
 
 # 使用 #
-<details>
-<summary>code</summary>
+<details open>
+<summary>LeetCode</summary>
 
-``` 
-LeetCode  
+```   
 - 146.LRU缓存 
 ```
 </details>

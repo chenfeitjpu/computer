@@ -4,10 +4,9 @@
 - [使用](#使用)
 
 # 定义 #
-> 字典树(前缀树)
 
 # 实现 #
-<details>
+<details open>
 <summary>code</summary>
 
 ```
@@ -56,11 +55,10 @@ func (this *Trie) StartsWith(prefix string) bool {
 </details>
 
 # 使用 #
-<details>
-<summary>code</summary>
+<details open>
+<summary>LeetCode</summary>
 
 ```
-LeetCode
 - 208.实现Trie(前缀树)
 ```
 </details>
