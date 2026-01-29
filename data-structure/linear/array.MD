@@ -10,25 +10,28 @@
 
 # 定义 #
 ```
-顺序存储元素，查询快O(1)，增删慢O(n)
+在内存中按顺序、连续地存放一组相同类型的元素
+通过下标直接访问元素，时间复杂度是O(1)
+在中间插入、删除元素时，需要搬动后面的元素，时间复杂度是O(n)
 ```
 
 # 使用 #
-## 前缀和 ##  
-**定义**
+## 前缀和 ## 
 ```
+定义
+从起始位置累加到当前位置的总和
+
+应用场景
 原始数组不变，频繁查询某个区间的累加和  
-```  
-**应用场景**
 - 求一维数组区间值
 - 求二维数组区间值
 - 查找指定区间值
+``` 
 
 <details>
-<summary>Example</summary>
+<summary>LeetCode</summary>
 
 ```
-LeetCode  
 - 303.区域和检索-数组不可变
 - 304.二维区域和检索-矩阵不可变
 - 560.和为K的子数组
@@ -36,16 +39,18 @@ LeetCode
 </details>
 
 ## 差分数组 ##
-**定义**
 ```
+定义
+记录当前元素和上一个元素的差值
+
+应用场景
 频繁对原始数组的某个区间的元素进行增减  
 ```
 
 <details>
-<summary>Example</summary>
+<summary>LeetCode</summary>
 
 ``` 
-LeetCode 
 - 370.区间加法
 - 1109.航班预订统计
 - 1094.拼车
@@ -53,17 +58,16 @@ LeetCode
 </details>
 
 ## 双指针 ##  
-**定义**  
 ```
+定义
 左右指针 两个指针相向而行或者相背而行  
 快慢指针 两个指针同向而行，一快一慢  
 ```
 
 <details>
-<summary>Example</summary>
+<summary>LeetCode</summary>
 
 ```
-LeetCode  
 - 26.删除有序数组中的重复项
 - 31.下一个排列
 - 581.最短无序连续子数组
@@ -73,14 +77,14 @@ LeetCode
 
 ## 滑动窗口 ##
 ```
+定义
 通过快慢指针，不停滑动搜索区间  
 ```
 
 <details>
-<summary>code</summary>
+<summary>LeetCode</summary>
 
 ```
-LeetCode  
 - 3.无重复字符的最长子串
 - 76.最小覆盖子串
 ```
@@ -88,24 +92,23 @@ LeetCode
 
 ## 哈希 ##
 ```
-通过数组模拟哈希表  
+定义
+通过数组下标模拟哈希表  
 ```
 
 <details>
-<summary>code</summary>
+<summary>LeetCode</summary>
 
 ```
-LeetCode
 - 448.找到所有数组中消失的数字
 ```
 </details>
 
 ## 矩阵 ##
 <details>
-<summary>code</summary>
+<summary>LeetCode</summary>
 
 ``` 
-LeetCode
 - 48.旋转图像
 - 240.搜索二维矩阵II
 ```
