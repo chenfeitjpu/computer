@@ -6,7 +6,7 @@
   
 # 定义 #
 ```
-只能在尾部添加数据、首部删除数据  
+元素只能在一端入队，在另一端出队，先进先出
 ```
 
 # 使用 #
@@ -14,11 +14,9 @@
 
 ## 单调队列 ##
 
-<details>
-<summary>code</summary>
-
+<details open>
+<summary>LeetCode</summary>
 ```  
-LeetCode  
 - 239.滑动窗口最大值
 ```
 </details>
