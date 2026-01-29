@@ -164,7 +164,7 @@ map
 
 sync.map
 - 实现
-  read无锁访问，dirty加锁访问，entry使用 atomic操作，减少锁粒度
+  空间换时间，通过两个(read和dirty)的冗余结构，实现"读写分离"，read无锁访问，dirty加锁访问，entry使用atomic操作，减少锁粒度
 - 结构
   // sync/map.go
   type Map struct {
@@ -245,9 +245,31 @@ method
 
 interface
 用于定义一组方法，可以由不同的类型实现，将抽象与实现分离
+- 结构
+  // 空interface{}
+  type eface struct {
+    _type *_type  // 实际类型
+    data  unsafe.Pointer  // 实际数据
+  }
+  // 带方法的interface
+  type iface struct {
+    tab  *itab
+    data unsafe.Pointer  // 实际数据
+  }
+  type itab struct {
+    inter *interfacetype  // 接口类型
+    _type *_type  // 实际类型
+    hash  uint32 
+    _     [4]byte
+    fun   [1]uintptr // 方法列表
+  }
 - 注意事项
-  - 对于T类型的接口，可以使用T类型的方法
+  - 对于T类型的接口，可以使用T类型的方法，调用*T类型的方法可能会报panic
   - 对于*T类型的接口，可以使用T和*T类型的方法
+- 类型转换T(value)&类型断言value.(T)
+  - 确定时机  类型转换是在编译期确定的，类型断言是运行期确定的
+  - 使用场景  类型转换解决不同类型间的转换问题，类型断言把接口还原成具体类型
+  - 底层实现  类型转换通常是简单的内存重新解释或者数据格式调整，类型断言需要检查接口的底层类型信息
 
 pointer
 指针是一种变量，存储了另一个变量的内存地址。通过指针，我们可以直接访问和修改变量的值。
@@ -269,7 +291,7 @@ reflect
 程序在运行的时候能够观察并且修改自己的行为
 - reflect慢的主要原因
   - 涉及到内存分配以及后续的GC
-  - reflect实现里面有大量的枚举，也就是for循环，比如类型之类的
+  - reflect实现里面有大量的枚举，也就是for循环
 
 error & panic & recover
 - error
@@ -400,6 +422,7 @@ WaitGroup
 
 channel  
 用于在goroutine之间进行通信和同步的机制
+CSP(通信顺序进程)并发编程模型，它的核心思想是通过通信来共享内存，不要通过共享内存来通信。
 - 结构
   // runtime/chan.go
   type hchan struct {
@@ -458,7 +481,7 @@ select
   - 不读关闭后通道
     将关闭通道置为nil
 
-锁
+锁(Mutex)
 并发编程中一种同步机制，用于保护共享资源的访问
 - 互斥锁(sync.Mutex)  
   同一时刻只能有一个锁操作
@@ -482,7 +505,7 @@ sync.Cond
 通常应用于等待某个条件的一组goroutine，当条件变为true的时候，其中一个goroutine或者所有的goroutine都会被唤醒执行
 
 context  
-用于在单个请求下多个goroutine之间同步数据、取消信号、超时控制
+在调用链之间传递数据和控制信号
 - 结构
   type Context interface {
       // 当context被取消或者到了 deadline，返回一个被关闭的 channel
