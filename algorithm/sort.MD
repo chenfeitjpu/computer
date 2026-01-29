@@ -1,13 +1,16 @@
 **排序**
-- [定义](#定义)
+- [简介](#简介)
 - [使用](#使用)
 
-# 定义 #
+## 简介
 ```
 对集合进行排序
 ```
 
-# 使用 #
+## 使用
+<details open>
+<summary>LeetCode</summary>
+
 ```
 LeetCode
 - 215.数组中的第K个最大元素
@@ -19,6 +22,7 @@ LeetCode
 - 451.根据字符出现频率排序 
 - 75.颜色分类
 ```
+</details>
 
 <details>
 <summary>冒泡</summary>

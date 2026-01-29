@@ -20,7 +20,7 @@
 
 # 使用 #
 ## 二叉树 ##  
-<details>
+<details open>
 <summary>LeetCode</summary>
 
 ```
@@ -68,7 +68,7 @@
 - 小顶堆 任意节点不大与左右子节点
 ```
 
-<details>
+<details open>
 <summary>LeetCode</summary>
 
 ```

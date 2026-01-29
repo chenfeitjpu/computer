@@ -1,23 +1,26 @@
 **搜索**
-- [定义](#定义)
-- [使用](#使用)
-  - [二分搜索](#二分搜索)
-  - [DFS](#dfs)
-  - [BFS](#bfs)
+- [简介](#简介)
+- [二分搜索](#二分搜索)
+- [DFS](#dfs)
+- [BFS](#bfs)
 
-# 定义 #
+## 简介 ##
+```
+```
 
-# 使用 #
 ## 二分搜索 ##
+<details open>
+<summary>LeetCode</summary>
+
 ``` 
-LeetCode
 - 875.爱吃香蕉的珂珂
 - 1011.在D天内送达包裹的能力
 - 410.分割数组的最大值
 ```
+</details>
 
 <details>
-<summary>模版</summary>
+<summary>Example</summary>
 <pre>
 <code>   
 
@@ -42,20 +45,26 @@ func BinarySearch(nums []int, target int) int {
 </details>
 
 ## DFS ##
+<details open>
+<summary>LeetCode</summary>
+
 ```
-LeetCode 
 - 200.岛屿数量
 - 1254.统计封闭岛屿的数目
 - 1020.飞地的数量
 - 1905.统计子岛屿
 - 694.不同的岛屿数量
 ```
+</details>
 
 ## BFS ##
+<details open>
+<summary>LeetCode</summary>
+
 ```
-LeetCode
 - 111.二叉树的最小深度
 - 102.二叉树的层序遍历
 - 752.打开转盘锁
 - 773.滑动谜题
 ```
+</details>
