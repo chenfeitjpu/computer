@@ -124,15 +124,15 @@ map
   }
   // 每个 bucket 可以存储 8 个键值对
   type bmap struct {
-      topbits  [8]uint8   // 存储每个 key 的哈希值的高 8 位
+      tophash  [8]uint8   // 存储每个 key 的哈希值的高 8 位
       keys     [8]keytype   // 后面是 8 个 key
       values   [8]valuetype  // 然后是 8 个 value
       overflow uintptr  // 最后是指向溢出桶的指针
   }
-- 查找
-  - 计算key的hash值，通过最后的B位来确定桶号，通过前8位快速确定是在这个桶的哪个位置
-  - 对比key是否匹配，如果都没有找到，就去连接的下一个溢出桶中找
-- 扩容
+- 查找过程
+  - 计算key的hash值，通过最后的B位来确定桶号，通过前8位快速确定是在这个桶的哪个位置，对比key是否匹配
+  - 如果都没有找到，就去连接的下一个溢出桶中找
+- 扩容过程
   - 条件
     - 等量扩容(桶中空位过多)
       - 当B<15时，overflow的bucket数量超过2^B
