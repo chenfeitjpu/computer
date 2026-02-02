@@ -13,7 +13,7 @@
 ```
 
 ## 遍历
-<details>
+<details open>
 <summary>LeetCode</summary>
 
 ```
@@ -28,7 +28,7 @@
 ## 最短路径
 ### Dijkstra(迪杰斯特拉算法)
 
-<details>
+<details open>
 <summary>LeetCode</summary>
 
 ```
@@ -40,7 +40,7 @@
 
 ## 最小生成树
 ### Kruskal(克鲁斯卡尔算法)
-<details>
+<details open>
 <summary>LeetCode</summary>
 
 ```
@@ -51,7 +51,7 @@
 </details>
 
 ### Prim(普里姆算法)
-<details>
+<details open>
 <summary>LeetCode</summary>
 
 ```
