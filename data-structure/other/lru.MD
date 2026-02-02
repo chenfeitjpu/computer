@@ -1,14 +1,15 @@
 **LRU**
-- [定义](#定义)
+- [简介](#简介)
 - [实现](#实现)
 - [使用](#使用)
 
-# 定义 #
+## 简介
 ```
+定义
 最近最少使用
 ```
 
-# 实现 #
+## 实现
 <details open>
 <summary>Struct</summary>
 
@@ -95,7 +96,7 @@ func (this *LRUCache) Put(key int, value int) {
 ```
 </details>
 
-# 使用 #
+## 使用
 <details open>
 <summary>LeetCode</summary>
 

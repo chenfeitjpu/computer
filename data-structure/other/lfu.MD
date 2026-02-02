@@ -1,15 +1,15 @@
 **LFU**
-- [定义](#定义)
+- [简介](#简介)
 - [实现](#实现)
 - [使用](#使用)
 
-# 定义 #
+## 简介
 ```
 定义
 最不经常使用
 ```
 
-# 实现 #
+## 实现
 <details open>
 <summary>Struct</summary>
 
@@ -160,7 +160,7 @@ func (l *LFUCache) DeleteLast() {
 ```
 </details>
 
-# 使用 #
+## 使用
 <details open>
 <summary>LeetCode</summary>
 

@@ -1,16 +1,16 @@
 **并查集**
-- [定义](#定义)
+- [简介](#简介)
 - [实现](#实现)
 - [使用](#使用)
 
 
-# 定义 #
+## 简介
 ```
 定义
 不相交集合的合并及查询问题  
 ```
 
-# 实现 #
+## 实现
 <details open>
 <summary>Struct</summary>
 
@@ -54,7 +54,7 @@ func (u *UF) Count() int {
 ```
 </details>
 
-# 使用 #
+## 使用
 <details open>
 <summary>LeetCode</summary>
 

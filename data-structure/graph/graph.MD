@@ -1,21 +1,18 @@
 **图**
-- [定义](#定义)
-- [使用](#使用)
-  - [基本操作](#基本操作)
-  - [最短路径](#最短路径)
-    - [Dijkstra(迪杰斯特拉算法)](#dijkstra迪杰斯特拉算法)
-  - [最小生成树](#最小生成树)
-    - [Kruskal(克鲁斯卡尔算法)](#kruskal克鲁斯卡尔算法)
-    - [Prim(普里姆算法)](#prim普里姆算法)
+- [简介](#简介)
+- [遍历](#遍历)
+- [最短路径](#最短路径)
+  - [Dijkstra(迪杰斯特拉算法)](#dijkstra迪杰斯特拉算法)
+- [最小生成树](#最小生成树)
+  - [Kruskal(克鲁斯卡尔算法)](#kruskal克鲁斯卡尔算法)
+  - [Prim(普里姆算法)](#prim普里姆算法)
 
-# 定义 #
+## 简介
 ```
 多个节点通过边连接起来，每个节点有多个前驱节点，有多个后续节点
 ```
 
-# 使用 #
-## 基本操作 ##  
-
+## 遍历
 <details>
 <summary>LeetCode</summary>
 
@@ -28,8 +25,8 @@
 ```
 </details>
 
-## 最短路径 ##
-### Dijkstra(迪杰斯特拉算法) ###
+## 最短路径
+### Dijkstra(迪杰斯特拉算法)
 
 <details>
 <summary>LeetCode</summary>
@@ -41,8 +38,8 @@
 ```
 </details>
 
-## 最小生成树 ##
-### Kruskal(克鲁斯卡尔算法) ###
+## 最小生成树
+### Kruskal(克鲁斯卡尔算法)
 <details>
 <summary>LeetCode</summary>
 
@@ -53,7 +50,7 @@
 ```
 </details>
 
-### Prim(普里姆算法) ###
+### Prim(普里姆算法)
 <details>
 <summary>LeetCode</summary>
 

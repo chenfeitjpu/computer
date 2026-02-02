@@ -1,11 +1,11 @@
 **Trie**
-- [定义](#定义)
+- [简介](#简介)
 - [实现](#实现)
 - [使用](#使用)
 
-# 定义 #
+## 简介
 
-# 实现 #
+## 实现
 <details open>
 <summary>code</summary>
 
@@ -54,7 +54,7 @@ func (this *Trie) StartsWith(prefix string) bool {
 ```
 </details>
 
-# 使用 #
+## 使用
 <details open>
 <summary>LeetCode</summary>
 
