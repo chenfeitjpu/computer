@@ -43,7 +43,7 @@
 - 右子树节点的值都比根结点的值要大  
 ```
 
-<details>
+<details open>
 <summary>LeetCode</summary>
 
 ```   
