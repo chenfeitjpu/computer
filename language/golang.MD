@@ -1,33 +1,27 @@
 **golang**
-- [定义](#定义)
-- [使用](#使用)
-  - [简介](#简介)
-  - [基础语法](#基础语法)
-  - [数据结构](#数据结构)
-  - [内存管理](#内存管理)
-  - [并发控制](#并发控制)
-  - [框架和库](#框架和库)
+- [简介](#简介)
+- [数据类型](#数据类型)
+- [数据结构](#数据结构)
+- [内存管理](#内存管理)
+- [并发控制](#并发控制)
+- [框架和库](#框架和库)
 
-# 定义 #
-静态、强类型、编译型语言
-
-# 使用 #
-## 简介 ##
+## 简介
 ```
 特点
 - 支持协程
-- 支持并行垃圾回收
-```
+- 支持并发垃圾回收
 
-## 基础语法 ##
-```
 变量 & 常量
 - 类型转换
-  变量转换必须指明类型(允许溢出)
-  有类型常量转换必须指明类型(不允许溢出)，无类型常量可直接转换为其它类型(不允许溢出)
+  - 变量转换必须指明类型(允许溢出)
+  - 有类型常量转换必须指明类型(不允许溢出)，无类型常量可直接转换为其它类型(不允许溢出)
 - 取址
-  变量允许取址，常量不能取址
+  - 变量允许取址，常量不能取址
+```
 
+## 数据类型
+```
 数据类型
 - 分类
   - uint8、uint16、uint32、uint64、uint、int8、int16、int32、int64、int
@@ -37,8 +31,8 @@
   - byte、rune
   - string
   - array、slice、map、channel 
-  - func
-  - struct、interface 
+  - func、interface 
+  - struct
   - pointer、uintptr
 - 引用类型 
   slice、map、channel、func、interface、pointer
@@ -50,7 +44,7 @@
   channel、sync.Map
 ```
 
-## 数据结构 ##
+## 数据结构
 ```
 string 
 - 结构
@@ -63,8 +57,8 @@ string
   - string对应的底层字节数组不能修改
   - 转换成[]byte会发生内存拷贝，不发生拷贝*(*[]byte)(unsafe.Pointer(&a))
   - 高效拼接
-    - strings.Builder  内部维护的是 []byte 的切片，String()时不会另外申请内存存储字节数组
-    - bytes.Buffer  内部维护一个 []byte 的切片，String()时会另外申请内存存储字节数组
+    - strings.Builder  构建字符串  String()时不会另外申请内存存储字节数组
+    - bytes.Buffer  通用字节缓冲区  String()时会另外申请内存存储字节数组
   - 获取长度
     - utf8.RuneCountInString()
 
@@ -94,7 +88,8 @@ slice
     - 如果新申请容量比两倍原有容量大，那么扩容后容量大小为新申请容量
     - 如果原有slice长度小于256，那么就扩容为原来的2倍
     - 如果原有slice长度大于等于256，那么每次扩容就扩为原来的1.25倍+3/4*256
-  - 内存对齐(size_to_class&class_to_size)  CPU以字长访问内存，如果不进行内存对齐，很可能增加CPU访问内存的次数
+  - 内存对齐(size_to_class&class_to_size) 
+    - CPU以字长访问内存，如果不进行内存对齐，很可能增加CPU访问内存的次数
 - 切片表达式  
   a[low:high:max]  0 <= low <= high <= max <= cap(a)，high默认是len(a),max默认是len(a)
   len=high-low，不包括high
