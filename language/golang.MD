@@ -537,10 +537,11 @@ GMP是Go运行时的调度器模型，把大量的goroutine分配到少量线程
 
 内存泄漏
 - 原因
-  - channel
-    - 读写nil通道
-    - 遍历未关闭通道
-  - 资源无法释放  加锁/解锁未同步、数据库读写产生死锁  
+  - goroutine泄漏
+    - channel阻塞
+    - context未取消
+  - 切片底层数组被引用，导致整个大数组无法回收
+  - time.Ticker未释放
 - 解决
   - 使用带超时的操作，比如select语句配合time.After
   - 使用context来控制生命周期
