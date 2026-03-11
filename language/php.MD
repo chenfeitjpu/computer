@@ -5,9 +5,10 @@
 - [并发控制](#并发控制)
 
 ## 简介
+```
 PHP-FPM的工作模式
-- master 进程：管理 worker
-- worker 进程：处理请求
+- master进程  管理 worker
+- worker进程  处理请求
 
 一个PHP请求的生命周期
 - Nginx接收请求
@@ -17,6 +18,11 @@ PHP-FPM的工作模式
 - 返回结果
 - 释放内存
 
+数据类型
+- int、float、bool、string
+- array、object
+- resource、null
+```
 ## 数据结构
 ```
 zval
