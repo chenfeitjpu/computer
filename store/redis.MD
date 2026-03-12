@@ -7,10 +7,10 @@
 - [集群](#集群)
   
 ## 简介
-定义
+定义  
 内存数据库，支持持久化，存储的是KV键值对数据
 
-为什么快
+为什么快  
 - 纯内存存储
   数据主要存储在内存中，读写操作直接操作内存
 - 高效的数据结构
@@ -22,7 +22,7 @@
 - 执行命令单线程模型
   避免了多线程模型的上下文切换和锁竞争开销
 
-应用场景
+应用场景  
 - 缓存
 - 分布式锁
 - 限流
@@ -125,7 +125,7 @@ lua
 ```
 - redisDb  结构体里存放了指向了dict结构的指针  
 - dict  结构体里存放了2个哈希表，正常情况下都是用「哈希表1」，「哈希表2」只有在 rehash 的时候才用  
-- ditctht  结构里存放了哈希表数组，数组中的每个元素都是指向一个哈希表节点结构（dictEntry）的指针  
+- dictht  结构里存放了哈希表数组，数组中的每个元素都是指向一个哈希表节点结构（dictEntry）的指针  
 - dictEntry  结构里存放了key和value指针，key指向的是String对象，而value则可以指向String对象，也可以指向集合类型的对象，比如List对象、Hash对象、Set对象和Zset对象  
 ```
 
@@ -143,15 +143,9 @@ lua
 ![sds](./images/redis/redis-sds-struct.webp)
 ```
 结构
-struct __attribute__ ((__packed__)) sdshdr16 {
-    uint16_t len;
-    uint16_t alloc; 
-    unsigned char flags; 
-    char buf[];
-}
 - len  记录了字符串长度    
 - alloc  分配给字符数组的空间长度  
-- flags  不同容量的sds，sdshdr5、sdshdr8、sdshdr16、sdshdr32和sdshdr64  
+- flags  不同类型的sds，sdshdr5、sdshdr8、sdshdr16、sdshdr32和sdshdr64  
 - buf[]  字节数组，用来保存实际数据  
 ```
 
@@ -170,30 +164,6 @@ struct __attribute__ ((__packed__)) sdshdr16 {
 ![quicklist](./images/redis/redis-quicklist-struct.webp)
 ```
 结构
-typedef struct quicklist {
-    //quicklist的链表头
-    quicklistNode *head;
-    //quicklist的链表尾
-    quicklistNode *tail; 
-    //所有压缩列表中的总元素个数
-    unsigned long count;
-    //quicklistNodes的个数
-    unsigned long len;       
-} 
-
-typedef struct quicklistNode {
-    //前一个quicklistNode
-    struct quicklistNode *prev; 
-    //下一个quicklistNode
-    struct quicklistNode *next;
-    //quicklistNode指向的压缩列表
-    unsigned char *zl;              
-    //压缩列表的的字节大小
-    unsigned int sz;                
-    //压缩列表的元素个数
-    unsigned int count;
-    ....
-}
 ```
 
 **intset**
@@ -220,36 +190,11 @@ typedef struct intset {
 
 ![skiplist](./images/redis/redis-skiplist-struct.webp)
 ```
-结构
-typedef struct zskiplistNode {
-    //Zset 对象的元素值
-    sds ele;
-    //元素权重值
-    double score;
-    //后向指针
-    struct zskiplistNode *backward;
-  
-    //节点的level数组，保存每层上的前向指针和跨度
-    struct zskiplistLevel {
-        struct zskiplistNode *forward;
-        unsigned long span;
-    } level[];
-}
-- span 上一个节点到当前节点之前的节点数
-
-typedef struct zskiplist {
-    struct zskiplistNode *header, *tail;
-    unsigned long length;
-    int level;
-}
-- 头尾节点  便于在O(1)时间复杂度内访问跳表的头节点和尾节点
-- 长度  便于在O(1)时间复杂度获取跳表节点的数量
-- 最大层数  便于在O(1)时间复杂度获取跳表中层高最大的那个节点的层数量
-
-查询过程
-- 如果当前节点的权重小于要查找的权重时，跳表就会访问该层上的下一个节点
-- 如果当前节点的权重等于要查找的权重时，并且当前节点的SDS类型数据小于要查找的数据时，跳表就会访问该层上的下一个节点
-- 下一个节点为空时，跳表就会使用目前遍历到的节点的level数组里的下一层指针，然后沿着下一层指针继续查找
+查找过程(先右后下)
+- 如果右边节点不存在 → 向下
+- 如果右边节点 == target -> 返回
+- 如果右边节点 < target → 向右
+- 如果右边节点 > target → 向下
 
 层数设置
 跳表在创建节点时候，会生成范围为[0-1]的一个随机数，如果这个随机数小于等于0.25（相当于概率25%），那么层数就增加1层，然后继续生成下一个随机数，直到随机数的结果大于0.25结束，最终确定该节点的层数
@@ -264,37 +209,13 @@ typedef struct zskiplist {
 ![hash](./images/redis/redis-hash-struct.webp)
 ```
 结构
-typedef struct dictht {
-    //哈希表数组
-    dictEntry **table;
-    //哈希表大小
-    unsigned long size;  
-    //哈希表大小掩码，用于计算索引值
-    unsigned long sizemask;
-    //该哈希表已有的节点数量
-    unsigned long used;
-}
-
-typedef struct dictEntry {
-    //键值对中的键
-    void *key;
-
-    //键值对中的值
-    union {
-        void *val;
-        uint64_t u64;
-        int64_t s64;
-        double d;
-    } v;
-    //指向下一个哈希表节点，形成链表
-    struct dictEntry *next;
-}
 - 缺点
   哈希冲突加剧，导致查询性能降低
 - rehash
   - 条件
     - 当负载因子大于等于1，并且Redis没有在执行bgsave命令或者bgrewiteaof命令，也就是没有执行RDB快照或没有进行AOF重写的时候，就会进行rehash操作
     - 当负载因子大于等于5，此时说明哈希冲突非常严重了，不管有没有有在执行RDB快照或AOF重写，都会强制进行rehash操作
+    - 当负载因子小于0.1，会进行缩容
   - 过程
     - 为ht[1]分配空间，大小为used * 2
     - 在字典中维持一个索引计数器变量rehashidx，并将它的值设置为0， 表示rehash工作正式开始
@@ -304,7 +225,6 @@ typedef struct dictEntry {
     - 插入  一律会被保存到ht[1]里面
     - 查询  先在ht[0]里面进行查找，如果没找到的话，就会继续到ht[1]里面进行查找
     - 遍历  新旧桶同时查询，然后合并数据进行去重
-
 ```
 
 ## 内存管理 ##
