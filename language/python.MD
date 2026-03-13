@@ -7,6 +7,9 @@
 
 ## 简介
 ```
+优势
+开发效率高+AI生态
+
 变量
 - 本质是名字(name)到对象(object)的绑定(binding)，变量不存储对象
 - is比较的是对象身份(内存地址)是否相等，==比较的是对象内容(eq)是否相等
@@ -39,11 +42,9 @@
     - 性能更高，没有__eq__函数调用
 复合数据类型
 - list
-  - 列表推导式
-    优雅、简洁的创建列表  [表达式 for 变量 in 可迭代对象]
-  - range
-    惰性生成数字序列  range(start, stop, step)
-  - 扩容  新容量1.125倍扩容
+  - 列表推导式  优雅、简洁的创建列表  [表达式 for 变量 in 可迭代对象]
+  - range  惰性生成数字序列  range(start, stop, step)
+  - 扩容  新容量(1+1/8)倍扩容
 - tuple
   - 更省内存
     - 简化结构，去掉了可变属性(当前大小，分配容量、数组指针)
@@ -80,8 +81,13 @@ dict
   - 提高cpu cache命中率
   - 更高的查找性能，负载因子2/3，保证有较多的空位，查找使用了跳跃算法
 - 如何保证插入顺序
-  - entries(条目数组)，有序
-  - indices(索引数组)，无序
+  - split dict
+    - indices(hashtable)，无序
+    - entries(keys数组, key+hash)，有序
+    - values(values数组, value)，有序
+  - combined dict
+    - indices(hashtable)，无序
+    - entries(key+hash+value)，有序
 - 元素删除
   为了保证有序性，标记删除，当被删除元素过多时，dict会重建哈希表
 

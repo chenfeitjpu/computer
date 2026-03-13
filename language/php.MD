@@ -6,6 +6,9 @@
 
 ## 简介
 ```
+优势
+web开发效率+网站生态
+
 PHP-FPM的工作模式
 - master进程  管理 worker
 - worker进程  处理请求
