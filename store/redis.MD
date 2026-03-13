@@ -382,15 +382,10 @@ rdb
 ```
 主从复制
 - 实现
-  - 设置  
-    replicaof <服务器的IP地址> <服务器的Redis端口号>
   - 缓冲区的生成时机
-    - 主服务器启动
-      - 设置master_repl_offset为0
-    - 第一个从服务器连接主服务器
-      - 主服务生成repl_backlog_buffer
-    - 从服务器连接主服务器
-      - 主服务器为每个从服务器生成replication buffer
+    - 主服务器启动  设置master_repl_offset为0
+    - 第一个从服务器连接主服务器  主服务生成repl_backlog_buffer
+    - 从服务器连接主服务器  主服务器为每个从服务器生成replication buffer
   - 同步
     - 全量同步
       - 第一次同步，建立链接、协商同步
@@ -402,8 +397,8 @@ rdb
       - 然后主服务将主从服务器断线期间，所执行的写命令发送给从服务器，然后从服务器执行这些命令
   - repl backlog buffer&replication buffer区别
     - 分配
-      - repl backlog buffer  一个主节点只分配一个repl backlog buffer
-      - replication buffer  主节点会给每个新连接的从节点分配一个replication buffer
+      - repl backlog buffer  一个主节点只分配一个
+      - replication buffer  主节点会给每个新连接的从节点分配一个
     - 大小限制
       - 当repl backlog buffer满了，因为是环形结构，会直接覆盖起始位置数据
       - 当replication buffer满了，会导致连接断开，删除缓存，从节点重新连接，重新开始全量复制       
@@ -419,7 +414,7 @@ rdb
       - 异步复制同步丢失
       - 集群产生脑裂数据丢失
     - 方案
-      - min-slaves-max-lag x，主从库间进行数据复制时，从库给主库发送ACK消息的最大延迟，主从数据复制和同步的延迟不能超过x秒，如果主从同步的延迟超过x秒，主节点会禁止写数据
+      - min-slaves-max-lag x，主从库间进行数据复制时，从库给主库发送ACK消息的最大延迟，如果主从同步的延迟超过x秒，主节点会禁止写数据
       - min-slaves-to-write x，主节点必须要有至少x个从节点连接，如果小于这个数，主节点会禁止写数据
 
 哨兵
