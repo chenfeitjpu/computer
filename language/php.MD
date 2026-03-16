@@ -7,10 +7,10 @@
 ## 简介
 ```
 优势
-web开发效率+网站生态
+web开发效率高+网站生态
 
 PHP-FPM的工作模式
-- master进程  管理 worker
+- master进程  管理worker
 - worker进程  处理请求
 
 一个PHP请求的生命周期
@@ -41,15 +41,15 @@ array
 PHP数组底层是一个HashTable（哈希表）
 - 哈希索引
 - bucket数据
-  - value
-  - hash
   - key
+  - hash
+  - value
 ```
 
 ## 内存管理
 ```
 Copy On Write（写时拷贝）
-- 多个变量指向同一个 zval
+- 多个变量指向同一个zval
 - 只有当某个变量被修改时才会复制
 - 避免无意义内存拷贝，提高性能
 
@@ -65,8 +65,8 @@ Copy On Write（写时拷贝）
 - 循环垃圾回收(辅助机制)
   - root buffer(可能参与循环引用的对象)达到阀值(10000)，会触发垃圾回收，加入后会标为紫色
   - 遍历root buffer，减少引用，把对象置灰
-  - 遍历root buffer, 引用数为0的对象置白，引用数大于0的置黑
-  - 遍历rootr buffer,删除白色垃圾对象
+  - 遍历root buffer，引用数为0的对象置白，引用数大于0的置黑
+  - 遍历root buffer，删除白色垃圾对象
 ```
 
 ## 并发控制
