@@ -64,11 +64,11 @@
 ```
 dict
 - 结构
-  - split dict(类实例)
+  - split dict(分离字典，只有类实例在用)
     - indices(hashtable)，无序
     - entries(keys数组, key+hash)，有序
     - values(values数组, value)，有序
-  - combined dict(紧凑)
+  - combined dict(合并字典)
     - indices(hashtable)，无序
     - entries(key+hash+value)，有序
 - 哈希冲突解决
