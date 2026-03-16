@@ -62,34 +62,25 @@
 
 ## 数据结构
 ```
-PyObject
-- 结构
-  typedef struct {
-    Py_ssize_t ob_refcnt;
-    PyTypeObject *ob_type;
-  } PyObject;
-- 引用计数
-  - 赋值只是增加引用
-  - del只是减少引用
-- 对象共享导致数据污染
-- 减少对象创建减低GC压力
-
 dict
+- 结构
+  - split dict(类实例)
+    - indices(hashtable)，无序
+    - entries(keys数组, key+hash)，有序
+    - values(values数组, value)，有序
+  - combined dict(紧凑)
+    - indices(hashtable)，无序
+    - entries(key+hash+value)，有序
 - 哈希冲突解决
   开放寻址法
   - 减少对象指针，降低内存占用
   - 提高cpu cache命中率
-  - 更高的查找性能，负载因子2/3，保证有较多的空位，查找使用了跳跃算法
-- 如何保证插入顺序
-  - split dict
-    - indices(hashtable)，无序
-    - entries(keys数组, key+hash)，有序
-    - values(values数组, value)，有序
-  - combined dict
-    - indices(hashtable)，无序
-    - entries(key+hash+value)，有序
-- 元素删除
-  为了保证有序性，标记删除，当被删除元素过多时，dict会重建哈希表
+  - 更高的查找性能，负载因子2/3，保证有较多的空位，查找使用了跳跃算法 
+- 元素操作
+  - 删除  为了保证有序性，标记删除，当被删除元素过多时，dict会重建哈希表
+- 扩容(一次性)
+  - 装载因子，元素数量(有效+删除)/哈希表大小 > 2/3，触发扩容
+  - 大小为大于当前有效元素数量最小的2的幂容量
 
 迭代器
 迭代器是一个可以记住遍历状态的对象
@@ -115,6 +106,18 @@ dict
   - functools.wraps(func)  保证被装饰的函数元信息(__name__等)不丢失
   - functools.lru_cache  对相同参数的调用直接返回缓存结果，避免重复计算
 
+PyObject
+- 结构
+  typedef struct {
+    Py_ssize_t ob_refcnt;
+    PyTypeObject *ob_type;
+  } PyObject;
+- 引用计数
+  - 赋值只是增加引用
+  - del只是减少引用
+- 对象共享导致数据污染
+- 减少对象创建减低GC压力
+
 函数
 - PyFrameObject(栈帧)
   - 一次Python函数调用的执行环境
@@ -132,11 +135,11 @@ dict
 类
 - 类创建过程
   - metaclass(类名，基类元组，命名空间)
+- 元类(metaclass)
+  用来创建类的类，元类可以控制类的创建过程
 - 实例创建过程
   - 调用__new__()，创建实例
   - 调用__init__()，初始化实例
-- 元类(metaclass)
-  用来创建类的类，元类可以控制类的创建过程
 - 常见属性&方法
   - __slots__  用于限制实例属性并避免创建实例__dict__，降低内存占用
   - getattribute  所有属性访问都会触发
@@ -169,7 +172,7 @@ dict
 
 内存分配
 - 大对象(>512bytes)  直接调用操作系统malloc()
-- 小对象(≤512 bytes)  由Python自己管理pymalloc()
+- 小对象(≤512bytes)  由Python自己管理pymalloc()
   - Arena(256K) 内存区
   - Pool(4K)  内存池
   - Block(size class)  内存块
@@ -187,7 +190,7 @@ dict
       - 1代(0代回收次数超过阀值)，高版本已去掉
       - 2代(1代回收次数超过阀值)
     - 扫描该代及更年轻代的tracked对象，复制refcount到gc_refs，扣除内部引用，找出gc_refs == 0的不可达候选对象，进行可达性传播修正(从gc_refs > 0的对象出发，把它们能到达的对象从不可达候选集里挪出去)
-    - 统一调用finalizer，断开引用，通过引用计数释放对象
+    - 统一调用finalizer，断开引用，通过引用计数释放内存
 ```
 
 ## 并发控制
