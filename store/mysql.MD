@@ -224,82 +224,73 @@ SQL优化
 
 ## 事务
 ```
-- 特性  
-  - 原子性(Atomicity)  一个事务中的所有操作，要么全部完成，要么全部不完成
-  - 一致性(Consistency)  事务操作前和操作后，数据满足完整性约束，数据库保持一致性状态
-  - 隔离性(Isolation)  数据库允许多个并发事务同时对其数据进行读写
-  - 持久性(Durability)  事务处理结束后，对数据的修改就是永久的
-  InnoDB使用undo log(回滚日志)保证原子性，使用redo log(重做日志)保证持久性，使用MVCC和锁来保证隔离性，，通过原子性、持久性、隔离性来保证一致性
-- 使用
-  - `BEGIN`  开启事务   
-  - `COMMIT`  提交事务
-  - `ROLLBACK`  手动中止事务 
-  - `START TRANSACTION [READ ONLY|READ WRITE] [WITH CONSISTENT SNAPSHOT]`  开启事务  
-- 并发问题  
-  - 脏写  A事务修改了未提交B事务修改过的数据，A事务提交后，B事务发生回滚，A事务的修改会丢失  
-  - 脏读  A事务读到了未提交B事务修改过的数据，A事务提交后，B事务发生回滚，A事务读到了不存在的数据   
-  - 不可重复读  一个事务读到另一个已经提交的事务修改过的数据，并且其他事务每对该数据进行一次修改并提交后，该事务都能查询得到最新值  
-  - 幻读  一个事务先根据某些条件查询出一些记录，之后另一个事务又向表中插入了符合这些条件的记录，原先的事务再次按照该条件查询时，能把另一个事务插入的记录也读出来
-- 隔离级别  
-  - read uncommitted  未提交读
-  - read committed  已提交读   
-  - repeatable read  可重复读
-  - serializable  可串行化
-  | 隔离级别 | 脏读 | 不可重复读 | 幻读 |  
-  | :---: | :---: | :---: | :---: |
-  | read uncommitted | Possible | Possible | Possible |
-  | read committed | Not Possible | Possible | Possible |
-  | repeatable read | Not Possible | Not Possible | Possible |
-  | serializable | Not Possible | Not Possible | Not Possible |
-  - 设置隔离级别  
-    `show variables like 'transaction_isolation`  
-    `SET [GLOBAL|SESSION] TRANSACTION ISOLATION LEVEL level`  [read uncommitted|read committed|repeatable read|serializable]
-- MVCC
-  - 基础
-    - trx_id 
-      每次一个事务对某条聚簇索引记录进行改动时，都会把该事务的事务id赋值给trx_id隐藏列
-    - roll_pointer 
-      每次对某条聚簇索引记录进行改动时，都会把旧的版本写入到undo日志中，然后这个隐藏列就相当于一个指针，可以通过它来找到该记录修改前的信息  
-      记录每次更新后，都会将旧值放到一条undo日志中，就算是该记录的一个旧版本，随着更新次数的增多，所有的版本都会被roll_pointer属性连接成一个链表，我们把这个链表称之为版本链
-  - ReadView    
-    - m_ids  表示在生成ReadView时当前系统中活跃的读写事务的事务id列表  
-    - min_trx_id  表示在生成ReadView时当前系统中活跃的读写事务中最小的事务id，也就是m_ids中的最小值
-    - max_trx_id  表示生成ReadView时系统中应该分配给下一个事务的id值
-    - creator_trx_id  表示生成该ReadView的事务的事务id  
-  - 访问过程
-    - 如果被访问版本的trx_id属性值与ReadView中的creator_trx_id值相同，意味着当前事务在访问它自己修改过的记录，所以该版本可以被当前事务访问  
-    - 如果被访问版本的trx_id属性值小于ReadView中的min_trx_id值，表明生成该版本的事务在当前事务生成ReadView前已经提交，所以该版本可以被当前事务访问  
-    - 如果被访问版本的trx_id属性值大于或等于ReadView中的max_trx_id值，表明生成该版本的事务在当前事务生成ReadView后才开启，所以该版本不可以被当前事务访问
-    - 如果被访问版本的trx_id属性值在ReadView的min_trx_id和max_trx_id之间，那就需要判断一下trx_id属性值是不是在m_ids列表中，如果在，说明创建ReadView时生成该版本的事务还是活跃的，该版本不可以被访问；如果不在，说明创建ReadView时生成该版本的事务已经被提交，该版本可以被访问  
-  - 生成时机  
-    - READ COMMITTED  每次读取数据前都生成一个ReadView  
-    - REPEATABLE READ  第一次读取数据时生成一个ReadView  
-- 常见问题
-  - 可重复读隔离级别，出现幻读的情况
-    - 快照读  
-      - 事务B插入记录，事务A更新了事务B插入的记录，事务A就能看到事务B插入的记录，仍然会出现幻读
-    - 当前读
-      - 事务A先执行快照读，事务B插入一条记录，事务A再执行当前读，仍然会出现幻读  
+特性  
+- 原子性(Atomicity)  一个事务中的所有操作，要么全部完成，要么全部不完成
+- 一致性(Consistency)  事务操作前和操作后，数据满足完整性约束，数据库保持一致性状态
+- 隔离性(Isolation)  数据库允许多个并发事务同时对其数据进行读写
+- 持久性(Durability)  事务处理结束后，对数据的修改是永久的
+InnoDB使用undo log(回滚日志)保证原子性，使用redo log(重做日志)保证持久性，使用MVCC和锁来保证隔离性，通过原子性、隔离性、持久性来保证一致性 
+
+并发问题  
+- 脏写  A事务修改了未提交B事务修改过的数据，A事务提交后，B事务发生回滚，A事务的修改会丢失  
+- 脏读  A事务读到了未提交B事务修改过的数据，A事务提交后，B事务发生回滚，A事务读到了不存在的数据   
+- 不可重复读  一个事务读到另一个已经提交的事务修改过的数据，并且其他事务每次对该数据进行修改并提交后，该事务都能查询到最新值  
+- 幻读  一个事务先根据某些条件查询出一些记录，之后另一个事务又向表中插入了符合这些条件的记录，原先的事务再次按照该条件查询时，能把另一个事务插入的记录也读出来
+
+隔离级别  
+- read uncommitted  读未提交
+- read committed  读已提交   
+- repeatable read  可重复读
+- serializable  可串行化
+| 隔离级别 | 脏读 | 不可重复读 | 幻读 |  
+| :---: | :---: | :---: | :---: |
+| read uncommitted | Possible | Possible | Possible |
+| read committed | Not Possible | Possible | Possible |
+| repeatable read | Not Possible | Not Possible | Possible |
+| serializable | Not Possible | Not Possible | Not Possible |
+
+MVCC
+- 基础
+  - trx_id 
+    每次一个事务对某条聚簇索引记录进行改动时，都会把该事务的事务id赋值给trx_id隐藏列
+  - roll_pointer 
+    每次对某条聚簇索引记录进行改动时，都会把旧的版本写入到undo日志中，然后这个隐藏列就相当于一个指针，可以通过它来找到该记录修改前的信息  
+- ReadView    
+  - m_ids  表示在生成ReadView时当前系统中活跃的读写事务的事务id列表  
+  - min_trx_id  表示在生成ReadView时当前系统中活跃的读写事务中最小的事务id，也就是m_ids中的最小值
+  - max_trx_id  表示生成ReadView时系统中应该分配给下一个事务的id值
+  - creator_trx_id  表示生成该ReadView的事务的事务id  
+- 访问过程
+  - 如果被访问版本的trx_id属性值与ReadView中的creator_trx_id值相同，意味着当前事务在访问它自己修改过的记录，所以该版本可以被当前事务访问  
+  - 如果被访问版本的trx_id属性值小于ReadView中的min_trx_id值，表明生成该版本的事务在当前事务生成ReadView前已经提交，所以该版本可以被当前事务访问  
+  - 如果被访问版本的trx_id属性值大于或等于ReadView中的max_trx_id值，表明生成该版本的事务在当前事务生成ReadView后才开启，所以该版本不可以被当前事务访问
+  - 如果被访问版本的trx_id属性值在ReadView的min_trx_id和max_trx_id之间，那就需要判断一下trx_id属性值是不是在m_ids列表中，如果在，说明创建ReadView时生成该版本的事务还是活跃的，该版本不可以被访问；如果不在，说明创建ReadView时生成该版本的事务已经被提交，该版本可以被访问  
+- 生成时机  
+  - READ COMMITTED  每次读取数据前都生成一个ReadView  
+  - REPEATABLE READ  第一次读取数据时生成一个ReadView  
+
+常见问题
+- 可重复读隔离级别，出现幻读的情况
+  - 快照读  
+    - 事务B插入记录，事务A更新了事务B插入的记录，事务A就能看到事务B插入的记录，仍然会出现幻读
+  - 当前读
+    - 事务A先执行快照读，事务B插入一条记录，事务A再执行当前读，仍然会出现幻读  
 ```
 
 ## 日志
 ```
-undo日志
+undo log(回滚日志)
 - 作用
   - 保障事务的原子性
   - 实现MVCC(多版本并发控制)
 
-redo日志
+redo log(重做日志)
 - 作用
   - 实现事务的持久性
   - 将写操作从随机写变成了顺序写
 
 bin日志
 server层生成的日志，主要用于数据备份和主从复制
-- 格式
-  - STATEMENT
-  - ROW
-  - MIXED
 
 relay log
 主从复制场景下，slave通过io线程拷贝master的bin log后本地生成的日志
