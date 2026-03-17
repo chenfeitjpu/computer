@@ -1,6 +1,6 @@
 **MySQL**
 - [简介](#简介)
-- [数据操作](#数据操作)
+- [查询](#查询)
 - [事务](#事务)
 - [日志](#日志)
 - [锁](#锁)
@@ -10,81 +10,68 @@
 ## 简介
 ```
 三范式
-- 1NF 每一列都是不可再分的原子值
-- 2NF 所有非主键字段必须完全依赖主键
-- 3NF 非主键字段不能依赖其他非主键字段
+- 1NF  字段必须原子化，每一列都是不可再分的单一值
+- 2NF  消除对主键的部分依赖，非主键字段必须完全依赖主键
+- 3NF  消除非主键之间的传递依赖，非主键字段不能依赖其他非主键字段
 
-字符集转换过程   
-- 客户端对请求字符串进行编码，发送给服务端  
-- 服务端采用character_set_client代表的字符集进行解码
-- 将解码后的字符串再按照character_set_connection代表的字符集进行编码  
-- 将请求值从character_set_connection代表的字符集转换为具体操作的列使用的字符集
-- 将查询结果从列使用的字符集转换为character_set_results代表的字符集后发送到客户端  
-- 客户端对字符串进行解码
+字符集转换过程
+多次字符集转换，确保解析一致，比较一致，返回一致
+- 客户端编码
+- 服务端按`character_set_client`解码
+- 转`character_set_connection`，统一内部处理
+  - 灵活性，不同连接可以使用不同的SQL语义
+  - 稳定性，同一连接内SQL语义不变
+- 转列字符集，保证比较一致性
+- 转`character_set_results`返回
 
 查询顺序
 from -> on -> join -> where -> group -> having -> select -> order -> limit
 
 请求过程
-- 连接管理  连接器
-- 解析与优化  解析器、优化器、执行器
-- 存储引擎
+连接器 -> 解析器 -> 优化器 -> 执行器 -> 存储引擎
 
 数据类型
-- 整型  
-  tinyint、smallint、mediumint、int、bigint
-  - int(M)
-    M是显示宽度，只在设置zerofill且数字宽度不足M的时候，会显示00XXX
-- 浮点数
-  float(M,D)、double(M,D)  
-- 定点数  
-  decimal(M,D) 
-- 时间和日期  
-  year、date、time、datetime、timestamp
+- 整型  tinyint、smallint、mediumint、int、bigint
+  - int(M)  M是显示宽度，只在设置zerofill且数字宽度不足M的时候，会显示00XXX
+- 浮点数  float(M,D)、double(M,D)  
+- 定点数  decimal(M,D) 
+- 时间和日期  year、date、time、datetime、timestamp
   - timestamp(受时区影响)
     - 默认值
       - default current_timestmap  插入当前时间
       - on update current_timestamp  更新当前时间
     - timestamp只能表示1970-2038年
     - timestmp必须显式地设置时区，不要使用默认系统时区，否则存在性能问题
-- 字符串  
-  char(M)、varchar(M)、tinytext、text、mediumtext、longtext、enum、set
-  - char(M)
-    M是字符数，占用M*W(某个字符集编码一个字符最多需要的字节)个字节，剩余空间会用空格字符填充
-  - varchar(M)
-    M是字符数，占用空间字符串长度(1或者2个字节)+字符串个字节
+- 字符串  char(M)、varchar(M)、tinytext、text、mediumtext、longtext、enum、set
+  - char(M)  M是字符数，占用M*W(某个字符集编码一个字符最多需要的字节)个字节，剩余空间会用空格字符填充
+  - varchar(M)  M是字符数，占用空间字符串长度(1或者2个字节)+字符串个字节
     - varchar(50) vs varchar(100)
       - 磁盘占用  磁盘占用空间大小是一样的
       - 索引占用  索引大小会使用定义长度  
-      - 内存占用  部分操作(排序、临时表)会使用定义长度
-- 二进制字符串
-  bit(M)、binary(M)、varbinary(M)、tinyblob、blob、mediumblob、longblob
-```
+      - 内存占用  排序、临时表会使用定义长度
+- 二进制字符串  bit(M)、binary(M)、varbinary(M)、tinyblob、blob、mediumblob、longblob
 
-## 数据操作
-```
+engine  
+- InnoDB  支持事务、行级锁、外键，适用于高并发的读写操作
+- MyISAM  存储空间小、读取性能好，适用于大量读操作的场景
+- MEMORY  基于哈希表，存储在内存，用于临时表 
+
+column
+- `auto_increament` 自增
+  - 一个表中最多有一个具有AUTO_INCREMENT属性的列
+  - 具有AUTO_INCREMENT属性的列必须建立索引  
+  - 拥有AUTO_INCREMENT属性的列就不能再通过DEFAULT来指定默认值
+- `zerofill` 零填充
+  - 该列必须是整数类型的
+  - 该列必须有zerofill(会自动添加unsigned)的属性
+  - 该列的实际值的位数必须小于显示宽度  
+
 SQL
-- DDL
-  - engine
-    - InnoDB  支持事务、行级锁、外键，适用于高并发的读写操作
-    - MyISAM  存储空间小、读取性能好，适用于大量读操作的场景
-    - MEMORY  基于哈希表，存储在内存，用于临时表
-  - database      
-  - table  
-  - column  
-    - `auto_increament` 自增
-      - 一个表中最多有一个具有AUTO_INCREMENT属性的列
-      - 具有AUTO_INCREMENT属性的列必须建立索引  
-      - 拥有AUTO_INCREMENT属性的列就不能再通过指定DEFAULT属性来指定默认值
-    - `zerofill` 零填充
-      - 该列必须是整数类型的
-      - 该列必须有zerofill(会自动添加unsigned)的属性
-      - 该列的实际值的位数必须小于显示宽度  
-- DML
-- DQL
-- DCL
-- TCL
+DDL、DML、DQL、DCL、TCL   
+```
 
+## 查询
+```
 查询
 - 单表  `select * from table [where] [group by column having] [order by column] [limit]`
 - 连接查询
