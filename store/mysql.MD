@@ -55,8 +55,8 @@ from -> on -> join -> where -> group -> having -> select -> order -> limit
     M是字符数，占用空间字符串长度(1或者2个字节)+字符串个字节
     - varchar(50) vs varchar(100)
       - 磁盘占用  磁盘占用空间大小是一样的
-      - 内存占用  部分操作(排序、临时表)会使用定义长度
       - 索引占用  索引大小会使用定义长度  
+      - 内存占用  部分操作(排序、临时表)会使用定义长度
 - 二进制字符串
   bit(M)、binary(M)、varbinary(M)、tinyblob、blob、mediumblob、longblob
 ```
@@ -66,64 +66,31 @@ from -> on -> join -> where -> group -> having -> select -> order -> limit
 SQL
 - DDL
   - engine
-    - `show engines` 查看存储引擎
-      - InnoDB  支持事务、行级锁、外键，适用于高并发的读写操作
-      - MyISAM  具有较低的存储空间和内存消耗，适用于大量读操作的场景
-      - MEMORY  存储在内存，用于临时表
-  - database    
-    - `show databases` 查看所有库
-    - `show create database 库名`  查看库定义
-    - `create database [if not exists] 库名` 创建库
-    - `drop database [if exists] 库名` 删除库
-    - `use 库名` 选择库
-  - table    
-    - `show tables [from 库名]` 查看所有表
-    - `show create table [库名.]表名` 查看表定义
-    - `[describe|desc|explain|show columns from|show fields form] 表名` 查看表描述
-    - `create table [if not exists] 表名` 创建表
-    - `drop table [if exists ]表名` 删除表
-    - `rename table 旧表名 to 新表名` 修改表名
-    - `alter table 旧表名 rename to 新表名` 修改表名
-    - `alter table 表名 add [column] 列名 数据类型 [列的属性] [first|after 列名]` 增加列
-    - `alter table 表名 drop [column] 列名` 删除列
-    - `alter table 表名 change [column] 列名 新列名 新数据类型 [新属性]` 修改列
-    - `alter table 表名 modify [column] 列名 新数据类型 [新属性] [first|after 列名]` 修改列
-  - column    
-    - `default` 默认值
-    - `not null` 非空
-    - `comment` 注释
+    - InnoDB  支持事务、行级锁、外键，适用于高并发的读写操作
+    - MyISAM  存储空间小、读取性能好，适用于大量读操作的场景
+    - MEMORY  基于哈希表，存储在内存，用于临时表
+  - database      
+  - table  
+  - column  
     - `auto_increament` 自增
       - 一个表中最多有一个具有AUTO_INCREMENT属性的列
       - 具有AUTO_INCREMENT属性的列必须建立索引  
       - 拥有AUTO_INCREMENT属性的列就不能再通过指定DEFAULT属性来指定默认值
     - `zerofill` 零填充
       - 该列必须是整数类型的
-      - 该列必须有unsigned zerofill的属性
+      - 该列必须有zerofill(会自动添加unsigned)的属性
       - 该列的实际值的位数必须小于显示宽度  
-    - `primary key`  主键
-    - `unique key [索引名](列名)`  唯一键
-    - `key [索引名](列名)`  普通索引
-    - `foreign key [索引名](列1, 列2, ...) references 父表名 (父列1, 父列2, ...)`  外键
 - DML
-  - `insert [ignore] into 表名 (列名, 列名) values (值, 值) [on duplicate key update 列名 = 值|values(列名)]` 插入数据
-  - `delete from 表名 [where 表达式]` 删除数据
-  - `update 表名 set 列名=值 [where 表达式]` 更新数据 
 - DQL
-  - `select [distinct] 列名 [as] [别名] from 表名` 查询
-  - `limit [开始行,] 限制条数` 限制查询结果条数
-  - `order by 列名 asc|desc[, 列名 asc|desc]` 按照单列|多列的值进行排序，默认升序
 - DCL
-  - `grant 权限 on 库名.表名 to 用户@主机` 授权
-  - `revoke 权限 on 库名.表名 to 用户@主机` 回收权限  
+- TCL
 
 查询
-- 分类
-  - 单表
-    `select * from table [where] [group by column having] [order by column] [limit]`
-  - 连接查询
-    - `inner join`  内连接
-    - `left join`  左外连接
-    - `right join`  右外连接
+- 单表  `select * from table [where] [group by column having] [order by column] [limit]`
+- 连接查询
+  - `inner join`  内连接
+  - `left join`  左外连接
+  - `right join`  右外连接
   - 子查询   
     - 分类
       - 标量子查询
