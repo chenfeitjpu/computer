@@ -18,14 +18,14 @@
 多次字符集转换，确保解析一致，比较一致，返回一致
 - 客户端编码
 - 服务端按`character_set_client`解码
-- 转`character_set_connection`，统一内部处理
+- 转`character_set_connection`
   - 灵活性，不同连接可以使用不同的SQL语义
   - 稳定性，同一连接内SQL语义不变
 - 转列字符集，保证比较一致性
 - 转`character_set_results`返回
 
 查询顺序
-from -> on -> join -> where -> group -> having -> select -> order -> limit
+from -> join -> on-> where -> group by -> having -> select -> order by -> limit
 
 请求过程
 连接器 -> 解析器 -> 优化器 -> 执行器 -> 存储引擎
@@ -41,20 +41,20 @@ from -> on -> join -> where -> group -> having -> select -> order -> limit
       - default current_timestmap  插入当前时间
       - on update current_timestamp  更新当前时间
     - timestamp只能表示1970-2038年
-    - timestmp必须显式地设置时区，不要使用默认系统时区，否则存在性能问题
+    - timestmp必须显式地设置时区，不要使用默认(系统时区)，否则存在性能问题
 - 字符串  char(M)、varchar(M)、tinytext、text、mediumtext、longtext、enum、set
   - char(M)  M是字符数，占用M*W(某个字符集编码一个字符最多需要的字节)个字节，剩余空间会用空格字符填充
   - varchar(M)  M是字符数，占用空间字符串长度(1或者2个字节)+字符串个字节
     - varchar(50) vs varchar(100)
       - 磁盘占用  磁盘占用空间大小是一样的
       - 索引占用  索引大小会使用定义长度  
-      - 内存占用  排序、临时表会使用定义长度
+      - 内存占用  排序、临时表(memory引擎是定长行结构)会使用定义长度
 - 二进制字符串  bit(M)、binary(M)、varbinary(M)、tinyblob、blob、mediumblob、longblob
 
 engine  
-- InnoDB  支持事务、行级锁、外键，适用于高并发的读写操作
-- MyISAM  存储空间小、读取性能好，适用于大量读操作的场景
-- MEMORY  基于哈希表，存储在内存，用于临时表 
+- InnoDB  支持事务、行级锁、外键，适用于高并发读写的场景
+- MyISAM  存储空间小、读取性能好，适用于大量读的场景
+- MEMORY  基于哈希索引，存储在内存，用于临时表 
 
 column
 - `auto_increament` 自增
@@ -108,7 +108,7 @@ DDL、DML、DQL、DCL、TCL
 索引
 - 作用  减少扫描的数据量，提高查询效率
 - 分类
-  - 按数据结构  B+tree索引、Hash索引、Full text索引
+  - 按数据结构  B+tree索引、Hash索引、倒排索引
   - 按物理存储  聚簇索引、非聚簇索引
   - 按字段特性  主键索引、唯一索引、普通索引、前缀索引
     - 主键索引的适用条件
@@ -133,7 +133,7 @@ DDL、DML、DQL、DCL、TCL
     相同的数据量，跳表层数过高导致的磁盘io次数增多
 - 失效
   - 对索引列使用模糊匹配
-  - 对索引列进行表达式计算、对索引使用函数
+  - 对索引列进行表达式计算、对索引列使用函数
   - 对索引列隐式类型转换  MySQL遇到字符串和数字比较的时候，会自动把字符串转为数字，然后再进行比较
   - 联合索引非最左匹配
   - WHERE子句中的OR 只要有条件列不是索引列，就会进行全表扫描
@@ -143,9 +143,7 @@ DDL、DML、DQL、DCL、TCL
     - 访问二级索引使用顺序I/O，访问聚簇索引使用随机I/O  
   - 减少回表
     - 索引覆盖  一个索引包含了查询所需的所有列
-    - 索引下推  
-      在存储引擎层之上(Server层)执行的过滤操作，下推到更底层的存储引擎层去执行。
-      查询条件需要包含联合索引的最左列，并且还有其他索引列的条件
+    - 索引下推  将原本需要在回表之后在Server过滤的条件，下推到存储引擎层，在二级索引扫描阶段提前过滤，从而减少回表次数
 - 注意事项
   - 只为用于搜索、排序或分组的列创建索引
   - 为列的基数大的列创建索引
@@ -173,8 +171,8 @@ DDL、DML、DQL、DCL、TCL
 
 查询成本
 - 成本计算
-  - IO成本  从磁盘到内存这个加载的过程损耗的时间
-  - CPU成本  检测记录，对结果集进行排序等这些操作损耗的时间
+  - IO成本  从磁盘到内存损耗的时间
+  - CPU成本  检测记录，对结果集进行排序等损耗的时间
 - 单表查询成本
   - 根据搜索条件，找出所有可能使用的索引  
   - 计算全表扫描的代价  
@@ -186,10 +184,12 @@ DDL、DML、DQL、DCL、TCL
 执行计划(explain)
 - id  查询语句中每出现一个SELECT关键字，就会为它分配一个唯一的id值
 - select_type  查询方式 
+- table  查询表名
+- partitions
 - type  表的访问方式
 - possible_keys  可能用到的索引
 - key  实际用到的索引  
-- key_len  索引记录的最大长度，由三个部分构成，主要用来区分某个使用联合索引的查询具体用了几个索引列  
+- key_len  索引记录的最大长度  
 - ref  与索引列作等值匹配的内容  
 - rows  预计需要扫描的行数  
 - filtered  驱动表扇出值  
@@ -213,55 +213,51 @@ SQL优化
 ```
 特性  
 - 原子性(Atomicity)  一个事务中的所有操作，要么全部完成，要么全部不完成
-- 一致性(Consistency)  事务操作前和操作后，数据满足完整性约束，数据库保持一致性状态
-- 隔离性(Isolation)  数据库允许多个并发事务同时对其数据进行读写
-- 持久性(Durability)  事务处理结束后，对数据的修改是永久的
+- 一致性(Consistency)  事务执行前后，数据库从一个一致状态转变为另一个一致状态，满足约束和业务规则
+- 隔离性(Isolation)  多个事务并发执行时，彼此之间互不干扰，一个事务的中间状态对其他事务不可见
+- 持久性(Durability)  事务提交后，对数据的修改是永久的，即使系统崩溃也不会丢失
 InnoDB使用undo log(回滚日志)保证原子性，使用redo log(重做日志)保证持久性，使用MVCC和锁来保证隔离性，通过原子性、隔离性、持久性来保证一致性 
 
 并发问题  
-- 脏写  A事务修改了未提交B事务修改过的数据，A事务提交后，B事务发生回滚，A事务的修改会丢失  
-- 脏读  A事务读到了未提交B事务修改过的数据，A事务提交后，B事务发生回滚，A事务读到了不存在的数据   
-- 不可重复读  一个事务读到另一个已经提交的事务修改过的数据，并且其他事务每次对该数据进行修改并提交后，该事务都能查询到最新值  
-- 幻读  一个事务先根据某些条件查询出一些记录，之后另一个事务又向表中插入了符合这些条件的记录，原先的事务再次按照该条件查询时，能把另一个事务插入的记录也读出来
+- 脏写  一个事务修改了另一个未提交事务修改的数据 
+- 脏读  一个事务读取到了另一个未提交事务修改的数据  
+- 不可重复读  在同一个事务中，多次读取同一行数据，结果不一致
+- 幻读  同一事务中，两次按照相同条件的查询，返回的记录数不同
 
 隔离级别  
 - read uncommitted  读未提交
 - read committed  读已提交   
 - repeatable read  可重复读
 - serializable  可串行化
-| 隔离级别 | 脏读 | 不可重复读 | 幻读 |  
-| :---: | :---: | :---: | :---: |
-| read uncommitted | Possible | Possible | Possible |
-| read committed | Not Possible | Possible | Possible |
-| repeatable read | Not Possible | Not Possible | Possible |
-| serializable | Not Possible | Not Possible | Not Possible |
+| 隔离级别          | 脏读          | 不可重复读     | 幻读 |  
+| :---:            | :---:        | :---:        | :---: |
+| read uncommitted | Possible     | Possible     | Possible |
+| read committed   | Not Possible | Possible     | Possible |
+| repeatable read  | Not Possible | Not Possible | Possible |
+| serializable     | Not Possible | Not Possible | Not Possible |
 
 MVCC
-- 基础
-  - trx_id 
-    每次一个事务对某条聚簇索引记录进行改动时，都会把该事务的事务id赋值给trx_id隐藏列
-  - roll_pointer 
-    每次对某条聚簇索引记录进行改动时，都会把旧的版本写入到undo日志中，然后这个隐藏列就相当于一个指针，可以通过它来找到该记录修改前的信息  
+- 隐藏列
+  - trx_id  最后一次修改该记录的事务ID
+  - roll_pointer  指向该记录的undo log，undo log通过指针形成版本链，可以回溯到历史版本
 - ReadView    
-  - m_ids  表示在生成ReadView时当前系统中活跃的读写事务的事务id列表  
-  - min_trx_id  表示在生成ReadView时当前系统中活跃的读写事务中最小的事务id，也就是m_ids中的最小值
-  - max_trx_id  表示生成ReadView时系统中应该分配给下一个事务的id值
-  - creator_trx_id  表示生成该ReadView的事务的事务id  
+  - m_ids  生成ReadView时，系统中所有未提交事务ID列表（活跃事务）
+  - min_trx_id  m_ids中最小的事务ID
+  - max_trx_id  当前系统即将分配的下一个事务ID
+  - creator_trx_id  创建该ReadView的事务ID  
 - 访问过程
-  - 如果被访问版本的trx_id属性值与ReadView中的creator_trx_id值相同，意味着当前事务在访问它自己修改过的记录，所以该版本可以被当前事务访问  
-  - 如果被访问版本的trx_id属性值小于ReadView中的min_trx_id值，表明生成该版本的事务在当前事务生成ReadView前已经提交，所以该版本可以被当前事务访问  
-  - 如果被访问版本的trx_id属性值大于或等于ReadView中的max_trx_id值，表明生成该版本的事务在当前事务生成ReadView后才开启，所以该版本不可以被当前事务访问
-  - 如果被访问版本的trx_id属性值在ReadView的min_trx_id和max_trx_id之间，那就需要判断一下trx_id属性值是不是在m_ids列表中，如果在，说明创建ReadView时生成该版本的事务还是活跃的，该版本不可以被访问；如果不在，说明创建ReadView时生成该版本的事务已经被提交，该版本可以被访问  
+  - trx_id == creator_trx_id，可见(读自己修改) 
+  - trx_id < min_trx_id，可见(生成ReadView前已提交)
+  - trx_id >= max_trx_id，不可见(生成ReadView 之后才开始)
+  - trx_id in m_ids, 不可见(事务还未提交)，否则可见(事务已提交)
 - 生成时机  
   - READ COMMITTED  每次读取数据前都生成一个ReadView  
   - REPEATABLE READ  第一次读取数据时生成一个ReadView  
+- 常见问题
+  - 可重复读隔离级别，出现幻读的情况(快照读中混用了当前读)
+    - 事务A先执行快照读，事务B插入记录，事务A再执行当前读，仍然会出现幻读  
+    - 事务A先执行快照读，事务B插入记录，事务A更新了事务B插入的记录，事务A再执行当前读，仍然会出现幻读
 
-常见问题
-- 可重复读隔离级别，出现幻读的情况
-  - 快照读  
-    - 事务B插入记录，事务A更新了事务B插入的记录，事务A就能看到事务B插入的记录，仍然会出现幻读
-  - 当前读
-    - 事务A先执行快照读，事务B插入一条记录，事务A再执行当前读，仍然会出现幻读  
 ```
 
 ## 日志
